@@ -1,0 +1,33 @@
+;Define registers
+macro A { 0 }
+macro B { 1 }
+macro C { 2 }
+macro D { 3 }
+
+;Checks if register is valid value
+macro ValidateRegister register {
+	if(!(0 <= register && register <= 3)) {
+		error "Invalid register " + register
+	}
+}
+
+;Defines Addition code of operation. This command adds register A with the provided register as a parameter.
+;Code of operation is 8 bit number with high 6 bits code of addition and 2 low bits register number to add to A.
+macro ADD register {
+	; Make sure the register is a valid number
+	ValidateRegister register
+	;Code of ADD operation is 0b011001 concatenate it with register number to produce actual code of operation
+	0b01100100 | register
+}
+
+;Defines halt CPU command
+macro HALT {
+	;code of operation for halt command is 0
+	0
+}
+
+macro main {
+	;sample program that adds value in register B to value in register A and store the result in register A, then it halts the execution
+	ADD B
+	HALT
+}

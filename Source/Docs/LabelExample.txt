@@ -1,0 +1,12 @@
+macro Quote argument {
+	argument
+}
+
+macro main {
+	Quote 3
+	Quote 4
+MyLabel:
+	Quote 5
+	Quote MyLabel
+	Quote 6
+}

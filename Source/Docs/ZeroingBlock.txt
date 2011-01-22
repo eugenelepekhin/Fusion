@@ -1,0 +1,10 @@
+macro Fill value, size {
+	if(size > 0) {
+		value
+		Fill value, size - 1
+	}
+}
+
+macro main {
+	Fill 0xAB, 10
+}
