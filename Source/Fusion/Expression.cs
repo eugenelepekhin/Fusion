@@ -22,7 +22,7 @@ namespace Fusion {
 		}
 
 		public abstract Value Evaluate(Context context, bool generate);
-		public abstract Value Evaluate();
+		public abstract Value Reevaluate();
 
 		public override int Size() {
 			return 1;
@@ -46,7 +46,7 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -68,7 +68,7 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			Debug.Assert(this.Context.IsLabelDefined(this.Name));
 			return new NumberValue(this.Context.LabelValue(this.Name));
 		}
@@ -85,7 +85,7 @@ namespace Fusion {
 			return this.Value;
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			return this.Value;
 		}
 	}
@@ -125,7 +125,7 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -142,7 +142,7 @@ namespace Fusion {
 			return context.Argument(this.ParameterName);
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -169,7 +169,7 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -207,7 +207,7 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			Debug.Assert(this.Context != null);
 			return this.Evaluate(this.Context, false);
 		}
@@ -389,7 +389,7 @@ namespace Fusion {
 			return new NumberValue(operation(leftNumber.Value, rightNumber.Value));
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			Debug.Assert(this.Context != null);
 			return this.Evaluate(this.Context, false);
 		}
@@ -436,7 +436,7 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -470,7 +470,7 @@ namespace Fusion {
 			return this.Macro.Body.Evaluate(callContext, generate);
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}
@@ -507,7 +507,7 @@ namespace Fusion {
 			return list;
 		}
 
-		public override Value Evaluate() {
+		public override Value Reevaluate() {
 			throw new InvalidOperationException();
 		}
 	}

@@ -138,7 +138,7 @@ namespace Fusion {
 				} else {
 					Expression expression = this.List[i] as Expression;
 					if(expression != null) {
-						this.List[i] = expression.Evaluate();
+						this.List[i] = expression.Reevaluate();
 						Debug.Assert(!(this.List[i] is Expression));
 					}
 				}
