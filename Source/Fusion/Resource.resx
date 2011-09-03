@@ -205,6 +205,9 @@
     <value>{0} ({1})</value>
     <comment>{string file, int line}</comment>
   </data>
+  <data name="PrimaryItem" xml:space="preserve">
+    <value>Identifier, literal, "(", or keyword</value>
+  </data>
   <data name="StringOrNumberValueExpected" xml:space="preserve">
     <value>Number or string value expected at {0}</value>
     <comment>{string position}</comment>

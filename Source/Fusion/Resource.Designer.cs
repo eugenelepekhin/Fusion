@@ -204,6 +204,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to Identifier, literal, "(", or keyword.
+		/// </summary>
+ 		internal static string PrimaryItem {
+			get { return ResourceManager.GetString("PrimaryItem", Culture); }
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Number or string value expected at {0}.
 		/// </summary>
  		public static string StringOrNumberValueExpected(string position) {

@@ -348,7 +348,7 @@ namespace Fusion {
 			if(token.IsEOS()) {
 				this.FatalError(Resource.UnexpectedEOF(token.Position.ToString()));
 			} else {
-				this.Error(Resource.ItemExpected("Identifier, literal, \"(\", or keyword", token.Value, token.Position.ToString()));
+				this.Error(Resource.ItemExpected(Resource.PrimaryItem, token.Value, token.Position.ToString()));
 			}
 			return null;
 		}
