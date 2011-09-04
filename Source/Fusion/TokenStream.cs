@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 
 namespace Fusion {
-	public class TokenStream : IDisposable {
+	public sealed class TokenStream : IDisposable {
 		public Assembler Assembler { get; set; }
 		public string Path { get; private set; }
 		private StreamReader reader;
@@ -24,7 +24,7 @@ namespace Fusion {
 			while(this.Assembler.CanContinue) {
 				int c = this.Skip();
 				if(c == -1) {
-					return new Token(new Position(this.Path, this.line), TokenType.EOS, null);
+					return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
 				}
 				if(TokenStream.IsDecimalDigit(c)) {
 					return this.Number(c);
@@ -41,7 +41,7 @@ namespace Fusion {
 				this.Assembler.Error(Resource.UnexpectedChar((char)c, c, new Position(this.Path, this.line).ToString()));
 				c = this.SkipLine(c);
 			}
-			return new Token(new Position(this.Path, this.line), TokenType.EOS, null);
+			return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
 		}
 
 		public void SkipLine() {

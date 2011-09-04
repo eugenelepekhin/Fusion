@@ -8,6 +8,6 @@ namespace Fusion {
 		Separator,
 		Operator,
 		Comparison,
-		EOS
+		Eos
 	}
 }

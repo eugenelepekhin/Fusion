@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -92,16 +93,17 @@ namespace Fusion {
 			}
 		}
 
+		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		private void FirstPass(string file) {
 			using(ParseStream stream = new ParseStream(this, file)) {
 				Dictionary<string, MacroDefinition> macro = new Dictionary<string, MacroDefinition>();
 				while(this.CanContinue) {
 					Token token = stream.First();
-					while(this.CanContinue && !token.IsEOS() && !token.IsIdentifier(Assembler.MacroName)) {
+					while(this.CanContinue && !token.IsEos() && !token.IsIdentifier(Assembler.MacroName)) {
 						this.Error(Resource.MacroExpected(token.Position.ToString()));
 						token = stream.First();
 					}
-					if(!this.CanContinue || token.IsEOS()) break;
+					if(!this.CanContinue || token.IsEos()) break;
 					Token name = stream.Next();
 					if(!token.IsIdentifier()) {
 						this.Error(Resource.MacroNameExpected(name.Value, name.Position.ToString()));
@@ -141,7 +143,7 @@ namespace Fusion {
 							count--;
 						} else if(next.IsSeparator("{")) {
 							count++;
-						} else if(next.IsEOS()) {
+						} else if(next.IsEos()) {
 							this.FatalError(Resource.UnexpectedEOF(next.Position.ToString()));
 							break;
 						} if(next.IsSeparator(":")) {
@@ -166,7 +168,7 @@ namespace Fusion {
 			using(ParseStream stream = new ParseStream(this, file)) {
 				while(this.CanContinue) {
 					Token token = stream.First();
-					if(token.IsEOS()) break;
+					if(token.IsEos()) break;
 					if(!token.IsIdentifier(Assembler.MacroName)) {
 						this.FatalError(Resource.MacroExpected(token.Position.ToString()));
 						return;
@@ -325,9 +327,9 @@ namespace Fusion {
 				} else if(token.TextEqual(Assembler.ErrorName)) {
 					return new Error() { Token = token, Text = this.ParseOr(macro, stream, stream.Next()) };
 				} else if(macro.IsParameter(token)) {
-					return this.ParseParameter(macro, stream, token);
+					return Assembler.ParseParameter(macro, token);
 				} else if(macro.IsLabel(token)) {
-					return this.ParseLabel(macro, stream, token);
+					return Assembler.ParseLabel(macro, token);
 				} else {
 					return this.ParseCall(macro, stream, token);
 				}
@@ -345,7 +347,7 @@ namespace Fusion {
 			if(token.IsNumber() || token.IsString()) {
 				return new Literal() { Value = token };
 			}
-			if(token.IsEOS()) {
+			if(token.IsEos()) {
 				this.FatalError(Resource.UnexpectedEOF(token.Position.ToString()));
 			} else {
 				this.Error(Resource.ItemExpected(Resource.PrimaryItem, token.Value, token.Position.ToString()));
@@ -376,12 +378,13 @@ namespace Fusion {
 			return new If() { IfToken = token, Condition = condition, Then = thenList, Else = elseList };
 		}
 
-		private Expression ParseParameter(MacroDefinition macro, ParseStream stream, Token token) {
+		private static Expression ParseParameter(MacroDefinition macro, Token token) {
 			Debug.Assert(token.IsIdentifier() && macro.IsParameter(token), "Token should be the name of the parameter");
 			return new Parameter() { Macro = macro, ParameterName = token };
 		}
 
-		private Expression ParseLabel(MacroDefinition macro, ParseStream stream, Token token) {
+		[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId = "macro")]
+		private static Expression ParseLabel(MacroDefinition macro, Token token) {
 			Debug.Assert(token.IsIdentifier() && macro.IsLabel(token), "Token should be label");
 			return new LabelReference() { Name = token };
 		}

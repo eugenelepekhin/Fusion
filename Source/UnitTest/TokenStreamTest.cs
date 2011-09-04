@@ -106,7 +106,7 @@ namespace UnitTest {
 				this.TestNextToken(ts, 21, TokenType.Identifier, "def");
 				this.TestNextToken(ts, 22, TokenType.Comparison, "!=");
 				this.TestNextToken(ts, 22, TokenType.String, "hello,\n world");
-				this.TestNextToken(ts, 23, TokenType.EOS, null);
+				this.TestNextToken(ts, 23, TokenType.Eos, null);
 
 				Assert.AreEqual(2, assembler.ErrorCount);
 			}

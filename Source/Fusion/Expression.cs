@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
 
 namespace Fusion {
 	public abstract class Expression : Value {
 		public abstract void WriteText(TextWriter writer, int indent);
-		protected void Indent(TextWriter writer, int indent) {
-			for(int i = 0; i < indent; i++) {
+
+		protected static void Indent(TextWriter writer, int count) {
+			for(int i = 0; i < count; i++) {
 				writer.Write('\t');
 			}
 		}
 
 		public override string ToString() {
-			using(StringWriter writer = new StringWriter()) {
+			using(StringWriter writer = new StringWriter(CultureInfo.InvariantCulture)) {
 				this.WriteText(writer, 0);
 				return writer.ToString();
 			}
@@ -152,7 +155,7 @@ namespace Fusion {
 		public Expression Text { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
-			this.Indent(writer, indent);
+			Expression.Indent(writer, indent);
 			writer.Write(this.Token.Value);
 			writer.Write(" ");
 			this.Text.WriteText(writer, 0);
@@ -227,6 +230,7 @@ namespace Fusion {
 			this.Right.WriteText(writer, 0);
 		}
 
+		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public override Value Evaluate(Context context, bool generate) {
 			switch(this.Operation.Value) {
 			case "||": return this.BooleanOr(context, generate);
@@ -408,12 +412,12 @@ namespace Fusion {
 			this.Then.WriteText(writer, indent + 1);
 			if(this.Else != null) {
 				writer.WriteLine();
-				this.Indent(writer, indent);
+				Expression.Indent(writer, indent);
 				writer.WriteLine("} else {");
 				this.Else.WriteText(writer, indent + 1);
 			}
 			writer.WriteLine();
-			this.Indent(writer, indent);
+			Expression.Indent(writer, indent);
 			writer.WriteLine("}");
 		}
 
@@ -444,6 +448,7 @@ namespace Fusion {
 	public class Call : Expression {
 		public Token Name { get; set; }
 		public MacroDefinition Macro { get; set; }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public List<Expression> Parameter { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
@@ -476,11 +481,12 @@ namespace Fusion {
 	}
 
 	public class ExpressionList : Expression {
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public List<Expression> List { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
 			foreach(Expression expr in this.List) {
-				this.Indent(writer, indent);
+				Expression.Indent(writer, indent);
 				expr.WriteText(writer, indent);
 				writer.WriteLine();
 			}

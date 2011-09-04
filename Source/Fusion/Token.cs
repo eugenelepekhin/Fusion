@@ -11,7 +11,7 @@ namespace Fusion {
 		public string Value { get; private set; }
 
 		public Token(Position position, TokenType tokenType, string value) {
-			Debug.Assert(!string.IsNullOrEmpty(value) || tokenType == Fusion.TokenType.EOS);
+			Debug.Assert(!string.IsNullOrEmpty(value) || tokenType == Fusion.TokenType.Eos);
 			this.Position = position;
 			this.TokenType = tokenType;
 			this.Value = value;
@@ -33,7 +33,7 @@ namespace Fusion {
 		public bool IsComparison() { return this.TokenType == Fusion.TokenType.Comparison; }
 		public bool IsComparison(string text) { return this.IsComparison() && this.TextEqual(text); }
 		public bool IsComparison(params string[] text) { return this.IsComparison() && this.TextEqual(text); }
-		public bool IsEOS() { return this.TokenType == Fusion.TokenType.EOS; }
+		public bool IsEos() { return this.TokenType == Fusion.TokenType.Eos; }
 
 		public bool Equals(Token other) {
 			return this.TokenType == other.TokenType && this.TextEqual(other.Value);
@@ -86,7 +86,7 @@ namespace Fusion {
 
 		#if DEBUG
 			public override string ToString() {
-				return string.Format("{0} \"{1}\" @ line {2}", this.TokenType, this.Value, this.Position.Line);
+				return string.Format(CultureInfo.InvariantCulture, "{0} \"{1}\" @ line {2}", this.TokenType, this.Value, this.Position.Line);
 			}
 		#endif
 	}

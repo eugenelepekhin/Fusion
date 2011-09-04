@@ -88,7 +88,7 @@ namespace UnitTest {
 				this.TestFirst(stream, TokenType.Number, "123");
 				this.TestFirst(stream, TokenType.Identifier, "def");
 				this.TestFirst(stream, TokenType.Number, "456");
-				this.TestFirst(stream, TokenType.EOS, null);
+				this.TestFirst(stream, TokenType.Eos, null);
 			}
 		}
 
@@ -104,7 +104,7 @@ namespace UnitTest {
 				this.TestNext(stream, TokenType.Number, "123");
 				this.TestFirst(stream, TokenType.Identifier, "def");
 				this.TestNext(stream, TokenType.Number, "456");
-				this.TestFirst(stream, TokenType.EOS, null);
+				this.TestFirst(stream, TokenType.Eos, null);
 			}
 		}
 	}

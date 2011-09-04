@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace Fusion {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
 	public struct Position {
 		private string file;
 		public string File { get { return this.file; } }

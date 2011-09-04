@@ -141,11 +141,11 @@
     <comment>{string file, string position}</comment>
   </data>
   <data name="IncompleteCondition" xml:space="preserve">
-    <value>Condition is incomplete value. Only aready defined labes can be used in condition at {0}</value>
+    <value>Condition is incomplete value. Only already defined labels can be used in condition at {0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="IncompleteError" xml:space="preserve">
-    <value>Incomclusive error message at {0}</value>
+    <value>Inconclusive error message at {0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="IncorrectNumber" xml:space="preserve">
@@ -157,7 +157,7 @@
     <comment>{string type, long offset}</comment>
   </data>
   <data name="InternalError" xml:space="preserve">
-    <value>Internal assember error.</value>
+    <value>Internal assembler error.</value>
   </data>
   <data name="ItemExpected" xml:space="preserve">
     <value>{0} is expected instead of {1} at {2}</value>
@@ -198,7 +198,7 @@
     <comment>{string keyword, string position}</comment>
   </data>
   <data name="ParameterRedefinition" xml:space="preserve">
-    <value>Macro {0} already contins parameter {1} at {2}</value>
+    <value>Macro {0} already contains parameter {1} at {2}</value>
     <comment>{string macro, string parameter, string position}</comment>
   </data>
   <data name="PositionText" xml:space="preserve">

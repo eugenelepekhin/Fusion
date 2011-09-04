@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 
 namespace Fusion {
-	public class ParseStream : IDisposable {
+	public sealed class ParseStream : IDisposable {
 
 		public Assembler Assembler { get; private set; }
 		private Stack<TokenStream> include = new Stack<TokenStream>();
@@ -28,6 +28,7 @@ namespace Fusion {
 			}
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
 		public Token First() {
 			if(this.returned != null) {
 				return this.Returned();
@@ -35,7 +36,7 @@ namespace Fusion {
 			Debug.Assert(this.IsOpened);
 			for(;;) {
 				Token token = this.TokenStream.Next();
-				if(token.IsEOS()) {
+				if(token.IsEos()) {
 					this.Close();
 					if(this.IsOpened) {
 						continue;
@@ -65,7 +66,7 @@ namespace Fusion {
 			}
 			Debug.Assert(this.IsOpened);
 			Token token = this.TokenStream.Next();
-			if(token.IsEOS()) {
+			if(token.IsEos()) {
 				this.Close();
 				this.Assembler.FatalError(Resource.UnexpectedEOF(token.Position.ToString()));
 			}

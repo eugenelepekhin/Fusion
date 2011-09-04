@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -80,7 +81,7 @@ namespace Fusion {
 		}
 		#if DEBUG
 			public override string ToString() {
-				return string.Format("NumberValue(0x{0:X})", this.Value);
+				return string.Format(CultureInfo.InvariantCulture, "NumberValue(0x{0:X})", this.Value);
 			}
 		#endif
 	}
@@ -115,7 +116,7 @@ namespace Fusion {
 		}
 		#if DEBUG
 			public override string ToString() {
-				return string.Format("StringValue({0})", this.Value);
+				return string.Format(CultureInfo.InvariantCulture, "StringValue({0})", this.Value);
 			}
 		#endif
 	}

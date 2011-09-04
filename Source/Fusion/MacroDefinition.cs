@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,7 +53,7 @@ namespace Fusion {
 		}
 
 		public override string ToString() {
-			using(StringWriter writer = new StringWriter()) {
+			using(StringWriter writer = new StringWriter(CultureInfo.InvariantCulture)) {
 				this.Write(writer);
 				return writer.ToString();
 			}

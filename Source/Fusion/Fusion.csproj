@@ -12,6 +12,8 @@
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>Fusion.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,6 +42,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Expression.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="MacroDefinition.cs" />
     <Compile Include="ParseStream.cs" />
     <Compile Include="Position.cs" />
@@ -60,6 +63,9 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Fusion.ruleset" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

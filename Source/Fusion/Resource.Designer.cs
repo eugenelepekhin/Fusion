@@ -85,14 +85,14 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Condition is incomplete value. Only aready defined labes can be used in condition at {0}.
+		/// Looks up a localized string similar to Condition is incomplete value. Only already defined labels can be used in condition at {0}.
 		/// </summary>
  		public static string IncompleteCondition(string position) {
 			return string.Format(Culture, ResourceManager.GetString("IncompleteCondition", Culture), position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Incomclusive error message at {0}.
+		/// Looks up a localized string similar to Inconclusive error message at {0}.
 		/// </summary>
  		public static string IncompleteError(string position) {
 			return string.Format(Culture, ResourceManager.GetString("IncompleteError", Culture), position);
@@ -113,7 +113,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Internal assember error..
+		/// Looks up a localized string similar to Internal assembler error..
 		/// </summary>
  		internal static string InternalError {
 			get { return ResourceManager.GetString("InternalError", Culture); }
@@ -190,7 +190,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Macro {0} already contins parameter {1} at {2}.
+		/// Looks up a localized string similar to Macro {0} already contains parameter {1} at {2}.
 		/// </summary>
  		public static string ParameterRedefinition(string macro, string parameter, string position) {
 			return string.Format(Culture, ResourceManager.GetString("ParameterRedefinition", Culture), macro, parameter, position);
