@@ -12,6 +12,7 @@ namespace Fusion {
 		public List<Token> Parameter { get; private set; }
 		public List<Token> Label { get; private set; }
 		public ExpressionList Body { get; set; }
+		public bool Atomic { get; set; }
 
 		public MacroDefinition(Token name) {
 			Debug.Assert(name != null);
@@ -30,6 +31,9 @@ namespace Fusion {
 
 		public void Write(TextWriter writer) {
 			writer.WriteLine();
+			if(this.Atomic) {
+				writer.Write("atomic ");
+			}
 			writer.Write("macro ");
 			writer.Write(this.Name.Value);
 			for(int i = 0; i < this.Parameter.Count; i++) {

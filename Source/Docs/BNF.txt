@@ -4,7 +4,7 @@
 <IncludeStatement> ::= include <String>
 <String> ::= "<StringChars>"
 <MacroDefinition> ::= <MacroKeyword> <MacroName> <FormalParameterList> { <MacroBody> }
-<MacroKeyword> ::= macro
+<MacroKeyword> ::= macro | atomic macro
 <MacroName> ::= <Identifier>
 <FormalParameterList> ::= <EmptyParameterList> | <ParameterList>
 <EmptyParameterList> ::=

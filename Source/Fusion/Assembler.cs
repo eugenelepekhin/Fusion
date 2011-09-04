@@ -99,8 +99,13 @@ namespace Fusion {
 				Dictionary<string, MacroDefinition> macro = new Dictionary<string, MacroDefinition>();
 				while(this.CanContinue) {
 					Token token = stream.First();
+					bool atomic = false;
 					while(this.CanContinue && !token.IsEos() && !token.IsIdentifier(Assembler.MacroName)) {
-						this.Error(Resource.MacroExpected(token.Position.ToString()));
+						if(token.IsIdentifier(Assembler.AtomicName)) {
+							atomic = true;
+						} else {
+							this.Error(Resource.MacroExpected(token.Position.ToString()));
+						}
 						token = stream.First();
 					}
 					if(!this.CanContinue || token.IsEos()) break;
@@ -113,7 +118,7 @@ namespace Fusion {
 						this.Error(Resource.MacroNameRedefinition(name.Value, name.Position.ToString()));
 						continue;
 					}
-					MacroDefinition macroDefinition = new MacroDefinition(name);
+					MacroDefinition macroDefinition = new MacroDefinition(name) { Atomic = atomic };
 					macro.Add(name.Value, macroDefinition);
 					Token next = stream.Next();
 					while(this.CanContinue && next.IsIdentifier()) {
@@ -169,6 +174,11 @@ namespace Fusion {
 				while(this.CanContinue) {
 					Token token = stream.First();
 					if(token.IsEos()) break;
+					bool atomic = false;
+					if(token.IsIdentifier(Assembler.AtomicName)) {
+						atomic = true;
+						token = stream.Next();
+					}
 					if(!token.IsIdentifier(Assembler.MacroName)) {
 						this.FatalError(Resource.MacroExpected(token.Position.ToString()));
 						return;
@@ -180,6 +190,10 @@ namespace Fusion {
 					}
 					MacroDefinition macro = this.Macro[name.Value];
 					Debug.Assert(macro.Name.Equals(name));
+					if(macro.Atomic != atomic) {
+						this.FatalError(Resource.FileChanged);
+						return;
+					}
 					for(int i = 0; i < macro.Parameter.Count; i++) {
 						if(0 < i) {
 							if(!stream.Next().IsSeparator(",")) {
