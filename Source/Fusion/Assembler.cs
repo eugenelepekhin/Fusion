@@ -8,6 +8,13 @@ using System.Text;
 namespace Fusion {
 	public class Assembler {
 
+		private const string MainName = "main";
+		private const string AtomicName = "atomic";
+		private const string MacroName = "macro";
+		private const string ErrorName = "error";
+		private const string IfName = "if";
+		private const string ElseName = "else";
+
 		public TextWriter StdErr { get; private set; }
 		public TextWriter StdOut { get; private set; }
 		public BinaryWriter Writer { get; private set; }
@@ -51,7 +58,7 @@ namespace Fusion {
 			this.SecondPass(file);
 			if(0 < this.ErrorCount) return;
 			MacroDefinition main;
-			if(!this.Macro.TryGetValue("main", out main)) {
+			if(!this.Macro.TryGetValue(Assembler.MainName, out main)) {
 				this.Error(Resource.MainMissing);
 				return;
 			}
@@ -61,10 +68,10 @@ namespace Fusion {
 		}
 
 		public void Expand() {
-			MacroDefinition main = this.Macro["main"];
+			MacroDefinition main = this.Macro[Assembler.MainName];
 			Debug.Assert(main.Parameter.Count == 0);
 			Call call = new Call() {
-				Name = new Token(new Position(string.Empty, 1), TokenType.Identifier, "main"),
+				Name = new Token(new Position(string.Empty, 1), TokenType.Identifier, Assembler.MainName),
 				Macro = main,
 				Parameter = new List<Expression>(0)
 			};
@@ -90,7 +97,7 @@ namespace Fusion {
 				Dictionary<string, MacroDefinition> macro = new Dictionary<string, MacroDefinition>();
 				while(this.CanContinue) {
 					Token token = stream.First();
-					while(this.CanContinue && !token.IsEOS() && !token.IsIdentifier("macro")) {
+					while(this.CanContinue && !token.IsEOS() && !token.IsIdentifier(Assembler.MacroName)) {
 						this.Error(Resource.MacroExpected(token.Position.ToString()));
 						token = stream.First();
 					}
@@ -111,7 +118,7 @@ namespace Fusion {
 						if(macroDefinition.Parameter.Any(other => other.Equals(next))) {
 							this.Error(Resource.ParameterRedefinition(name.Value, next.Value, next.Position.ToString()));
 						}
-						if(next.IsIdentifier("macro", "error", "if", "else")) {
+						if(next.IsIdentifier(Assembler.MacroName, Assembler.ErrorName, Assembler.IfName, Assembler.ElseName)) {
 							this.Error(Resource.ParameterKeyword(next.Value, next.Position.ToString()));
 						}
 						macroDefinition.Parameter.Add(next);
@@ -160,7 +167,7 @@ namespace Fusion {
 				while(this.CanContinue) {
 					Token token = stream.First();
 					if(token.IsEOS()) break;
-					if(!token.IsIdentifier("macro")) {
+					if(!token.IsIdentifier(Assembler.MacroName)) {
 						this.FatalError(Resource.MacroExpected(token.Position.ToString()));
 						return;
 					}
@@ -313,9 +320,9 @@ namespace Fusion {
 
 		private Expression Primary(MacroDefinition macro, ParseStream stream, Token token) {
 			if(token.IsIdentifier()) {
-				if(token.TextEqual("if")) {
+				if(token.TextEqual(Assembler.IfName)) {
 					return this.ParseIf(macro, stream, token);
-				} else if(token.TextEqual("error")) {
+				} else if(token.TextEqual(Assembler.ErrorName)) {
 					return new Error() { Token = token, Text = this.ParseOr(macro, stream, stream.Next()) };
 				} else if(macro.IsParameter(token)) {
 					return this.ParseParameter(macro, stream, token);
@@ -347,7 +354,7 @@ namespace Fusion {
 		}
 
 		private Expression ParseIf(MacroDefinition macro, ParseStream stream, Token token) {
-			Debug.Assert(token.IsIdentifier("if"));
+			Debug.Assert(token.IsIdentifier(Assembler.IfName));
 			if(!this.EnsureSeparator(stream.Next(), "(")) return null;
 			Expression condition = this.ParseOr(macro, stream, stream.Next());
 			if(condition == null) return null;
@@ -358,7 +365,7 @@ namespace Fusion {
 			if(!this.CanContinue) return null;
 			ExpressionList elseList = null;
 			Token elseToken = stream.Next();
-			if(elseToken.IsIdentifier("else")) {
+			if(elseToken.IsIdentifier(Assembler.ElseName)) {
 				if(!this.EnsureSeparator(stream.Next(), "{")) return null;
 				elseList = new ExpressionList() { List = new List<Expression>() };
 				this.ParseExpressionList(macro, stream, elseList);
