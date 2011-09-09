@@ -182,6 +182,9 @@ namespace UnitTest {
 			this.CompileTest("macro main{0 m a << b 2 a:3 b:4} macro m x{x}", 0, 0x30, 2, 3, 4);
 			this.CompileTest("macro main{0 b & a 2 a:3 b:4}", 0, 0, 2, 3, 4);
 			this.CompileTest("macro main{0 m b | a 2 a:3 b:4} macro m x{x}", 0, 7, 2, 3, 4);
+
+			this.CompileTest("macro main{0 a:1 2 3 b:4 5 b-a}", 0, 1, 2, 3, 4, 5, 3);
+			this.CompileTest("macro main{0 a:1 2 3 b:4 5 m b,a} macro m max, min{max-min+10}", 0, 1, 2, 3, 4, 5, 13);
 		}
 
 		/// <summary>
