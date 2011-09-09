@@ -71,7 +71,7 @@ namespace UnitTest {
 		}
 
 		/// <summary>
-		///A test for Compile First Pass
+		///A test for Compile
 		///</summary>
 		[TestMethod()]
 		public void AssemblerCompileTest() {
@@ -123,9 +123,10 @@ namespace UnitTest {
 			this.CompileTest("macro main{l1:if(a>2*a){3}else{4}l2:a l2 l1} macro a{5}", 4, 5, 1, 0);
 			this.CompileTest("macro main{\"ab\" l1:if(a>2*a){3}else{4}l2:a l2 l1} macro a{5}", 'a' & 0xFF, 'b' & 0xFF, 0, 4, 5, 4, 3);
 
-			// passing labes to macro
+			// passing labels to macro
 			this.CompileTest("macro main{6 a:7 m a,b b:5} macro m a,b{a b}", 6, 7, 1, 4, 5);
 			this.CompileTest("macro main{6 a:4 m a,b b:5} macro m a,b{n a,b 2 3} macro n a,b{7 a b 9}", 6, 4, 7, 1, 8, 9, 2, 3, 5);
+			this.CompileTest("macro main{6 a b+100 b:5} macro a b{c b+10} macro c b{b}", 6, 112, 5);
 			this.CompileTest("macro main{6 a:4 m a,b+100 b:5} macro m a,b{n a,10+b 2 3} macro n a,b{7 a o b+100 9} macro o p{10+p}", 6, 4, 7, 1, 228, 9, 2, 3, 5);
 			this.CompileTest("macro main{0 a:1 m a,b,c b:2 c:3} macro m a,b,c{n a+10,b+c+20,c-a+30} macro n a,b,c{a+100 b c+200-b}", 0, 1, 111, 31, 204, 2, 3);
 
@@ -181,6 +182,15 @@ namespace UnitTest {
 			this.CompileTest("macro main{0 m a << b 2 a:3 b:4} macro m x{x}", 0, 0x30, 2, 3, 4);
 			this.CompileTest("macro main{0 b & a 2 a:3 b:4}", 0, 0, 2, 3, 4);
 			this.CompileTest("macro main{0 m b | a 2 a:3 b:4} macro m x{x}", 0, 7, 2, 3, 4);
+		}
+
+		/// <summary>
+		///A test for investigation of Compile errors
+		///</summary>
+		[TestMethod()]
+		public void CompileSpecialCase() {
+			this.CompileTest("macro main{6 a:4 m a,b+100 b:5} macro m a,b{n a,10+b 2 3} macro n a,b{7 a o b+100 9} macro o p{10+p}", 6, 4, 7, 1, 228, 9, 2, 3, 5);
+			this.CompileTest("macro main{6 a b+100 b:5} macro a b{c b+10} macro c b{b}", 6, 112, 5);
 		}
 	}
 }

@@ -24,8 +24,7 @@ namespace Fusion {
 			}
 		}
 
-		public abstract Value Evaluate(Context context, bool generate);
-		public abstract Value Reevaluate();
+		public abstract Value Evaluate(Context context, int address);
 
 		public override int Size() {
 			return 1;
@@ -44,13 +43,9 @@ namespace Fusion {
 			writer.WriteLine(":");
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			context.DefineLabel(this.Name, context.Assembler.Address);
+		public override Value Evaluate(Context context, int address) {
+			context.DefineLabel(this.Name, address);
 			return VoidValue.Value;
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 
@@ -62,18 +57,14 @@ namespace Fusion {
 			writer.Write(this.Name.Value);
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			Context currentContext = this.Context ?? context;
-			if(currentContext.IsLabelDefined(this.Name)) {
-				return new NumberValue(currentContext.LabelValue(this.Name));
+		public override Value Evaluate(Context context, int address) {
+			context = this.Context ?? context;
+			Debug.Assert(context != null);
+			if(context.IsLabelDefined(this.Name)) {
+				return new NumberValue(context.LabelValue(this.Name));
 			} else {
-				return new LabelReference() { Name = this.Name, Context = currentContext };
+				return new LabelReference() { Name = this.Name, Context = context };
 			}
-		}
-
-		public override Value Reevaluate() {
-			Debug.Assert(this.Context.IsLabelDefined(this.Name));
-			return new NumberValue(this.Context.LabelValue(this.Name));
 		}
 	}
 
@@ -84,11 +75,7 @@ namespace Fusion {
 			throw new InvalidOperationException();
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			return this.Value;
-		}
-
-		public override Value Reevaluate() {
+		public override Value Evaluate(Context context, int address) {
 			return this.Value;
 		}
 	}
@@ -120,16 +107,12 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
+		public override Value Evaluate(Context context, int address) {
 			if(this.Value.IsNumber()) {
 				return new NumberValue(this.Value.Number);
 			} else {
 				return new StringValue(this.Value.Value);
 			}
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 
@@ -141,12 +124,8 @@ namespace Fusion {
 			writer.Write(this.ParameterName.Value);
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
+		public override Value Evaluate(Context context, int address) {
 			return context.Argument(this.ParameterName);
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 
@@ -162,18 +141,14 @@ namespace Fusion {
 			writer.WriteLine();
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			Value text = this.Text.Evaluate(context, false);
+		public override Value Evaluate(Context context, int address) {
+			Value text = this.Text.Evaluate(context, 0);
 			if(text.IsComplete) {
 				context.Assembler.Error(text.ToString());
 			} else {
 				context.Assembler.Error(Resource.IncompleteError(this.Token.Position.ToString()));
 			}
 			return VoidValue.Value;
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 
@@ -189,10 +164,12 @@ namespace Fusion {
 			writer.Write(")");
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			Value operand = this.Operand.Evaluate(context, false).ToSingular();
+		public override Value Evaluate(Context context, int address) {
+			context = this.Context ?? context;
+			Debug.Assert(context != null);
+			Value operand = this.Operand.Evaluate(context, 0).ToSingular();
 			if(!operand.IsComplete) {
-				return new Unary() { Operation = this.Operation, Operand = (Expression)operand, Context = this.Context ?? context };
+				return new Unary() { Operation = this.Operation, Operand = (Expression)operand, Context = context };
 			}
 			NumberValue number = operand.ToNumber();
 			if(number == null) {
@@ -208,11 +185,6 @@ namespace Fusion {
 				Debug.Fail("Unknown unary operator");
 				throw new InvalidOperationException();
 			}
-		}
-
-		public override Value Reevaluate() {
-			Debug.Assert(this.Context != null);
-			return this.Evaluate(this.Context, false);
 		}
 	}
 
@@ -231,45 +203,47 @@ namespace Fusion {
 		}
 
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
-		public override Value Evaluate(Context context, bool generate) {
+		public override Value Evaluate(Context context, int address) {
+			context = this.Context ?? context;
+			Debug.Assert(context != null);
 			switch(this.Operation.Value) {
-			case "||": return this.BooleanOr(context, generate);
-			case "&&": return this.BooleanAnd(context, generate);
-			case "<":  return this.Compare(context, generate, r => r < 0);
-			case "<=": return this.Compare(context, generate, r => r <= 0);
-			case "==": return this.Compare(context, generate, r => r == 0);
-			case "!=": return this.Compare(context, generate, r => r != 0);
-			case ">=": return this.Compare(context, generate, r => r >= 0);
-			case ">":  return this.Compare(context, generate, r => r > 0);
-			case "+":  return this.Plus(context, generate);
-			case "-":  return this.Numeric(context, generate, (a, b) => a - b);
-			case "*":  return this.Numeric(context, generate, (a, b) => a * b);
-			case "/":  return this.Numeric(context, generate, (a, b) => a / b);
-			case "%":  return this.Numeric(context, generate, (a, b) => a % b);
-			case "&":  return this.Numeric(context, generate, (a, b) => a & b);
-			case "|":  return this.Numeric(context, generate, (a, b) => a | b);
-			case "^":  return this.Numeric(context, generate, (a, b) => a ^ b);
-			case "<<": return this.Numeric(context, generate, (a, b) => a << b);
-			case ">>": return this.Numeric(context, generate, (a, b) => a >> b);
+			case "||": return this.BooleanOr(context);
+			case "&&": return this.BooleanAnd(context);
+			case "<":  return this.Compare(context, r => r < 0);
+			case "<=": return this.Compare(context, r => r <= 0);
+			case "==": return this.Compare(context, r => r == 0);
+			case "!=": return this.Compare(context, r => r != 0);
+			case ">=": return this.Compare(context, r => r >= 0);
+			case ">":  return this.Compare(context, r => r > 0);
+			case "+":  return this.Plus(context);
+			case "-":  return this.Numeric(context, (a, b) => a - b);
+			case "*":  return this.Numeric(context, (a, b) => a * b);
+			case "/":  return this.Numeric(context, (a, b) => a / b);
+			case "%":  return this.Numeric(context, (a, b) => a % b);
+			case "&":  return this.Numeric(context, (a, b) => a & b);
+			case "|":  return this.Numeric(context, (a, b) => a | b);
+			case "^":  return this.Numeric(context, (a, b) => a ^ b);
+			case "<<": return this.Numeric(context, (a, b) => a << b);
+			case ">>": return this.Numeric(context, (a, b) => a >> b);
 			default:
 				Debug.Fail("Unknown unary operator");
 				throw new InvalidOperationException();
 			}
 		}
 
-		private Value BooleanOr(Context context, bool generate) {
-			Value left = this.Left.Evaluate(context, generate).ToSingular();
+		private Value BooleanOr(Context context) {
+			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete) {
-				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = this.Context ?? context };
+				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = context };
 			}
 			NumberValue leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value != 0) {
 					return leftNumber;
 				}
-				Value right = this.Right.Evaluate(context, generate).ToSingular();
+				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
-					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = this.Context ?? context };
+					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
 				}
 				NumberValue rightNumber = right.ToNumber();
 				if(rightNumber != null) {
@@ -280,19 +254,19 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		private Value BooleanAnd(Context context, bool generate) {
-			Value left = this.Left.Evaluate(context, generate).ToSingular();
+		private Value BooleanAnd(Context context) {
+			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete) {
-				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = this.Context ?? context };
+				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = context };
 			}
 			NumberValue leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value == 0) {
 					return leftNumber;
 				}
-				Value right = this.Right.Evaluate(context, generate).ToSingular();
+				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
-					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = this.Context ?? context };
+					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
 				}
 				NumberValue rightNumber = right.ToNumber();
 				if(rightNumber != null) {
@@ -303,15 +277,15 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		private Value Compare(Context context, bool generate, Func<int, bool> probe) {
-			Value left = this.Left.Evaluate(context, generate).ToSingular();
-			Value right = this.Right.Evaluate(context, generate).ToSingular();
+		private Value Compare(Context context, Func<int, bool> probe) {
+			Value left = this.Left.Evaluate(context, 0).ToSingular();
+			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
 				return new Binary() {
 					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
 					Operation = this.Operation,
 					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = this.Context ?? context
+					Context = context
 				};
 			}
 			NumberValue leftNumber = left.ToNumber();
@@ -336,15 +310,15 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		private Value Plus(Context context, bool generate) {
-			Value left = this.Left.Evaluate(context, generate).ToSingular();
-			Value right = this.Right.Evaluate(context, generate).ToSingular();
+		private Value Plus(Context context) {
+			Value left = this.Left.Evaluate(context, 0).ToSingular();
+			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
 				return new Binary() {
 					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
 					Operation = this.Operation,
 					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = this.Context ?? context
+					Context = context
 				};
 			}
 			NumberValue leftNumber = left.ToNumber();
@@ -369,15 +343,15 @@ namespace Fusion {
 			return VoidValue.Value;
 		}
 
-		private Value Numeric(Context context, bool generate, Func<int, int, int> operation) {
-			Value left = this.Left.Evaluate(context, generate).ToSingular();
-			Value right = this.Right.Evaluate(context, generate).ToSingular();
+		private Value Numeric(Context context, Func<int, int, int> operation) {
+			Value left = this.Left.Evaluate(context, 0).ToSingular();
+			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
 				return new Binary() {
 					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
 					Operation = this.Operation,
 					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = this.Context ?? context
+					Context = context
 				};
 			}
 			NumberValue leftNumber = left.ToNumber();
@@ -391,11 +365,6 @@ namespace Fusion {
 				return VoidValue.Value;
 			}
 			return new NumberValue(operation(leftNumber.Value, rightNumber.Value));
-		}
-
-		public override Value Reevaluate() {
-			Debug.Assert(this.Context != null);
-			return this.Evaluate(this.Context, false);
 		}
 	}
 
@@ -421,8 +390,8 @@ namespace Fusion {
 			writer.WriteLine("}");
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
-			Value condition = this.Condition.Evaluate(context, false).ToSingular();
+		public override Value Evaluate(Context context, int address) {
+			Value condition = this.Condition.Evaluate(context, 0).ToSingular();
 			if(!condition.IsComplete) {
 				context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
 				return VoidValue.Value;
@@ -433,15 +402,11 @@ namespace Fusion {
 				return VoidValue.Value;
 			}
 			if(number.Value != 0) {
-				return this.Then.Evaluate(context, generate);
+				return this.Then.Evaluate(context, address);
 			} else if(this.Else != null) {
-				return this.Else.Evaluate(context, generate);
+				return this.Else.Evaluate(context, address);
 			}
 			return VoidValue.Value;
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 
@@ -464,19 +429,15 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
+		public override Value Evaluate(Context context, int address) {
 			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
 			Context callContext = new Context() {
 				Assembler = context.Assembler, Macro = this.Macro
 			};
 			foreach(Expression arg in this.Parameter) {
-				callContext.AddArgument(arg.Evaluate(context, false));
+				callContext.AddArgument(arg.Evaluate(context, 0));
 			}
-			return this.Macro.Body.Evaluate(callContext, generate);
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
+			return this.Macro.Body.Evaluate(callContext, address);
 		}
 	}
 
@@ -492,29 +453,14 @@ namespace Fusion {
 			}
 		}
 
-		public override Value Evaluate(Context context, bool generate) {
+		public override Value Evaluate(Context context, int address) {
 			ListValue list = new ListValue();
 			foreach(Expression expr in this.List) {
-				if(generate) {
-					expr.WriteText(context.Assembler.StdOut, 0);
-					context.Assembler.StdOut.WriteLine();
-				}
-				Value value = expr.Evaluate(context, generate);
-				if(generate) {
-					if(value is NumberValue) {
-						context.Assembler.StdOut.WriteLine("\t>>>>>{0:X8}: {1:X2}", context.Assembler.Address, value.ToNumber().Value);
-					}
-					context.Assembler.IncrementAddress(value.Size());
-				}
-				if(!(value is VoidValue)) {
-					list.List.Add(value);
-				}
+				Value value = expr.Evaluate(context, address);
+				address += value.Size();
+				list.List.Add(value);
 			}
 			return list;
-		}
-
-		public override Value Reevaluate() {
-			throw new InvalidOperationException();
 		}
 	}
 }

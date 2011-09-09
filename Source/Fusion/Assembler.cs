@@ -24,23 +24,12 @@ namespace Fusion {
 		public bool CanContinue { get { return !this.fatalError && this.ErrorCount < 10; } }
 		public IEnumerable<string> SearchPath { get { yield break; } }
 		public Dictionary<string, MacroDefinition> Macro { get; private set; }
-		public int Address { get; private set; }
 
 		public Assembler(TextWriter stdErr, TextWriter stdOut, BinaryWriter writer) {
 			this.StdErr = stdErr;
 			this.StdOut = stdOut;
 			this.Writer = writer;
 			this.ErrorCount = 0;
-		}
-
-		public int IncrementAddress(int delta) {
-			this.Address += delta;
-			return this.Address;
-		}
-
-		public int SetAddress(int address) {
-			this.Address = address;
-			return address;
 		}
 
 		public void Error(string message) {
@@ -76,8 +65,7 @@ namespace Fusion {
 				Macro = main,
 				Parameter = new List<Expression>(0)
 			};
-			this.Address = 0;
-			Value value = call.Evaluate(new Context() { Assembler = this, Macro = main }, true);
+			Value value = call.Evaluate(new Context() { Assembler = this, Macro = main }, 0);
 			if(0 < this.ErrorCount) return;
 			ListValue listValue = value as ListValue;
 			if(listValue != null) {

@@ -53,8 +53,6 @@ namespace Fusion {
 		private VoidValue() {}
 		public override int Size() { return 0; }
 		public override Value WriteValue(Assembler assembler) {
-			assembler.Error(Resource.IncorrectValue("Void", assembler.Writer.BaseStream.Position));
-			assembler.Writer.Write((byte)0xFF);
 			return this;
 		}
 		#if DEBUG
@@ -124,7 +122,7 @@ namespace Fusion {
 	public class ListValue : Value {
 		private List<Value> list = new List<Value>();
 		public List<Value> List { get { return this.list; } }
-		public override int Size() { return 0; }
+		public override int Size() { return this.list.Sum(v => v.Size()); }
 		public override Value WriteValue(Assembler assembler) {
 			foreach(Value value in this.list) {
 				value.WriteValue(assembler);
@@ -139,8 +137,8 @@ namespace Fusion {
 				} else {
 					Expression expression = this.List[i] as Expression;
 					if(expression != null) {
-						this.List[i] = expression.Reevaluate();
-						Debug.Assert(!(this.List[i] is Expression));
+						this.List[i] = expression.Evaluate(null, 0);
+						Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
 					}
 				}
 			}
