@@ -68,9 +68,8 @@ namespace Fusion {
 			Value value = call.Evaluate(new Context() { Assembler = this, Macro = main }, 0);
 			if(0 < this.ErrorCount) return;
 			ListValue listValue = value as ListValue;
-			if(listValue != null) {
-				listValue.ResolveLabels();
-			}
+			Debug.Assert(listValue != null);
+			listValue.ResolveLabels();
 			value.WriteValue(this);
 		}
 
