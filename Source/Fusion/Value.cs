@@ -8,6 +8,10 @@ using System.Text;
 
 namespace Fusion {
 	public abstract class Value {
+
+		public int Address { get; set; }
+		public bool IsComplete { get { return !(this is Expression); } }
+
 		public abstract int Size();
 		public abstract Value WriteValue(Assembler assembler);
 
@@ -44,8 +48,6 @@ namespace Fusion {
 			list.List.Add(this);
 			return list;
 		}
-
-		public bool IsComplete { get { return !(this is Expression); } }
 	}
 
 	public class VoidValue : Value {
@@ -139,6 +141,7 @@ namespace Fusion {
 					if(expression != null) {
 						this.List[i] = expression.Evaluate(null, 0);
 						Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
+						this.List[i].Address = expression.Address;
 					}
 				}
 			}

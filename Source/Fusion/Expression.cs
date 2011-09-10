@@ -457,6 +457,7 @@ namespace Fusion {
 			ListValue list = new ListValue();
 			foreach(Expression expr in this.List) {
 				Value value = expr.Evaluate(context, address);
+				value.Address = address;
 				address += value.Size();
 				list.List.Add(value);
 			}
