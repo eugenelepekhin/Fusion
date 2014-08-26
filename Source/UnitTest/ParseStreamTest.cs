@@ -11,46 +11,12 @@ namespace UnitTest {
 	/// </summary>
 	[TestClass()]
 	public class ParseStreamTest {
-
-		#region Additional test attributes
-		/// <summary>
-		///Gets or sets the test context which provides
-		///information about and functionality for the current test run.
-		///</summary>
 		public TestContext TestContext { get; set; }
-
-		// 
-		//You can use the following additional attributes as you write your tests:
-		//
-		//Use ClassInitialize to run code before running the first test in the class
-		//[ClassInitialize()]
-		//public static void MyClassInitialize(TestContext testContext)
-		//{
-		//}
-		//
-		//Use ClassCleanup to run code after all tests in a class have run
-		//[ClassCleanup()]
-		//public static void MyClassCleanup()
-		//{
-		//}
-		//
-		//Use TestInitialize to run code before running each test
-		//[TestInitialize()]
-		//public void MyTestInitialize()
-		//{
-		//}
-		//
-		//Use TestCleanup to run code after each test has run
-		//[TestCleanup()]
-		//public void MyTestCleanup()
-		//{
-		//}
-		//
-		#endregion
 
 		private string CreateChain(params string[] content) {
 			int index = 0;
 			string prev = null;
+			string path = null;
 			foreach(string text in content) {
 				string name = this.TestContext.TestName + ++index + ".asm";
 				string value = string.Format("\r\n; hello world {0}\r\n", index);
@@ -58,10 +24,11 @@ namespace UnitTest {
 					value += string.Format("include \"{0}\" ;including file\r\n", prev);
 				}
 				value += string.Format("\r\n\r\n{0}\r\n\r\n\r\n", text);
-				File.WriteAllText(Path.Combine(this.TestContext.TestDeploymentDir, name), value);
+				path = Path.Combine(this.TestContext.TestDeploymentDir, name);
+				File.WriteAllText(path, value);
 				prev = name;
 			}
-			return prev;
+			return path;
 		}
 
 		private void TestFirst(ParseStream stream, TokenType tokenType, string value) {

@@ -12,42 +12,7 @@ namespace UnitTest {
 	///</summary>
 	[TestClass()]
 	public class CompilerTest {
-
-		#region Additional test attributes
-		/// <summary>
-		///Gets or sets the test context which provides
-		///information about and functionality for the current test run.
-		///</summary>
 		public TestContext TestContext { get; set; }
-
-		// 
-		//You can use the following additional attributes as you write your tests:
-		//
-		//Use ClassInitialize to run code before running the first test in the class
-		//[ClassInitialize()]
-		//public static void MyClassInitialize(TestContext testContext)
-		//{
-		//}
-		//
-		//Use ClassCleanup to run code after all tests in a class have run
-		//[ClassCleanup()]
-		//public static void MyClassCleanup()
-		//{
-		//}
-		//
-		//Use TestInitialize to run code before running each test
-		//[TestInitialize()]
-		//public void MyTestInitialize()
-		//{
-		//}
-		//
-		//Use TestCleanup to run code after each test has run
-		//[TestCleanup()]
-		//public void MyTestCleanup()
-		//{
-		//}
-		//
-		#endregion
 
 		private void CompileTest(string text, params byte[] expected) {
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileTest.asm");
@@ -92,6 +57,7 @@ namespace UnitTest {
 			this.CompileTest("macro main{(0!=0) (1!=1) (-2!=-2) (3!=4) (\"abc\"!=\"abc\") (\"abc\"!=\"def\")}", 0, 0, 0, 1, 0, 1);
 
 			this.CompileTest("macro main{(1+2) (-3+-4) (\"abc\"+\"def\")}", 3, (-7 & 0xFF), (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f', 0);
+			this.CompileTest("macro main{(\"abc\"+(3+4)+\"def\")}", (byte)'a', (byte)'b', (byte)'c', (byte)'7', (byte)'d', (byte)'e', (byte)'f', 0);
 			this.CompileTest("macro main{5-2}", 3);
 			this.CompileTest("macro main{4*2}", 8);
 			this.CompileTest("macro main{7/2}", 3);

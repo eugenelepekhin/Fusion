@@ -28,6 +28,10 @@ namespace Fusion {
 			if(str != null) {
 				return str;
 			}
+			NumberValue num = this.ToSingular() as NumberValue;
+			if(num != null) {
+				return new StringValue(num.Value.ToString("X"));
+			}
 			return null;
 		}
 

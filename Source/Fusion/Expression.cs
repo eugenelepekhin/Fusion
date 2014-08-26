@@ -144,7 +144,16 @@ namespace Fusion {
 		public override Value Evaluate(Context context, int address) {
 			Value text = this.Text.Evaluate(context, 0);
 			if(text.IsComplete) {
-				context.Assembler.Error(text.ToString());
+				string message = null;
+				StringValue stringValue = text as StringValue;
+				if(stringValue != null) {
+					message = stringValue.Value;
+				} else {
+					context.Assembler.Error(Resource.StringValueExpected(this.Token.Position.ToString()));
+				}
+				if(message != null) {
+					context.Assembler.Error(message);
+				}
 			} else {
 				context.Assembler.Error(Resource.IncompleteError(this.Token.Position.ToString()));
 			}
