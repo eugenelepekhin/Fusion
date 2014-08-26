@@ -145,7 +145,7 @@ namespace Fusion {
 			Value text = this.Text.Evaluate(context, 0);
 			if(text.IsComplete) {
 				string message = null;
-				StringValue stringValue = text as StringValue;
+				StringValue stringValue = text.ToStringValue();
 				if(stringValue != null) {
 					message = stringValue.Value;
 				} else {
@@ -519,8 +519,18 @@ namespace Fusion {
 				assembler.StandardOutput.Write("{0:X2} ", n.Value);
 			} else {
 				StringValue s = value.ToStringValue();
-				Debug.Assert(s is StringValue);
-				assembler.StandardOutput.Write("{0} ", s.Value);
+				if(s is StringValue) {
+					assembler.StandardOutput.Write("{0} ", s.Value);
+				} else {
+					ListValue list = value as ListValue;
+					if(list != null) {
+						foreach(var item in list.List) {
+							ExpressionList.WriteText(assembler, item);
+						}
+					} else {
+						Debug.Assert(value is VoidValue);
+					}
+				}
 			}
 		}
 	}
