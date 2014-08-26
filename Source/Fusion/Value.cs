@@ -30,7 +30,7 @@ namespace Fusion {
 			}
 			NumberValue num = this.ToSingular() as NumberValue;
 			if(num != null) {
-				return new StringValue(num.Value.ToString("X"));
+				return new StringValue(num.Value.ToString("X", CultureInfo.InvariantCulture));
 			}
 			return null;
 		}

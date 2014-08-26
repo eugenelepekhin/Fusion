@@ -16,8 +16,8 @@ namespace Fusion {
 		private const string IfName = "if";
 		private const string ElseName = "else";
 
-		public TextWriter StdErr { get; private set; }
-		public TextWriter StdOut { get; private set; }
+		public TextWriter ErrorOutput { get; private set; }
+		public TextWriter StandardOutput { get; private set; }
 		public BinaryWriter Writer { get; private set; }
 		public int ErrorCount { get; private set; }
 		private bool fatalError = false;
@@ -25,16 +25,16 @@ namespace Fusion {
 		public IEnumerable<string> SearchPath { get { yield break; } }
 		public Dictionary<string, MacroDefinition> Macro { get; private set; }
 
-		public Assembler(TextWriter stdErr, TextWriter stdOut, BinaryWriter writer) {
-			this.StdErr = stdErr;
-			this.StdOut = stdOut;
+		public Assembler(TextWriter errorOutput, TextWriter standardOutput, BinaryWriter writer) {
+			this.ErrorOutput = errorOutput;
+			this.StandardOutput = standardOutput;
 			this.Writer = writer;
 			this.ErrorCount = 0;
 		}
 
 		public void Error(string message) {
 			this.ErrorCount++;
-			this.StdErr.WriteLine(message);
+			this.ErrorOutput.WriteLine(message);
 		}
 
 		public void FatalError(string message) {
@@ -70,7 +70,8 @@ namespace Fusion {
 			ListValue listValue = value as ListValue;
 			Debug.Assert(listValue != null);
 			listValue.ResolveLabels();
-			value.WriteValue(this);
+			listValue.WriteValue(this);
+			main.Body.WriteListing(this, listValue, 0);
 		}
 
 		public void Compile(string file) {
@@ -88,7 +89,7 @@ namespace Fusion {
 					Token token = stream.First();
 					bool atomic = false;
 					while(this.CanContinue && !token.IsEos() && !token.IsIdentifier(Assembler.MacroName)) {
-						if(token.IsIdentifier(Assembler.AtomicName)) {
+						if(!atomic && token.IsIdentifier(Assembler.AtomicName)) {
 							atomic = true;
 						} else {
 							this.Error(Resource.MacroExpected(token.Position.ToString()));

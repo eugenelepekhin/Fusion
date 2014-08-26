@@ -472,5 +472,56 @@ namespace Fusion {
 			}
 			return list;
 		}
+
+		public void WriteListing(Assembler assembler, ListValue result, int indent) {
+			this.List.Zip<Expression, Value, int>(result.List, (expr, value) => {
+				ExpressionList list = expr as ExpressionList;
+				ListValue resultList = value as ListValue;
+				if(list != null) {
+					Debug.Assert(resultList != null);
+					list.WriteListing(assembler, resultList, indent);
+					return 0;
+				}
+				Call call = expr as Call;
+				if(call != null) {
+					Debug.Assert(resultList != null);
+					call.WriteText(assembler.StandardOutput, indent);
+					assembler.StandardOutput.WriteLine();
+					if(resultList.List.Count > 0) {
+						if(call.Macro.Atomic) {
+							ExpressionList.WriteAddress(assembler, resultList.List[0].Address);
+							foreach(Value v in resultList.List) {
+								ExpressionList.WriteText(assembler, v);
+							}
+							assembler.StandardOutput.WriteLine();
+						} else {
+							call.Macro.Body.WriteListing(assembler, resultList, indent + 1);
+						}
+					}
+					return 0;
+				}
+				expr.WriteText(assembler.StandardOutput, indent);
+				assembler.StandardOutput.WriteLine();
+				ExpressionList.WriteAddress(assembler, value.Address);
+				ExpressionList.WriteText(assembler, value);
+				assembler.StandardOutput.WriteLine();
+				return 0;
+			}).All(v => true);
+		}
+
+		private static void WriteAddress(Assembler assembler, int address) {
+			assembler.StandardOutput.Write(">>> {0:X8} ", address);
+		}
+
+		private static void WriteText(Assembler assembler, Value value) {
+			NumberValue n = value.ToNumber();
+			if(n != null) {
+				assembler.StandardOutput.Write("{0:X2} ", n.Value);
+			} else {
+				StringValue s = value.ToStringValue();
+				Debug.Assert(s is StringValue);
+				assembler.StandardOutput.Write("{0} ", s.Value);
+			}
+		}
 	}
 }
