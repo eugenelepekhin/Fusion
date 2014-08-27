@@ -16,7 +16,7 @@
 <Statement> ::= <String> | <Label> | <Expression>
 <Label> ::= <LabelName>:
 <LabelName> ::= <Identifier>
-<Expression> ::= <Number> | <LabelName> | <MacroCall> | <ArithmeticExpression> | <IfStatement> | <ErrorStatement> | (<Expression>)
+<Expression> ::= <Number> | <LabelName> | <MacroCall> | <ArithmeticExpression> | <IfStatement> | <PrintStatement> | (<Expression>)
 <Number> ::= <DecimalNumber> | <HexadecimalNumber> | <BinaryNumber>
 <MacroCall> ::= <MacroName> <ActualParameterList>
 <ArithmeticExpression> ::= <Expression> <BinaryOperation> <Expression> | <UnaryOperation> <Expression>
@@ -27,7 +27,7 @@
 <IfStatement> ::= <SimpleIfStatement> | <IfElseStatement>
 <SimpleIfStatement> ::= if(<Expression>) { <MacroBody> }
 <IfElseStatement> ::= <SimpleIfStatement> else { <MacroBody> }
-<ErrorStatement> ::= error <String>
+<PrintStatement> ::= error | print <String>
 <DecimalNumber> ::= <DecimalDigit> | <DecimalDigit><DecimalNumber>
 <HexadecimalNumber> :: 0x<HexadecimalDigits>
 <BinaryNumber> ::= 0b<BinaryDigits>

@@ -131,7 +131,7 @@ namespace Fusion {
 		}
 	}
 
-	public class Error : Expression {
+	public class Print : Expression {
 		public Token Token { get; set; }
 		public Expression Text { get; set; }
 
@@ -154,7 +154,11 @@ namespace Fusion {
 					context.Assembler.Error(Resource.StringValueExpected(this.Token.Position.ToString()));
 				}
 				if(message != null) {
-					context.Assembler.Error(message);
+					if(this.Token.TextEqual(Assembler.ErrorName)) {
+						context.Assembler.Error(message);
+					} else {
+						context.Assembler.StandardOutput.WriteLine(message);
+					}
 				}
 			} else {
 				context.Assembler.Error(Resource.IncompleteError(this.Token.Position.ToString()));

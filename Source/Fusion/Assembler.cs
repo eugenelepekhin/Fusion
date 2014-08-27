@@ -12,7 +12,8 @@ namespace Fusion {
 		private const string MainName = "main";
 		private const string AtomicName = "atomic";
 		private const string MacroName = "macro";
-		private const string ErrorName = "error";
+		private const string PrintName = "print";
+		public  const string ErrorName = "error";
 		private const string IfName = "if";
 		private const string ElseName = "else";
 
@@ -113,7 +114,7 @@ namespace Fusion {
 						if(macroDefinition.Parameter.Any(other => other.Equals(next))) {
 							this.Error(Resource.ParameterRedefinition(name.Value, next.Value, next.Position.ToString()));
 						}
-						if(next.IsIdentifier(Assembler.MacroName, Assembler.ErrorName, Assembler.IfName, Assembler.ElseName)) {
+						if(next.IsIdentifier(Assembler.MacroName, Assembler.PrintName, Assembler.ErrorName, Assembler.IfName, Assembler.ElseName)) {
 							this.Error(Resource.ParameterKeyword(next.Value, next.Position.ToString()));
 						}
 						macroDefinition.Parameter.Add(next);
@@ -326,8 +327,8 @@ namespace Fusion {
 			if(token.IsIdentifier()) {
 				if(token.TextEqual(Assembler.IfName)) {
 					return this.ParseIf(macro, stream, token);
-				} else if(token.TextEqual(Assembler.ErrorName)) {
-					return new Error() { Token = token, Text = this.ParseOr(macro, stream, stream.Next()) };
+				} else if(token.TextEqual(Assembler.PrintName, Assembler.ErrorName)) {
+					return new Print() { Token = token, Text = this.ParseOr(macro, stream, stream.Next()) };
 				} else if(macro.IsParameter(token)) {
 					return Assembler.ParseParameter(macro, token);
 				} else if(macro.IsLabel(token)) {
