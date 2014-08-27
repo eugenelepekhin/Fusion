@@ -135,29 +135,34 @@ namespace Fusion {
 		public Token Token { get; set; }
 		public Expression Text { get; set; }
 
+		private string message;
+
 		public override void WriteText(TextWriter writer, int indent) {
 			Expression.Indent(writer, indent);
 			writer.Write(this.Token.Value);
 			writer.Write(" ");
 			this.Text.WriteText(writer, 0);
 			writer.WriteLine();
+			if(this.message != null) {
+				writer.WriteLine(this.message);
+			}
 		}
 
 		public override Value Evaluate(Context context, int address) {
 			Value text = this.Text.Evaluate(context, 0);
 			if(text.IsComplete) {
-				string message = null;
+				this.message = null;
 				StringValue stringValue = text.ToStringValue();
 				if(stringValue != null) {
-					message = stringValue.Value;
+					this.message = stringValue.Value;
 				} else {
 					context.Assembler.Error(Resource.StringValueExpected(this.Token.Position.ToString()));
 				}
-				if(message != null) {
+				if(this.message != null) {
 					if(this.Token.TextEqual(Assembler.ErrorName)) {
-						context.Assembler.Error(message);
+						context.Assembler.Error(this.message);
 					} else {
-						context.Assembler.StandardOutput.WriteLine(message);
+						context.Assembler.StandardOutput.WriteLine(this.message);
 					}
 				}
 			} else {
