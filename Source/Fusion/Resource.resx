@@ -216,6 +216,13 @@
     <value>String value expected at {0}</value>
     <comment>{string position}</comment>
   </data>
+  <data name="SummaryErrors" xml:space="preserve">
+    <value>{0} error(s) found</value>
+    <comment>{int errorCount}</comment>
+  </data>
+  <data name="SummarySuccess" xml:space="preserve">
+    <value>Compilation is successful</value>
+  </data>
   <data name="UndefinedMacro" xml:space="preserve">
     <value>Undefined macro {0} at {1}</value>
     <comment>{string name, string poisition}</comment>

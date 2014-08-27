@@ -23,6 +23,11 @@ namespace Fusion {
 									bin.WriteTo(file);
 								}
 							}
+							if(assembler.ErrorCount == 0) {
+								assembler.StandardOutput.WriteLine(Resource.SummarySuccess);
+							} else {
+								assembler.StandardOutput.WriteLine(Resource.SummaryErrors(assembler.ErrorCount));
+							}
 						}
 					}
 				}

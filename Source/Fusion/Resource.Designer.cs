@@ -232,6 +232,20 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to {0} error(s) found.
+		/// </summary>
+ 		public static string SummaryErrors(int errorCount) {
+			return string.Format(Culture, ResourceManager.GetString("SummaryErrors", Culture), errorCount);
+		}
+
+		/// <summary>
+		/// Looks up a localized string similar to Compilation is successful.
+		/// </summary>
+ 		public static string SummarySuccess {
+			get { return ResourceManager.GetString("SummarySuccess", Culture); }
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Undefined macro {0} at {1}.
 		/// </summary>
  		public static string UndefinedMacro(string name, string poisition) {
