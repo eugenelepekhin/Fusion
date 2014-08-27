@@ -10,7 +10,7 @@ namespace Fusion {
 	public abstract class Value {
 
 		public int Address { get; set; }
-		public bool IsComplete { get { return !(this is Expression); } }
+		public virtual bool IsComplete { get { return true; } }
 
 		public abstract int Size();
 		public abstract Value WriteValue(Assembler assembler);

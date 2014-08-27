@@ -9,6 +9,8 @@ using System.Text;
 
 namespace Fusion {
 	public abstract class Expression : Value {
+		public override bool IsComplete { get { return false; } }
+
 		public abstract void WriteText(TextWriter writer, int indent);
 
 		protected static void Indent(TextWriter writer, int count) {
