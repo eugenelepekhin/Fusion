@@ -42,7 +42,7 @@ namespace Fusion {
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
-			writer.WriteLine(":");
+			writer.Write(":");
 		}
 
 		public override Value Evaluate(Context context, int address) {
@@ -513,7 +513,9 @@ namespace Fusion {
 				}
 				expr.WriteText(assembler.StandardOutput, indent);
 				assembler.StandardOutput.WriteLine();
-				ExpressionList.WriteAddress(assembler, value.Address);
+				if(!(value is VoidValue)) {
+					ExpressionList.WriteAddress(assembler, value.Address);
+				}
 				ExpressionList.WriteText(assembler, value);
 				assembler.StandardOutput.WriteLine();
 				return 0;
