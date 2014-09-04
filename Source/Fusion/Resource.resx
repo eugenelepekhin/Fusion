@@ -125,6 +125,14 @@
     <value>"{" expected instead of {0} at {1}</value>
     <comment>{string token, string position}</comment>
   </data>
+  <data name="BinaryTypeExpected" xml:space="preserve">
+    <value>Expected binary format type 8, 16, or 32 instead of {0} at {1}</value>
+    <comment>{string text, string position}</comment>
+  </data>
+  <data name="BinaryTypeRedefined" xml:space="preserve">
+    <value>Binary type already defined at {0}</value>
+    <comment>{string position}</comment>
+  </data>
   <data name="FileChanged" xml:space="preserve">
     <value>Compiled file get changed between passes.</value>
   </data>
@@ -149,8 +157,8 @@
     <comment>{string position}</comment>
   </data>
   <data name="IncorrectNumber" xml:space="preserve">
-    <value>Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0xFF</value>
-    <comment>{int value, long offset}</comment>
+    <value>Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0x{2:X}</value>
+    <comment>{int value, long offset, int replaced}</comment>
   </data>
   <data name="IncorrectValue" xml:space="preserve">
     <value>Incorrect value of type {0} is written to the output at offset {1}. The value replaced with 0xFF</value>
@@ -168,7 +176,7 @@
     <comment>{string label, string macro, string position}</comment>
   </data>
   <data name="MacroExpected" xml:space="preserve">
-    <value>macro or include expected at {0}</value>
+    <value>macro, include, or binary expected at {0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="MacroNameExpected" xml:space="preserve">

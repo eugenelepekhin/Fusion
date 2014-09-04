@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -28,7 +29,7 @@ namespace Fusion {
 			}
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
+		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
 		public Token First() {
 			if(this.returned != null) {
 				return this.Returned();

@@ -64,6 +64,20 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to Expected binary format type 8, 16, or 32 instead of {0} at {1}.
+		/// </summary>
+ 		public static string BinaryTypeExpected(string text, string position) {
+			return string.Format(Culture, ResourceManager.GetString("BinaryTypeExpected", Culture), text, position);
+		}
+
+		/// <summary>
+		/// Looks up a localized string similar to Binary type already defined at {0}.
+		/// </summary>
+ 		public static string BinaryTypeRedefined(string position) {
+			return string.Format(Culture, ResourceManager.GetString("BinaryTypeRedefined", Culture), position);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Compiled file get changed between passes..
 		/// </summary>
  		public static string FileChanged {
@@ -106,10 +120,10 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0xFF.
+		/// Looks up a localized string similar to Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0x{2:X}.
 		/// </summary>
- 		public static string IncorrectNumber(int value, long offset) {
-			return string.Format(Culture, ResourceManager.GetString("IncorrectNumber", Culture), value, offset);
+ 		public static string IncorrectNumber(int value, long offset, int replaced) {
+			return string.Format(Culture, ResourceManager.GetString("IncorrectNumber", Culture), value, offset, replaced);
 		}
 
 		/// <summary>
@@ -141,7 +155,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to macro or include expected at {0}.
+		/// Looks up a localized string similar to macro, include, or binary expected at {0}.
 		/// </summary>
  		public static string MacroExpected(string position) {
 			return string.Format(Culture, ResourceManager.GetString("MacroExpected", Culture), position);

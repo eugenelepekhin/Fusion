@@ -1,8 +1,10 @@
 <FusionFile> ::= <FusionDefinitionList>
 <FusionDefinitionList> ::= <FusionDefinition> | <FusionDefinition> <FusionDefinitionList>
-<FusionDefinition> ::= <MacroDefinition> | <IncludeStatement>
+<FusionDefinition> ::= <MacroDefinition> | <IncludeStatement> | <BinaryDefinition>
 <IncludeStatement> ::= include <String>
 <String> ::= "<StringChars>"
+<BinaryDefinition> ::= binary <BinaryBase>
+<BinaryBase> ::= 8 | 16 | 32
 <MacroDefinition> ::= <MacroKeyword> <MacroName> <FormalParameterList> { <MacroBody> }
 <MacroKeyword> ::= macro | atomic macro
 <MacroName> ::= <Identifier>
@@ -27,7 +29,7 @@
 <IfStatement> ::= <SimpleIfStatement> | <IfElseStatement>
 <SimpleIfStatement> ::= if(<Expression>) { <MacroBody> }
 <IfElseStatement> ::= <SimpleIfStatement> else { <MacroBody> }
-<PrintStatement> ::= error | print <String>
+<PrintStatement> ::= print | error <String>
 <DecimalNumber> ::= <DecimalDigit> | <DecimalDigit><DecimalNumber>
 <HexadecimalNumber> :: 0x<HexadecimalDigits>
 <BinaryNumber> ::= 0b<BinaryDigits>

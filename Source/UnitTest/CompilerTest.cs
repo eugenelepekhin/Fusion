@@ -14,10 +14,9 @@ namespace UnitTest {
 	public class CompilerTest {
 		public TestContext TestContext { get; set; }
 
-		private void CompileTest(string text, params byte[] expected) {
+		private byte[] Compile(string text) {
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileTest.asm");
 			File.WriteAllText(file, text);
-			byte[] actual = null;
 			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
 				using(BinaryWriter writer = new BinaryWriter(stream)) {
 					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer);
@@ -25,13 +24,40 @@ namespace UnitTest {
 					Assert.AreEqual(0, assembler.ErrorCount);
 					if(assembler.ErrorCount <= 0) {
 						writer.Flush();
-						actual = stream.ToArray();
+						return stream.ToArray();
 					}
 				}
 			}
+			return null;
+		}
+
+		private void CompileTest(string text, params byte[] expected) {
+			byte[] actual = this.Compile(text);
 			Assert.AreEqual(expected.Length, actual.Length);
 			for(int i = 0; i < expected.Length; i++) {
 				Assert.AreEqual(expected[i], actual[i]);
+			}
+		}
+
+		private void CompileTest16(string text, params int[] expected) {
+			byte[] actual = this.Compile(text);
+			Assert.AreEqual(expected.Length * 2, actual.Length);
+			int i = 0;
+			using(MemoryStream stream = new MemoryStream(actual)) {
+				using(BinaryReader reader = new BinaryReader(stream)) {
+					Assert.AreEqual((int)reader.ReadInt16(), actual[i++]);
+				}
+			}
+		}
+
+		private void CompileTest32(string text, params int[] expected) {
+			byte[] actual = this.Compile(text);
+			Assert.AreEqual(expected.Length * 4, actual.Length);
+			int i = 0;
+			using(MemoryStream stream = new MemoryStream(actual)) {
+				using(BinaryReader reader = new BinaryReader(stream)) {
+					Assert.AreEqual(reader.ReadInt32(), actual[i++]);
+				}
 			}
 		}
 
@@ -158,9 +184,22 @@ namespace UnitTest {
 		///A test for investigation of Compile errors
 		///</summary>
 		[TestMethod()]
-		public void CompileSpecialCase() {
+		public void CompileSpecialCaseTest() {
 			this.CompileTest("macro main{6 a:4 m a,b+100 b:5} macro m a,b{n a,10+b 2 3} macro n a,b{7 a o b+100 9} macro o p{10+p}", 6, 4, 7, 1, 228, 9, 2, 3, 5);
 			this.CompileTest("macro main{6 a b+100 b:5} macro a b{c b+10} macro c b{b}", 6, 112, 5);
+		}
+
+		/// <summary>
+		///A test for compiling to 16 and 32 binaries
+		///</summary>
+		[TestMethod()]
+		public void CompileBinaryTypesTest() {
+			this.CompileTest16("binary 16 macro main{1 2 0xABCD}", 1, 2, 0xABCD);
+			this.CompileTest16("binary 16 macro main{1 2 0xABCD a: 3 4 5 a}", 1, 2, 0xABCD, 3, 4, 5, 3);
+			this.CompileTest16("binary 16 macro main{1 2 0xABCD a: 3 4 5 a + 0x8000}", 1, 2, 0xABCD, 3, 4, 5, 0x8003);
+			this.CompileTest32("binary 32 macro main{1 2 0xABCD}", 1, 2, 0xABCD);
+			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a}", 1, 2, 0xABCD, 3, 4, 5, 3);
+			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a + 0x70000000}", 1, 2, 0xABCD, 3, 4, 5, 0x70000003);
 		}
 	}
 }

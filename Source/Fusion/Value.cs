@@ -76,11 +76,10 @@ namespace Fusion {
 		public override int Size() { return 1; }
 		public override Value WriteValue(Assembler assembler) {
 			int value = this.Value;
-			if(0xFF < Math.Abs(value)) {
-				assembler.Error(Resource.IncorrectNumber(this.Value, assembler.Writer.BaseStream.Position));
-				value = 0xFF;
+			string error = assembler.BinaryFormatter.Write(value);
+			if(error != null) {
+				assembler.Error(error);
 			}
-			assembler.Writer.Write((byte)value);
 			return this;
 		}
 		#if DEBUG
@@ -94,8 +93,8 @@ namespace Fusion {
 		public static readonly LabelValue Label = new LabelValue();
 		private LabelValue() : base(0) {}
 		public override Value WriteValue(Assembler assembler) {
-			assembler.Error(Resource.IncorrectValue("Label", assembler.Writer.BaseStream.Position));
-			assembler.Writer.Write((byte)0xFF);
+			assembler.Error(Resource.IncorrectValue("Label", assembler.BinaryFormatter.Position));
+			assembler.BinaryFormatter.Write(0xFF);
 			return this;
 		}
 		#if DEBUG
@@ -111,10 +110,17 @@ namespace Fusion {
 		public override int Size() { return this.Value.Length + 1; }
 		public override Value WriteValue(Assembler assembler) {
 			if(this.Value != null) {
+				string error = null;
+				string message = null;
 				foreach(char c in this.Value) {
-					assembler.Writer.Write((byte)(c & 0xFF));
+					message = assembler.BinaryFormatter.Write(c);
+					error = error ?? message;
 				}
-				assembler.Writer.Write((byte)0);
+				message = assembler.BinaryFormatter.Write((char)0);
+				error = error ?? message;
+				if(error != null) {
+					assembler.Error(error);
+				}
 			}
 			return this;
 		}

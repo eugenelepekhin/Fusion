@@ -9,6 +9,7 @@ using System.Text;
 namespace Fusion {
 	public class Assembler {
 
+		private const string BinaryName = "binary";
 		private const string MainName = "main";
 		private const string AtomicName = "atomic";
 		private const string MacroName = "macro";
@@ -19,18 +20,23 @@ namespace Fusion {
 
 		public TextWriter ErrorOutput { get; private set; }
 		public TextWriter StandardOutput { get; private set; }
-		public BinaryWriter Writer { get; private set; }
+
+		private readonly BinaryWriter writer;
+
 		public int ErrorCount { get; private set; }
 		private bool fatalError = false;
 		public bool CanContinue { get { return !this.fatalError && this.ErrorCount < 10; } }
 		public IEnumerable<string> SearchPath { get { yield break; } }
 		public Dictionary<string, MacroDefinition> Macro { get; private set; }
 
+		public BinaryFormatter BinaryFormatter { get; private set; }
+
 		public Assembler(TextWriter errorOutput, TextWriter standardOutput, BinaryWriter writer) {
 			this.ErrorOutput = errorOutput;
 			this.StandardOutput = standardOutput;
-			this.Writer = writer;
+			this.writer = writer;
 			this.ErrorCount = 0;
+			this.BinaryFormatter = new BinaryFormatter8(this.writer);
 		}
 
 		public void Error(string message) {
@@ -85,6 +91,7 @@ namespace Fusion {
 		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		private void FirstPass(string file) {
 			using(ParseStream stream = new ParseStream(this, file)) {
+				bool binaryDefined = false;
 				Dictionary<string, MacroDefinition> macro = new Dictionary<string, MacroDefinition>();
 				while(this.CanContinue) {
 					Token token = stream.First();
@@ -92,6 +99,30 @@ namespace Fusion {
 					while(this.CanContinue && !token.IsEos() && !token.IsIdentifier(Assembler.MacroName)) {
 						if(!atomic && token.IsIdentifier(Assembler.AtomicName)) {
 							atomic = true;
+						} else if(token.IsIdentifier(Assembler.BinaryName)) {
+							if(binaryDefined) {
+								this.Error(Resource.BinaryTypeRedefined(token.Position.ToString()));
+							}
+							binaryDefined = true;
+							token = stream.Next();
+							int binaryType = 0;
+							if(token.IsNumber()) {
+								binaryType = token.Number;
+							}
+							switch(binaryType) {
+							case 8:
+								this.BinaryFormatter = new BinaryFormatter8(this.writer);
+								break;
+							case 16:
+								this.BinaryFormatter = new BinaryFormatter16(this.writer);
+								break;
+							case 32:
+								this.BinaryFormatter = new BinaryFormatter32(this.writer);
+								break;
+							default:
+								this.Error(Resource.BinaryTypeExpected(token.Value, token.Position.ToString()));
+								break;
+							}
 						} else {
 							this.Error(Resource.MacroExpected(token.Position.ToString()));
 						}
@@ -164,6 +195,14 @@ namespace Fusion {
 					Token token = stream.First();
 					if(token.IsEos()) break;
 					bool atomic = false;
+					if(token.IsIdentifier(Assembler.BinaryName)) {
+						token = stream.Next();
+						if(!token.IsNumber() || this.BinaryFormatter.CellSize != token.Number) {
+							this.FatalError(Resource.FileChanged);
+							return;
+						}
+						token = stream.Next();
+					}
 					if(token.IsIdentifier(Assembler.AtomicName)) {
 						atomic = true;
 						token = stream.Next();
