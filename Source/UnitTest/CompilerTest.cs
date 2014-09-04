@@ -194,12 +194,20 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void CompileBinaryTypesTest() {
+			this.CompileTest("binary 8 macro main{1 2 0xAB}", 1, 2, 0xAB);
+			this.CompileTest("binary 8 macro main{1 2 0xCD a: 3 4 5 a}", 1, 2, 0xCD, 3, 4, 5, 3);
+			this.CompileTest("binary 8 macro main{1 2 0xAD a: 3 4 5 a + 0x80}", 1, 2, 0xAD, 3, 4, 5, 0x83);
+			this.CompileTest("binary 8 macro main{1 2 a 0xAD a: 3 4 5 a 6}", 1, 2, 4, 0xAD, 3, 4, 5, 4, 6 );
+
 			this.CompileTest16("binary 16 macro main{1 2 0xABCD}", 1, 2, 0xABCD);
 			this.CompileTest16("binary 16 macro main{1 2 0xABCD a: 3 4 5 a}", 1, 2, 0xABCD, 3, 4, 5, 3);
 			this.CompileTest16("binary 16 macro main{1 2 0xABCD a: 3 4 5 a + 0x8000}", 1, 2, 0xABCD, 3, 4, 5, 0x8003);
+			this.CompileTest16("binary 16 macro main{1 2 a 0xADBC a: 3 4 5 a 6}", 1, 2, 4, 0xADBC, 3, 4, 5, 4, 6 );
+
 			this.CompileTest32("binary 32 macro main{1 2 0xABCD}", 1, 2, 0xABCD);
 			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a}", 1, 2, 0xABCD, 3, 4, 5, 3);
 			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a + 0x70000000}", 1, 2, 0xABCD, 3, 4, 5, 0x70000003);
+			this.CompileTest32("binary 32 macro main{1 2 a 0x1234ADBC a: 3 4 5 a 6}", 1, 2, 4, 0x1234ADBC, 3, 4, 5, 4, 6 );
 		}
 	}
 }

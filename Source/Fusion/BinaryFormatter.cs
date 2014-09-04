@@ -44,7 +44,7 @@ namespace Fusion {
 		}
 
 		public override string Write(char value) {
-			this.Writer.Write((byte)(value & 0xFF));
+			this.Writer.Write((short)(value & 0xFF));
 			return null;
 		}
 
@@ -66,7 +66,7 @@ namespace Fusion {
 		}
 
 		public override string Write(char value) {
-			this.Writer.Write((byte)(value & 0xFF));
+			this.Writer.Write((int)(value & 0xFF));
 			return null;
 		}
 

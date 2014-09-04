@@ -529,7 +529,8 @@ namespace Fusion {
 		private static void WriteText(Assembler assembler, Value value) {
 			NumberValue n = value.ToNumber();
 			if(n != null) {
-				assembler.StandardOutput.Write("{0:X2} ", n.Value);
+				string format = string.Format("{{0:X{0}}} ", assembler.BinaryFormatter.CellSize / 4);
+				assembler.StandardOutput.Write(format, n.Value);
 			} else {
 				StringValue s = value.ToStringValue();
 				if(s is StringValue) {
