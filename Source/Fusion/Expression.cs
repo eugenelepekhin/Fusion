@@ -433,7 +433,7 @@ namespace Fusion {
 	public class Call : Expression {
 		public Token Name { get; set; }
 		public MacroDefinition Macro { get; set; }
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public List<Expression> Parameter { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
@@ -462,7 +462,7 @@ namespace Fusion {
 	}
 
 	public class ExpressionList : Expression {
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public List<Expression> List { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
@@ -529,7 +529,7 @@ namespace Fusion {
 		private static void WriteText(Assembler assembler, Value value) {
 			NumberValue n = value.ToNumber();
 			if(n != null) {
-				string format = string.Format("{{0:X{0}}} ", assembler.BinaryFormatter.CellSize / 4);
+				string format = string.Format(CultureInfo.InvariantCulture, "{{0:X{0}}} ", assembler.BinaryFormatter.CellSize / 4);
 				assembler.StandardOutput.Write(format, n.Value);
 			} else {
 				StringValue s = value.ToStringValue();
