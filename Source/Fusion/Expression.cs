@@ -334,6 +334,9 @@ namespace Fusion {
 			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
+				if((left.IsComplete && left is StringValue) || (right.IsComplete && right is StringValue)) {
+					context.Assembler.Error(Resource.IncompleteString(this.Operation.Position.ToString()));
+				}
 				return new Binary() {
 					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
 					Operation = this.Operation,

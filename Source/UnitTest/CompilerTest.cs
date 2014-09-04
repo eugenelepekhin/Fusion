@@ -14,14 +14,14 @@ namespace UnitTest {
 	public class CompilerTest {
 		public TestContext TestContext { get; set; }
 
-		private byte[] Compile(string text) {
+		private byte[] Compile(string text, out int errorCount) {
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileTest.asm");
 			File.WriteAllText(file, text);
 			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
 				using(BinaryWriter writer = new BinaryWriter(stream)) {
 					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer);
 					assembler.Compile(file);
-					Assert.AreEqual(0, assembler.ErrorCount);
+					errorCount = assembler.ErrorCount;
 					if(assembler.ErrorCount <= 0) {
 						writer.Flush();
 						return stream.ToArray();
@@ -32,7 +32,9 @@ namespace UnitTest {
 		}
 
 		private void CompileTest(string text, params byte[] expected) {
-			byte[] actual = this.Compile(text);
+			int errorCount;
+			byte[] actual = this.Compile(text, out errorCount);
+			Assert.AreEqual(0, errorCount);
 			Assert.AreEqual(expected.Length, actual.Length);
 			for(int i = 0; i < expected.Length; i++) {
 				Assert.AreEqual(expected[i], actual[i]);
@@ -40,7 +42,9 @@ namespace UnitTest {
 		}
 
 		private void CompileTest16(string text, params int[] expected) {
-			byte[] actual = this.Compile(text);
+			int errorCount;
+			byte[] actual = this.Compile(text, out errorCount);
+			Assert.AreEqual(0, errorCount);
 			Assert.AreEqual(expected.Length * 2, actual.Length);
 			int i = 0;
 			using(MemoryStream stream = new MemoryStream(actual)) {
@@ -51,7 +55,9 @@ namespace UnitTest {
 		}
 
 		private void CompileTest32(string text, params int[] expected) {
-			byte[] actual = this.Compile(text);
+			int errorCount;
+			byte[] actual = this.Compile(text, out errorCount);
+			Assert.AreEqual(0, errorCount);
 			Assert.AreEqual(expected.Length * 4, actual.Length);
 			int i = 0;
 			using(MemoryStream stream = new MemoryStream(actual)) {
@@ -187,6 +193,13 @@ namespace UnitTest {
 		public void CompileSpecialCaseTest() {
 			this.CompileTest("macro main{6 a:4 m a,b+100 b:5} macro m a,b{n a,10+b 2 3} macro n a,b{7 a o b+100 9} macro o p{10+p}", 6, 4, 7, 1, 228, 9, 2, 3, 5);
 			this.CompileTest("macro main{6 a b+100 b:5} macro a b{c b+10} macro c b{b}", 6, 112, 5);
+
+			// concatenation of defined labels is allowed
+			this.CompileTest("macro main{1 2 3 a: 4 5 6 \"abc\"+a 7 8}", 1, 2, 3, 4, 5, 6, (byte)'a', (byte)'b', (byte)'c', (byte)'3', (byte)'\0', 7, 8);
+			// concatenation of undefined labels does not allowed
+			int errorCount;
+			byte[] actual = this.Compile("macro main{1 \"abc\"+a 2 3 a: 4 5}", out errorCount);
+			Assert.IsTrue(0 < errorCount);
 		}
 
 		/// <summary>

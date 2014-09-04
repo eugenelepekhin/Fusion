@@ -120,6 +120,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to String concatenation is incomplete value. Only already defined labels can be used in string concatenation at {0}.
+		/// </summary>
+ 		public static string IncompleteString(string position) {
+			return string.Format(Culture, ResourceManager.GetString("IncompleteString", Culture), position);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0x{2:X}.
 		/// </summary>
  		public static string IncorrectNumber(int value, long offset, int replaced) {

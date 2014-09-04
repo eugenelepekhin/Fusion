@@ -156,6 +156,10 @@
     <value>Inconclusive error message at {0}</value>
     <comment>{string position}</comment>
   </data>
+  <data name="IncompleteString" xml:space="preserve">
+    <value>String concatenation is incomplete value. Only already defined labels can be used in string concatenation at {0}</value>
+    <comment>{string position}</comment>
+  </data>
   <data name="IncorrectNumber" xml:space="preserve">
     <value>Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0x{2:X}</value>
     <comment>{int value, long offset, int replaced}</comment>
