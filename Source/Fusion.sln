@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fusion", "Fusion\Fusion.csproj", "{4E776B14-0C91-4AC3-82C0-207BB6030597}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -9,13 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fusion", "Fusion\Fusion.csp
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceWrapper.Generator", "Tools\ResourceWrapper.Generator\ResourceWrapper.Generator.csproj", "{B543E594-A653-4E16-9203-5C833D430A8C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{31C3BC32-569D-4A97-8532-AC7E5D85D804}"
-	ProjectSection(SolutionItems) = preProject
-		Fusion.vsmdi = Fusion.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{49AAF310-A010-4ACA-94CF-6E5F1B4D19C7}"
 EndProject
@@ -40,8 +33,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Fusion.vsmdi
 	EndGlobalSection
 EndGlobal
