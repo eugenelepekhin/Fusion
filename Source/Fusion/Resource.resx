@@ -122,7 +122,7 @@
     <comment>{string number, string position}</comment>
   </data>
   <data name="BeginExpected" xml:space="preserve">
-    <value>"{" expected instead of {0} at {1}</value>
+    <value>"{{" expected instead of {0} at {1}</value>
     <comment>{string token, string position}</comment>
   </data>
   <data name="BinaryTypeExpected" xml:space="preserve">

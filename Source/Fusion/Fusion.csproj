@@ -3,9 +3,8 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4E776B14-0C91-4AC3-82C0-207BB6030597}</ProjectGuid>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <OutputType>Exe</OutputType>
     <RootNamespace>Fusion</RootNamespace>
     <AssemblyName>Fusion</AssemblyName>
@@ -17,7 +16,6 @@
     <CodeAnalysisRuleSet>Fusion.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -69,6 +66,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>"$(SolutionDir)Tools\ResourceWrapper.Generator.exe" "ProjectPath=$(ProjectPath)"</PreBuildEvent>
+    <ResourceWrapperGeneratorCommand>"$(SolutionDir)Tools\ResourceWrapper.Generator.exe" /p "$(ProjectPath)"</ResourceWrapperGeneratorCommand>
   </PropertyGroup>
+  <Target Name="BeforeBuild">
+    <Exec Command="$(ResourceWrapperGeneratorCommand)" />
+  </Target>
 </Project>
