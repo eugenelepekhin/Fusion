@@ -53,6 +53,7 @@
     <Compile Include="TokenStream.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="Value.cs" />
+    <Compile Include="VersionInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resource.resx">
@@ -65,10 +66,29 @@
     <None Include="Fusion.ruleset" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <ResourceWrapperGeneratorCommand>"$(SolutionDir)Tools\ResourceWrapper.Generator.exe" /p "$(ProjectPath)"</ResourceWrapperGeneratorCommand>
-  </PropertyGroup>
   <Target Name="BeforeBuild">
+    <PropertyGroup>
+      <ResourceWrapperGeneratorCommand>"$(SolutionDir)Tools\ResourceWrapper.Generator.exe" /p "$(ProjectPath)"</ResourceWrapperGeneratorCommand>
+      <TempFile>$(MSBuildProjectFullPath).versiontemp</TempFile>
+      <VersionInfoFile>$(MSBuildThisFileDirectory)\VersionInfo.cs</VersionInfoFile>
+      <VersionString>1.$([System.DateTime]::UtcNow.ToString("yy.MM.dd"))</VersionString>
+      <VersionInfo>
+// Do not change this file manually as it will be regenerated during the next build. To change version edit project file instead.
+[assembly: System.Reflection.AssemblyVersion("$(VersionString)")]
+[assembly: System.Reflection.AssemblyFileVersion("$(VersionString)")]
+      </VersionInfo>
+    </PropertyGroup>
+    <!-- Write to temp file and read back version text to avoid unneeded compilation. -->
+    <WriteLinesToFile File="$(TempFile)" Lines="$(VersionInfo)" Overwrite="true" />
+    <ReadLinesFromFile File="$(TempFile)">
+      <Output TaskParameter="Lines" PropertyName="VersionInfoToBe" />
+    </ReadLinesFromFile>
+    <Delete Files="$(TempFile)" />
+    <ReadLinesFromFile File="$(VersionInfoFile)">
+      <Output TaskParameter="Lines" PropertyName="VersionInfoAsIs" />
+    </ReadLinesFromFile>
+
+    <WriteLinesToFile File="$(VersionInfoFile)" Lines="$(VersionInfo)" Overwrite="true" Condition=" '$(VersionInfoToBe)' != '$(VersionInfoAsIs)' " />
     <Exec Command="$(ResourceWrapperGeneratorCommand)" />
   </Target>
 </Project>
