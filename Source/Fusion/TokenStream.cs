@@ -38,10 +38,48 @@ namespace Fusion {
 				if(TokenStream.IsSeparator(c)) {
 					return this.Separator(c);
 				}
-				this.Assembler.Error(Resource.UnexpectedChar((char)c, c, new Position(this.Path, this.line).ToString()));
+				this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, new Position(this.Path, this.line).ToString()));
 				c = this.SkipLine(c);
 			}
 			return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
+		}
+
+		public Token NextPathString() {
+			int c = this.Skip();
+			Position p = new Position(this.Path, this.line);
+			if(c != '"') {
+				return new Token(p, TokenType.Eos, null);
+			}
+			HashSet<char> invalid = new HashSet<char>(System.IO.Path.GetInvalidPathChars());
+			invalid.Add('\n'); // just make sure these chars are included
+			invalid.Add('\r');
+			StringBuilder text = new StringBuilder(128);
+			this.reader.Read();
+			for(;;) {
+				c = this.reader.Read();
+				switch(c) {
+				case '"':
+					return new Token(p, TokenType.String, text.ToString());
+				case -1:
+					this.Assembler.Error(Resource.UnexpectedEOF(p.ToString()));
+					return new Token(p, TokenType.Eos, null);
+				default:
+					if(invalid.Contains((char)c)) {
+						this.Assembler.FatalError(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
+						this.SkipLine(c);
+						return new Token(p, TokenType.Eos, null);
+					}
+					text.Append((char)c);
+					break;
+				}
+			}
+		}
+
+		private static char MakePrintable(char c) {
+			if(char.IsSymbol(c)) {
+				return c;
+			}
+			return ' ';
 		}
 
 		public void SkipLine() {
@@ -128,7 +166,7 @@ namespace Fusion {
 				}
 			}
 			if(TokenStream.IsLetter(c) || text.Length < minLenght) {
-				this.Assembler.Error(Resource.UnexpectedChar((char)c, c, p.ToString()));
+				this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 				this.SkipLine(c);
 				return null;
 			}
@@ -180,13 +218,13 @@ namespace Fusion {
 					//case 'U':
 					//case 'x':
 					default:
-						this.Assembler.Error(Resource.UnexpectedChar((char)c, c, p.ToString()));
+						this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 						this.SkipLine(c);
 						return null;
 					}
 					break;
 				case '\n':
-					this.Assembler.Error(Resource.UnexpectedChar((char)c, c, p.ToString()));
+					this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 					this.SkipLine(c);
 					return null;
 				case -1:

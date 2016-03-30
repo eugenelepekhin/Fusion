@@ -11,6 +11,7 @@ abc: m r1, 0x20	;world!
 	123
 	;
 	@
+	"skip"
 	1234
 	
 	; comparison

@@ -26,13 +26,13 @@ namespace UnitTest {
 			int errorCount = ts.Assembler.ErrorCount;
 			Token token = ts.Next();
 			Assert.AreEqual(errorCount + 1, ts.Assembler.ErrorCount, "Error expected");
-			Assert.IsNull(token, "Unexpected token");
+			Assert.IsTrue(token == null || token.IsString() && token.Value == "skip", "Unexpected token");
 		}
 
 		/// <summary>
 		///A test for Next
 		///</summary>
-		//[TestMethod()]
+		[TestMethod()]
 		public void TokenStreamNextTest() {
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "TokenStreamNextTest.asm");
@@ -62,18 +62,37 @@ namespace UnitTest {
 				this.TestNextToken(ts, 11, TokenType.Number, "123");
 
 				this.TestNextToken(ts);
-				this.TestNextToken(ts, 14, TokenType.Number, "1234");
+				this.TestNextToken(ts, 15, TokenType.Number, "1234");
 
-				this.TestNextToken(ts, 18, TokenType.Operator, "!");
-				this.TestNextToken(ts, 19, TokenType.Identifier, "abc");
+				this.TestNextToken(ts, 19, TokenType.Operator, "!");
+				this.TestNextToken(ts, 20, TokenType.Identifier, "abc");
 
-				this.TestNextToken(ts, 20, TokenType.Operator, "=");
-				this.TestNextToken(ts, 21, TokenType.Identifier, "def");
-				this.TestNextToken(ts, 22, TokenType.Comparison, "!=");
-				this.TestNextToken(ts, 22, TokenType.String, "hello,\n world");
-				this.TestNextToken(ts, 23, TokenType.Eos, null);
+				this.TestNextToken(ts, 21, TokenType.Operator, "=");
+				this.TestNextToken(ts, 22, TokenType.Identifier, "def");
+				this.TestNextToken(ts, 23, TokenType.Comparison, "!=");
+				this.TestNextToken(ts, 23, TokenType.String, "hello,\n world");
+				this.TestNextToken(ts, 24, TokenType.Eos, null);
 
 				Assert.AreEqual(2, assembler.ErrorCount);
+			}
+		}
+
+		[TestMethod()]
+		public void TokenStreamNextPathStringTest() {
+			Assembler assembler = AssemblerFactory.Create(this.TestContext);
+			string file = Path.Combine(this.TestContext.TestDeploymentDir, "TokenStreamNextPathStringTest.asm");
+			File.WriteAllText(file, "\"hello\\world\"");
+			using(TokenStream ts = new TokenStream(assembler, file)) {
+				Token actual = ts.NextPathString();
+				Assert.IsNotNull(actual);
+				Assert.IsTrue(TokenType.String == actual.TokenType && "hello\\world" == actual.Value);
+			}
+
+			File.WriteAllText(file, "\"hello\nworld\"");
+			using(TokenStream ts = new TokenStream(assembler, file)) {
+				Token actual = ts.NextPathString();
+				Assert.IsNotNull(actual);
+				Assert.IsTrue(TokenType.Eos == actual.TokenType && null == actual.Value);
 			}
 		}
 	}
