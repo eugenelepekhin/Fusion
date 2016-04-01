@@ -48,7 +48,9 @@ namespace Fusion {
 			int c = this.Skip();
 			Position p = new Position(this.Path, this.line);
 			if(c != '"') {
-				return new Token(p, TokenType.Eos, null);
+				this.Assembler.FatalError(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
+				this.Assembler.Error(Resource.IncludeFileMissing(p.ToString()));
+				return null;
 			}
 			HashSet<char> invalid = new HashSet<char>(System.IO.Path.GetInvalidPathChars());
 			invalid.Add('\n'); // just make sure these chars are included
@@ -61,13 +63,14 @@ namespace Fusion {
 				case '"':
 					return new Token(p, TokenType.String, text.ToString());
 				case -1:
-					this.Assembler.Error(Resource.UnexpectedEOF(p.ToString()));
-					return new Token(p, TokenType.Eos, null);
+					this.Assembler.FatalError(Resource.UnexpectedEOF(p.ToString()));
+					this.Assembler.Error(Resource.IncludeFileMissing(p.ToString()));
+					return null;
 				default:
 					if(invalid.Contains((char)c)) {
 						this.Assembler.FatalError(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
-						this.SkipLine(c);
-						return new Token(p, TokenType.Eos, null);
+						this.Assembler.Error(Resource.IncludeFileMissing(p.ToString()));
+						return null;
 					}
 					text.Append((char)c);
 					break;

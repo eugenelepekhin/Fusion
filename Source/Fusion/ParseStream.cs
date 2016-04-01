@@ -44,8 +44,7 @@ namespace Fusion {
 					}
 				} else if(token.IsIdentifier() && token.Value == "include") {
 					Token file = this.TokenStream.NextPathString();
-					if(!file.IsString() || string.IsNullOrWhiteSpace(file.Value)) {
-						this.Assembler.Error(Resource.IncludeFileMissing(file.Position.ToString()));
+					if(file == null || !file.IsString() || string.IsNullOrWhiteSpace(file.Value)) {
 						continue;
 					}
 					string path = this.Find(file.Value.Trim());

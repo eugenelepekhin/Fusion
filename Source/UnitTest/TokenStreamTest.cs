@@ -91,8 +91,7 @@ namespace UnitTest {
 			File.WriteAllText(file, "\"hello\nworld\"");
 			using(TokenStream ts = new TokenStream(assembler, file)) {
 				Token actual = ts.NextPathString();
-				Assert.IsNotNull(actual);
-				Assert.IsTrue(TokenType.Eos == actual.TokenType && null == actual.Value);
+				Assert.IsNull(actual);
 			}
 		}
 	}
