@@ -250,4 +250,8 @@
   <data name="Usage" xml:space="preserve">
     <value>Usage: fusion &lt;InputFileName.asm&gt; &lt;OutputFileName.bin&gt;</value>
   </data>
+  <data name="UserError" xml:space="preserve">
+    <value>{0} at {1}</value>
+    <comment>{string message, string position}</comment>
+  </data>
 </root>

@@ -172,9 +172,9 @@ namespace Fusion {
 				}
 				if(this.message != null) {
 					if(this.Token.TextEqual(Assembler.ErrorName)) {
-						context.Assembler.Error(this.message);
+						context.Assembler.Error(Resource.UserError(this.message, this.Token.Position.ToString()));
 					} else {
-						context.Assembler.StandardOutput.WriteLine(this.message);
+						context.Assembler.StandardOutput.WriteLine(Resource.UserError(this.message, this.Token.Position.ToString()));
 					}
 				}
 			} else {

@@ -298,5 +298,12 @@ namespace Fusion {
  		public static string Usage {
 			get { return ResourceManager.GetString("Usage", Culture); }
 		}
+
+		/// <summary>
+		/// Looks up a localized string similar to {0} at {1}.
+		/// </summary>
+ 		public static string UserError(string message, string position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("UserError", Culture), message, position);
+		}
 	}
 }
