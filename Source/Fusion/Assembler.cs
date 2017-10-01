@@ -26,6 +26,8 @@ namespace Fusion {
 		public int ErrorCount { get; private set; }
 		private bool fatalError = false;
 		public bool CanContinue { get { return !this.fatalError && this.ErrorCount < 10; } }
+
+		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
 		public IEnumerable<string> SearchPath { get { yield break; } }
 		public Dictionary<string, MacroDefinition> Macro { get; private set; }
 
