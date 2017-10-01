@@ -79,6 +79,7 @@ namespace Fusion {
 			ListValue listValue = value as ListValue;
 			Debug.Assert(listValue != null);
 			listValue.ResolveLabels();
+			if(0 < this.ErrorCount) return;
 			listValue.WriteValue(this);
 			main.Body.WriteListing(this, listValue, 0);
 		}

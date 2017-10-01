@@ -12,7 +12,7 @@ namespace Fusion {
 		public int Address { get; set; }
 		public virtual bool IsComplete { get { return true; } }
 
-		public abstract int Size();
+		public abstract int Size(Context context);
 		public abstract Value WriteValue(Assembler assembler);
 
 		public NumberValue ToNumber() {
@@ -57,7 +57,7 @@ namespace Fusion {
 	public class VoidValue : Value {
 		public static readonly VoidValue Value = new VoidValue();
 		private VoidValue() {}
-		public override int Size() { return 0; }
+		public override int Size(Context context) { return 0; }
 		public override Value WriteValue(Assembler assembler) {
 			return this;
 		}
@@ -73,7 +73,7 @@ namespace Fusion {
 		public static readonly NumberValue True = new NumberValue(1);
 		public NumberValue(int value) { this.Value = value; }
 		public int Value { get; private set; }
-		public override int Size() { return 1; }
+		public override int Size(Context context) { return 1; }
 		public override Value WriteValue(Assembler assembler) {
 			int value = this.Value;
 			string error = assembler.BinaryFormatter.Write(value);
@@ -107,7 +107,7 @@ namespace Fusion {
 	public class StringValue : Value {
 		public StringValue(string value) { this.Value = value; }
 		public string Value { get; private set; }
-		public override int Size() { return this.Value.Length + 1; }
+		public override int Size(Context context) { return this.Value.Length + 1; }
 		public override Value WriteValue(Assembler assembler) {
 			if(this.Value != null) {
 				string error = null;
@@ -134,7 +134,7 @@ namespace Fusion {
 	public class ListValue : Value {
 		private List<Value> list = new List<Value>();
 		public List<Value> List { get { return this.list; } }
-		public override int Size() { return this.list.Sum(v => v.Size()); }
+		public override int Size(Context context) { return this.list.Sum(v => v.Size(context)); }
 		public override Value WriteValue(Assembler assembler) {
 			foreach(Value value in this.list) {
 				value.WriteValue(assembler);

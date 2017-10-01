@@ -28,7 +28,7 @@ namespace Fusion {
 
 		public abstract Value Evaluate(Context context, int address);
 
-		public override int Size() {
+		public override int Size(Context context) {
 			return 1;
 		}
 
@@ -49,6 +49,8 @@ namespace Fusion {
 			context.DefineLabel(this.Name, address);
 			return VoidValue.Value;
 		}
+
+		public override int Size(Context context) => 0;
 	}
 
 	public class LabelReference : Expression {
@@ -80,6 +82,8 @@ namespace Fusion {
 		public override Value Evaluate(Context context, int address) {
 			return this.Value;
 		}
+
+		public override int Size(Context context) => this.Value.Size(context);
 	}
 
 	public class Literal : Expression {
@@ -114,6 +118,14 @@ namespace Fusion {
 				return new NumberValue(this.Value.Number);
 			} else {
 				return new StringValue(this.Value.Value);
+			}
+		}
+
+		public override int Size(Context context) {
+			if(this.Value.IsNumber()) {
+				return 1;
+			} else {
+				return this.Value.Value.Length + 1;
 			}
 		}
 	}
@@ -170,6 +182,8 @@ namespace Fusion {
 			}
 			return VoidValue.Value;
 		}
+
+		public override int Size(Context context) => 0;
 	}
 
 	public class Unary : Expression {
@@ -396,6 +410,7 @@ namespace Fusion {
 		public Expression Condition { get; set; }
 		public ExpressionList Then { get; set; }
 		public ExpressionList Else { get; set; }
+		private Context Context {get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write("if(");
@@ -414,10 +429,24 @@ namespace Fusion {
 		}
 
 		public override Value Evaluate(Context context, int address) {
+			context = this.Context ?? context;
+			Debug.Assert(context != null);
 			Value condition = this.Condition.Evaluate(context, 0).ToSingular();
 			if(!condition.IsComplete) {
-				context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
-				return VoidValue.Value;
+				Debug.Assert(this.Context == null);
+				int thenSize = this.Then.Size(context);
+				int elseSize = (this.Else != null) ? this.Else.Size(context) : 0;
+				if(thenSize != elseSize) {
+					context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
+					return VoidValue.Value;
+				}
+				return new If() {
+					IfToken = this.IfToken,
+					Condition = this.Condition,
+					Then = this.Then,
+					Else = this.Else,
+					Context = context
+				};
 			}
 			NumberValue number = condition.ToNumber();
 			if(number == null) {
@@ -430,6 +459,31 @@ namespace Fusion {
 				return this.Else.Evaluate(context, address);
 			}
 			return VoidValue.Value;
+		}
+
+		public override int Size(Context context) {
+			if(this.Else == null) {
+				return this.Then.Size(context);
+			}
+			Value condition = this.Condition.Evaluate(context, 0).ToSingular();
+			if(condition.IsComplete) {
+				NumberValue number = condition.ToNumber();
+				if(number != null) {
+					if(number.Value != 0) {
+						return this.Then.Size(context);
+					} else {
+						return this.Else.Size(context);
+					}
+				} else {
+					return 0; // ignore now. this will cause an error later.
+				}
+			} else {
+				int size = this.Then.Size(context);
+				if(size != this.Else.Size(context)) {
+					context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
+				}
+				return size;
+			}
 		}
 	}
 
@@ -462,6 +516,17 @@ namespace Fusion {
 			}
 			return this.Macro.Body.Evaluate(callContext, address);
 		}
+
+		public override int Size(Context context) {
+			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
+			Context callContext = new Context() {
+				Assembler = context.Assembler, Macro = this.Macro
+			};
+			foreach(Expression arg in this.Parameter) {
+				callContext.AddArgument(arg.Evaluate(context, 0));
+			}
+			return this.Macro.Body.Size(callContext);
+		}
 	}
 
 	public class ExpressionList : Expression {
@@ -481,7 +546,7 @@ namespace Fusion {
 			foreach(Expression expr in this.List) {
 				Value value = expr.Evaluate(context, address);
 				value.Address = address;
-				address += value.Size();
+				address += value.Size(context);
 				list.List.Add(value);
 			}
 			return list;
@@ -550,5 +615,7 @@ namespace Fusion {
 				}
 			}
 		}
+
+		public override int Size(Context context) => this.List.Sum(expr => expr.Size(context));
 	}
 }
