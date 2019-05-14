@@ -139,7 +139,14 @@ namespace Fusion {
 		}
 
 		public override Value Evaluate(Context context, int address) {
-			return context.Argument(this.ParameterName);
+			Value value = context.Argument(this.ParameterName);
+			if(!value.IsComplete) {
+				Expression expression = value as Expression;
+				if(expression != null) {
+					return expression.Evaluate(context, address);
+				}
+			}
+			return value;
 		}
 	}
 
