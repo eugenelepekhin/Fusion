@@ -87,7 +87,6 @@
     <ReadLinesFromFile File="$(VersionInfoFile)">
       <Output TaskParameter="Lines" PropertyName="VersionInfoAsIs" />
     </ReadLinesFromFile>
-
     <WriteLinesToFile File="$(VersionInfoFile)" Lines="$(VersionInfo)" Overwrite="true" Condition=" '$(VersionInfoToBe)' != '$(VersionInfoAsIs)' and '$(Configuration)' == 'Release' " />
     <Exec Command="$(ResourceWrapperGeneratorCommand)" />
   </Target>
