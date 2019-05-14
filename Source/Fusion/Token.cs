@@ -34,6 +34,7 @@ namespace Fusion {
 		public bool IsComparison(string text) { return this.IsComparison() && this.TextEqual(text); }
 		public bool IsComparison(params string[] text) { return this.IsComparison() && this.TextEqual(text); }
 		public bool IsEos() { return this.TokenType == Fusion.TokenType.Eos; }
+		public bool IsError() { return this.TokenType == Fusion.TokenType.Error; }
 
 		public bool Equals(Token other) {
 			return this.TokenType == other.TokenType && this.TextEqual(other.Value);

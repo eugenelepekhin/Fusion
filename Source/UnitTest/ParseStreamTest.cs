@@ -74,5 +74,17 @@ namespace UnitTest {
 				this.TestFirst(stream, TokenType.Eos, null);
 			}
 		}
+
+		[TestMethod()]
+		public void ParseStreamNextErrorTest() {
+			Assembler assembler = AssemblerFactory.Create(this.TestContext);
+			string file = this.CreateChain("abc 0b 123", "def 0x abc");
+			using(ParseStream stream = new ParseStream(assembler, file)) {
+				this.TestFirst(stream, TokenType.Identifier, "abc");
+				this.TestNext(stream, TokenType.Error, "0b");
+				this.TestFirst(stream, TokenType.Identifier, "def");
+				this.TestNext(stream, TokenType.Error, "0x");
+			}
+		}
 	}
 }

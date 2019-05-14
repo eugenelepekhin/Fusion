@@ -24,7 +24,7 @@ namespace Fusion {
 			while(this.Assembler.CanContinue) {
 				int c = this.Skip();
 				if(c == -1) {
-					return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
+					break; // return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
 				}
 				if(TokenStream.IsDecimalDigit(c)) {
 					return this.Number(c);
@@ -165,13 +165,13 @@ namespace Fusion {
 				if(maxLenght < text.Length) {
 					this.Assembler.Error(Resource.BadNumberFormat(text.ToString(), p.ToString()));
 					this.SkipLine(c);
-					return null;
+					return new Token(p, TokenType.Error, text.ToString());
 				}
 			}
 			if(TokenStream.IsLetter(c) || text.Length < minLenght) {
 				this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 				this.SkipLine(c);
-				return null;
+				return new Token(p, TokenType.Error, text.ToString());
 			}
 			//TODO: still possible to have bad number here. Validate the parsed number.
 			return new Token(p, TokenType.Number, text.ToString());
@@ -223,16 +223,16 @@ namespace Fusion {
 					default:
 						this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 						this.SkipLine(c);
-						return null;
+						return new Token(p, TokenType.Error, text.ToString());
 					}
 					break;
 				case '\n':
 					this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
 					this.SkipLine(c);
-					return null;
+					return new Token(p, TokenType.Error, text.ToString());
 				case -1:
 					this.Assembler.Error(Resource.UnexpectedEOF(p.ToString()));
-					return null;
+					return new Token(p, TokenType.Error, text.ToString());
 				default:
 					text.Append((char)c);
 					break;

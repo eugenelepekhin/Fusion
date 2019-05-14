@@ -26,7 +26,7 @@ namespace UnitTest {
 			int errorCount = ts.Assembler.ErrorCount;
 			Token token = ts.Next();
 			Assert.AreEqual(errorCount + 1, ts.Assembler.ErrorCount, "Error expected");
-			Assert.IsTrue(token == null || token.IsString() && token.Value == "skip", "Unexpected token");
+			Assert.IsTrue(token.IsError() || token.IsString() && token.Value == "skip", "Unexpected token");
 		}
 
 		/// <summary>
