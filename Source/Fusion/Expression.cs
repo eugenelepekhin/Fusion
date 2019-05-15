@@ -550,6 +550,7 @@ namespace Fusion {
 
 		public override Value Evaluate(Context context, int address) {
 			ListValue list = new ListValue();
+			list.Address = address;
 			foreach(Expression expr in this.List) {
 				Value value = expr.Evaluate(context, address);
 				value.Address = address;
@@ -575,7 +576,7 @@ namespace Fusion {
 					assembler.StandardOutput.WriteLine();
 					if(resultList.List.Count > 0) {
 						if(call.Macro.Atomic) {
-							ExpressionList.WriteAddress(assembler, resultList.List[0].Address);
+							ExpressionList.WriteAddress(assembler, resultList.Address);
 							foreach(Value v in resultList.List) {
 								ExpressionList.WriteText(assembler, v);
 							}
