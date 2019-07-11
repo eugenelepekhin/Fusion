@@ -4,9 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace Fusion {
-	public class Program {
+	public static class Program {
 		//Debug: "E:\Projects\Fusion\Test.asm" "E:\Projects\Fusion\Test.bin"
 		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
+		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
 		public static int Main(string[] args) {
 			int returnCode = 1;
 			try {

@@ -17,28 +17,31 @@ namespace Fusion {
 			this.Value = value;
 		}
 
-		public bool TextEqual(string text) { return StringComparer.Ordinal.Compare(this.Value, text) == 0; }
-		public bool TextEqual(params string[] text) { return text.Contains(this.Value, StringComparer.Ordinal); }
+		public bool TextEqual(string data) { return StringComparer.Ordinal.Compare(this.Value, data) == 0; }
+		public bool TextEqual(params string[] oneOf) { return oneOf.Contains(this.Value, StringComparer.Ordinal); }
 
 		public bool IsNumber() { return this.TokenType == Fusion.TokenType.Number; }
 		public bool IsString() { return this.TokenType == Fusion.TokenType.String; }
 		public bool IsIdentifier() { return this.TokenType == Fusion.TokenType.Identifier; }
-		public bool IsIdentifier(string text) { return this.IsIdentifier() && this.TextEqual(text); }
-		public bool IsIdentifier(params string[] text) { return this.IsIdentifier() && this.TextEqual(text); }
+		public bool IsIdentifier(string data) { return this.IsIdentifier() && this.TextEqual(data); }
+		public bool IsIdentifier(params string[] oneOf) { return this.IsIdentifier() && this.TextEqual(oneOf); }
 		public bool IsSeparator() { return this.TokenType == Fusion.TokenType.Separator; }
-		public bool IsSeparator(string text) { return this.IsSeparator() && this.TextEqual(text); }
+		public bool IsSeparator(string data) { return this.IsSeparator() && this.TextEqual(data); }
 		public bool IsOperator() { return this.TokenType == Fusion.TokenType.Operator; }
-		public bool IsOperator(string text) { return this.IsOperator() && this.TextEqual(text); }
-		public bool IsOperator(params string[] text) { return this.IsOperator() && this.TextEqual(text); }
+		public bool IsOperator(string data) { return this.IsOperator() && this.TextEqual(data); }
+		public bool IsOperator(params string[] oneOf) { return this.IsOperator() && this.TextEqual(oneOf); }
 		public bool IsComparison() { return this.TokenType == Fusion.TokenType.Comparison; }
-		public bool IsComparison(string text) { return this.IsComparison() && this.TextEqual(text); }
-		public bool IsComparison(params string[] text) { return this.IsComparison() && this.TextEqual(text); }
+		public bool IsComparison(string data) { return this.IsComparison() && this.TextEqual(data); }
+		public bool IsComparison(params string[] oneOf) { return this.IsComparison() && this.TextEqual(oneOf); }
 		public bool IsEos() { return this.TokenType == Fusion.TokenType.Eos; }
 		public bool IsError() { return this.TokenType == Fusion.TokenType.Error; }
 
 		public bool Equals(Token other) {
 			return this.TokenType == other.TokenType && this.TextEqual(other.Value);
 		}
+
+		public override bool Equals(object obj) => base.Equals(obj);
+		public override int GetHashCode() => base.GetHashCode();
 
 		public int Number {
 			get {

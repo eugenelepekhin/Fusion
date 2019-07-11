@@ -9,3 +9,4 @@ glob:*.vsp
 glob:*.psess
 syntax: glob
 */.vs/*
+*/packages/*

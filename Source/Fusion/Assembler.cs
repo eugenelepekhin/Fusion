@@ -459,9 +459,9 @@ namespace Fusion {
 			return null;
 		}
 
-		private bool EnsureSeparator(Token token, string text) {
-			if(!token.IsSeparator(text)) {
-				this.Error(Resource.ItemExpected(text, token.Value, token.Position.ToString()));
+		private bool EnsureSeparator(Token token, string value) {
+			if(!token.IsSeparator(value)) {
+				this.Error(Resource.ItemExpected(value, token.Value, token.Position.ToString()));
 				return false;
 			}
 			return true;
