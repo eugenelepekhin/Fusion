@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Threading;
 
 namespace Fusion {
 	public static class Program {
@@ -17,7 +17,8 @@ namespace Fusion {
 					using(MemoryStream bin = new MemoryStream(16 * 1024)) {
 						using(BinaryWriter writer = new BinaryWriter(bin)) {
 							Assembler assembler = new Assembler(Console.Error, Console.Out, writer);
-							assembler.Compile(args[0]);
+							Program.RunOnBigStack(() => assembler.Compile(args[0]));
+							//assembler.Compile(args[0]);
 							if(assembler.ErrorCount <= 0) {
 								returnCode = 0;
 								writer.Flush();
@@ -38,6 +39,13 @@ namespace Fusion {
 				returnCode = 1;
 			}
 			return returnCode;
+		}
+
+		private static void RunOnBigStack(Action action) {
+			Thread thread = new Thread(new ThreadStart(action), 1024 * 1024 * 100);
+			thread.Name = "compile";
+			thread.Start();
+			thread.Join();
 		}
 	}
 }

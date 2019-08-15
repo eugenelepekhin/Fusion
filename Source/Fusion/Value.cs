@@ -23,25 +23,17 @@ namespace Fusion {
 		}
 
 		public StringValue ToStringValue() {
-			if(this.ToSingular() is StringValue str) {
+			Value value = this.ToSingular();
+			if(value is StringValue str) {
 				return str;
 			}
-			if(this.ToSingular() is NumberValue num) {
+			if(value is NumberValue num) {
 				return new StringValue(num.Value.ToString("X", CultureInfo.InvariantCulture));
 			}
 			return null;
 		}
 
-
-		public Value ToSingular() {
-			if(this is ListValue list && list != null && 0 < list.List.Count) {
-				IEnumerable<Value> select(Value value) { yield return value; }
-				IEnumerable<Value> flatten(IEnumerable<Value> v) => v.SelectMany(value => (value is ListValue l) ? flatten(l.List) : select(value));
-				List<Value> values = flatten(list.List).Where(value => !(value is VoidValue)).ToList();
-				if(1 == values.Count) {
-					return values[0];
-				}
-			}
+		public virtual Value ToSingular() {
 			return this;
 		}
 
@@ -142,6 +134,35 @@ namespace Fusion {
 			}
 			return this;
 		}
+
+		public override Value ToSingular() {
+			List<Value> list = new List<Value>(2);
+			void extract(IEnumerable<Value> values) {
+				if(values != null) {
+					foreach(Value value in values) {
+						if(!(value is VoidValue)) {
+							if(value is ListValue subList) {
+								extract(subList.List);
+							} else {
+								list.Add(value);
+							}
+
+							if(1 < list.Count) {
+								break;
+							}
+						}
+					}
+				}
+			}
+			extract(this.List);
+
+			if(1 == list.Count) {
+				return list[0];
+			}
+
+			return this;
+		}
+
 		public void ResolveLabels() {
 			for(int i = 0; i < this.List.Count; i++) {
 				if(this.List[i] is ListValue listValue) {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 
 namespace Fusion {
 	public class Context {
@@ -48,5 +48,16 @@ namespace Fusion {
 			Debug.Assert(this.IsLabelDefined(labelName));
 			return this.label[labelName.Value];
 		}
+
+		#if DEBUG
+			public override string ToString() {
+				string append(string text, string value) => string.IsNullOrEmpty(text) ? value : text + ", " + value;
+				return string.Format(CultureInfo.InvariantCulture,
+					"{{macro:{0} ({1})}}",
+					this.Macro.Name.Value,
+					(this.argument == null) ? "" : this.argument.Aggregate("", (x, y) => append(x, y.ToString()))
+				);
+			}
+		#endif
 	}
 }
