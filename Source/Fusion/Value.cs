@@ -32,10 +32,13 @@ namespace Fusion {
 			return null;
 		}
 
+
 		public Value ToSingular() {
 			if(this is ListValue list && list != null && 0 < list.List.Count) {
-				List<Value> values = list.List.Where(value => !(value is VoidValue)).ToList();
-				if(values.Count == 1) {
+				IEnumerable<Value> select(Value value) { yield return value; }
+				IEnumerable<Value> flatten(IEnumerable<Value> v) => v.SelectMany(value => (value is ListValue l) ? flatten(l.List) : select(value));
+				List<Value> values = flatten(list.List).Where(value => !(value is VoidValue)).ToList();
+				if(1 == values.Count) {
 					return values[0];
 				}
 			}
