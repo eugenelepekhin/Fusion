@@ -204,6 +204,9 @@ namespace UnitTest {
 			// if statement resulting in void value should be ignored to not affect arithmetic
 			this.CompileTest("macro c a {if(a<0){error \"hello\"}a}macro main{1+c 3}", 4);
 			this.CompileTest("macro c a {if(a<0){error \"world\"}a*3}macro main{4+c 5}", 19);
+			// also check for sublist
+			this.CompileTest("macro c a{if(a<0){error\"world\"}a*3}macro b a{if(a==1){c 10}else{if(a==2){c 20}else{error\"error\"}}}macro main{4+b 2}", 64);
+			this.CompileTest("macro c a{if(a<0){error\"world\"}a*3}macro b a{if(a==2){c 10}else{if(a==1){error\"error\"}else{c a}}}macro main{4+b 4}", 16);
 		}
 
 		/// <summary>
