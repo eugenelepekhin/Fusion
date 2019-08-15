@@ -9,8 +9,8 @@ namespace Fusion {
 	public sealed class ParseStream : IDisposable {
 
 		public Assembler Assembler { get; private set; }
-		private Stack<TokenStream> include = new Stack<TokenStream>();
-		private HashSet<string> parsing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+		private readonly Stack<TokenStream> include = new Stack<TokenStream>();
+		private readonly HashSet<string> parsing = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 		private Token returned;
 
 		private TokenStream TokenStream { get { return this.include.Peek(); } }

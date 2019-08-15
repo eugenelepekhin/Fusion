@@ -7,7 +7,7 @@ namespace Fusion {
 	public sealed class TokenStream : IDisposable {
 		public Assembler Assembler { get; set; }
 		public string Path { get; private set; }
-		private StreamReader reader;
+		private readonly StreamReader reader;
 		private int line = 1;
 
 		public TokenStream(Assembler assembler, string file) {
@@ -33,13 +33,13 @@ namespace Fusion {
 					return this.Identifier(c);
 				}
 				if(c == '"') {
-					return this.String(c);
+					return this.String();
 				}
 				if(TokenStream.IsSeparator(c)) {
 					return this.Separator(c);
 				}
 				this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, new Position(this.Path, this.line).ToString()));
-				c = this.SkipLine(c);
+				this.SkipLine();
 			}
 			return new Token(new Position(this.Path, this.line), TokenType.Eos, null);
 		}
@@ -52,9 +52,10 @@ namespace Fusion {
 				this.Assembler.Error(Resource.IncludeFileMissing(p.ToString()));
 				return null;
 			}
-			HashSet<char> invalid = new HashSet<char>(System.IO.Path.GetInvalidPathChars());
-			invalid.Add('\n'); // just make sure these chars are included
-			invalid.Add('\r');
+			HashSet<char> invalid = new HashSet<char>(System.IO.Path.GetInvalidPathChars()) {
+				'\n', // just make sure these chars are included
+				'\r'
+			};
 			StringBuilder text = new StringBuilder(128);
 			this.reader.Read();
 			for(;;) {
@@ -85,16 +86,12 @@ namespace Fusion {
 			return ' ';
 		}
 
-		public void SkipLine() {
-			this.SkipLine(0);
-		}
-
-		private int SkipLine(int c) {
+		private void SkipLine() {
+			int c;
 			do {
 				this.reader.Read();
 				c = this.reader.Peek();
 			} while(c != -1 && c != '\n');
-			return c;
 		}
 
 		private static bool IsWhiteSpace(int c) { return c != -1 && char.IsWhiteSpace((char)c); }
@@ -164,25 +161,25 @@ namespace Fusion {
 				c = this.reader.Peek();
 				if(maxLenght < text.Length) {
 					this.Assembler.Error(Resource.BadNumberFormat(text.ToString(), p.ToString()));
-					this.SkipLine(c);
+					this.SkipLine();
 					return new Token(p, TokenType.Error, text.ToString());
 				}
 			}
 			if(TokenStream.IsLetter(c) || text.Length < minLenght) {
 				this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
-				this.SkipLine(c);
+				this.SkipLine();
 				return new Token(p, TokenType.Error, text.ToString());
 			}
 			//TODO: still possible to have bad number here. Validate the parsed number.
 			return new Token(p, TokenType.Number, text.ToString());
 		}
 
-		private Token String(int c) {
+		private Token String() {
 			StringBuilder text = new StringBuilder(64);
 			Position p = new Position(this.Path, this.line);
 			this.reader.Read();
 			for(;;) {
-				c = this.reader.Read();
+				int c = this.reader.Read();
 				switch(c) {
 				case '"':
 					return new Token(p, TokenType.String, text.ToString());
@@ -222,13 +219,13 @@ namespace Fusion {
 					//case 'x':
 					default:
 						this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
-						this.SkipLine(c);
+						this.SkipLine();
 						return new Token(p, TokenType.Error, text.ToString());
 					}
 					break;
 				case '\n':
 					this.Assembler.Error(Resource.UnexpectedChar(TokenStream.MakePrintable((char)c), c, p.ToString()));
-					this.SkipLine(c);
+					this.SkipLine();
 					return new Token(p, TokenType.Error, text.ToString());
 				case -1:
 					this.Assembler.Error(Resource.UnexpectedEOF(p.ToString()));

@@ -4,18 +4,16 @@ using System.Diagnostics.CodeAnalysis;
 namespace Fusion {
 	[SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
 	public struct Position {
-		private string file;
-		public string File { get { return this.file; } }
-		private int line;
-		public int Line { get { return this.line; } }
+		public string File { get; }
+		public int Line { get; }
 
 		public Position(string file, int line) {
-			this.file = file;
-			this.line = line;
+			this.File = file;
+			this.Line = line;
 		}
 
 		public override string ToString() {
-			return Resource.PositionText(this.file, this.line);
+			return Resource.PositionText(this.File, this.Line);
 		}
 	}
 }

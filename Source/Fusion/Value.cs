@@ -16,20 +16,17 @@ namespace Fusion {
 		public abstract Value WriteValue(Assembler assembler);
 
 		public NumberValue ToNumber() {
-			NumberValue number = this.ToSingular() as NumberValue;
-			if(number != null) {
+			if(this.ToSingular() is NumberValue number) {
 				return number;
 			}
 			return null;
 		}
 
 		public StringValue ToStringValue() {
-			StringValue str = this.ToSingular() as StringValue;
-			if(str != null) {
+			if(this.ToSingular() is StringValue str) {
 				return str;
 			}
-			NumberValue num = this.ToSingular() as NumberValue;
-			if(num != null) {
+			if(this.ToSingular() is NumberValue num) {
 				return new StringValue(num.Value.ToString("X", CultureInfo.InvariantCulture));
 			}
 			return null;
@@ -113,7 +110,7 @@ namespace Fusion {
 		public override Value WriteValue(Assembler assembler) {
 			if(this.Value != null) {
 				string error = null;
-				string message = null;
+				string message;
 				foreach(char c in this.Value) {
 					message = assembler.BinaryFormatter.Write(c);
 					error = error ?? message;
@@ -134,23 +131,20 @@ namespace Fusion {
 	}
 
 	public class ListValue : Value {
-		private List<Value> list = new List<Value>();
-		public List<Value> List { get { return this.list; } }
-		public override int Size(Context context) { return this.list.Sum(v => v.Size(context)); }
+		public List<Value> List { get; } = new List<Value>();
+		public override int Size(Context context) { return this.List.Sum(v => v.Size(context)); }
 		public override Value WriteValue(Assembler assembler) {
-			foreach(Value value in this.list) {
+			foreach(Value value in this.List) {
 				value.WriteValue(assembler);
 			}
 			return this;
 		}
 		public void ResolveLabels() {
 			for(int i = 0; i < this.List.Count; i++) {
-				ListValue listValue = this.List[i] as ListValue;
-				if(listValue != null) {
+				if(this.List[i] is ListValue listValue) {
 					listValue.ResolveLabels();
 				} else {
-					Expression expression = this.List[i] as Expression;
-					if(expression != null) {
+					if(this.List[i] is Expression expression) {
 						this.List[i] = expression.Evaluate(null, 0);
 						Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
 						this.List[i].Address = expression.Address;
@@ -164,7 +158,7 @@ namespace Fusion {
 				StringBuilder text = new StringBuilder();
 				text.Append("ListValue(");
 				bool first = true;
-				foreach(Value value in this.list) {
+				foreach(Value value in this.List) {
 					if(!first) {
 						text.Append(" ");
 					} else {

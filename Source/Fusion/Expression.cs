@@ -141,8 +141,7 @@ namespace Fusion {
 		public override Value Evaluate(Context context, int address) {
 			Value value = context.Argument(this.ParameterName);
 			if(!value.IsComplete) {
-				Expression expression = value as Expression;
-				if(expression != null) {
+				if(value is Expression expression) {
 					return expression.Evaluate(context, address);
 				}
 			}
@@ -549,8 +548,9 @@ namespace Fusion {
 		}
 
 		public override Value Evaluate(Context context, int address) {
-			ListValue list = new ListValue();
-			list.Address = address;
+			ListValue list = new ListValue {
+				Address = address
+			};
 			foreach(Expression expr in this.List) {
 				Value value = expr.Evaluate(context, address);
 				value.Address = address;
@@ -562,15 +562,13 @@ namespace Fusion {
 
 		public void WriteListing(Assembler assembler, ListValue result, int indent) {
 			this.List.Zip<Expression, Value, int>(result.List, (expr, value) => {
-				ExpressionList list = expr as ExpressionList;
 				ListValue resultList = value as ListValue;
-				if(list != null) {
+				if(expr is ExpressionList list) {
 					Debug.Assert(resultList != null);
 					list.WriteListing(assembler, resultList, indent);
 					return 0;
 				}
-				Call call = expr as Call;
-				if(call != null) {
+				if(expr is Call call) {
 					Debug.Assert(resultList != null);
 					call.WriteText(assembler.StandardOutput, indent);
 					assembler.StandardOutput.WriteLine();
@@ -612,8 +610,7 @@ namespace Fusion {
 				if(s is StringValue) {
 					assembler.StandardOutput.Write("{0} ", s.Value);
 				} else {
-					ListValue list = value as ListValue;
-					if(list != null) {
+					if(value is ListValue list) {
 						foreach(var item in list.List) {
 							ExpressionList.WriteText(assembler, item);
 						}
