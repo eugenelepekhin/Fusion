@@ -36,9 +36,11 @@ namespace Fusion {
 		}
 
 		public Value ToSingular() {
-			ListValue list = this as ListValue;
-			if(list != null && list.List.Count == 1) {
-				return list.List[0];
+			if(this is ListValue list && list != null && 0 < list.List.Count) {
+				List<Value> values = list.List.Where(value => !(value is VoidValue)).ToList();
+				if(values.Count == 1) {
+					return values[0];
+				}
 			}
 			return this;
 		}

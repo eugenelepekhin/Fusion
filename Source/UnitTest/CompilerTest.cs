@@ -200,6 +200,10 @@ namespace UnitTest {
 			int errorCount;
 			byte[] actual = this.Compile("macro main{1 \"abc\"+a 2 3 a: 4 5}", out errorCount);
 			Assert.IsTrue(0 < errorCount);
+
+			// if statement resulting in void value should be ignored to not affect arithmetic
+			this.CompileTest("macro c a {if(a<0){error \"hello\"}a}macro main{1+c 3}", 4);
+			this.CompileTest("macro c a {if(a<0){error \"world\"}a*3}macro main{4+c 5}", 19);
 		}
 
 		/// <summary>
