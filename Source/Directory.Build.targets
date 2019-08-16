@@ -14,7 +14,6 @@
 [assembly: System.Reflection.AssemblyVersion("$(VersionString)")]
 [assembly: System.Reflection.AssemblyFileVersion("$(VersionString)")]
 			</VersionInfo>
-
 		</PropertyGroup>
 		<!--<Message Importance="high" Text=">>> Building Resource Wrappers: $(ResourceWrapperGeneratorCommand)"/>-->
 		<Exec Command="$(ResourceWrapperGeneratorCommand)"/>
@@ -29,5 +28,11 @@
 			<Output TaskParameter="Lines" PropertyName="VersionInfoAsIs" />
 		</ReadLinesFromFile>
 		<WriteLinesToFile File="$(VersionInfoFile)" Lines="$(VersionInfo)" Overwrite="true" Condition=" '$(VersionInfoToBe)' != '$(VersionInfoAsIs)' and '$(Configuration)' == 'Release' "/>
+
+		<ItemGroup>
+			<DocsItems Include="$(MSBuildThisFileDirectory)\Docs\*.*"/>
+		</ItemGroup>
+
+		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" Condition="'$(Configuration)' == 'Release'" SkipUnchangedFiles="true"/>
 	</Target>
 </Project>
