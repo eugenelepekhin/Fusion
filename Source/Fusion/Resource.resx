@@ -136,6 +136,10 @@
   <data name="FileChanged" xml:space="preserve">
     <value>Compiled file get changed between passes.</value>
   </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>File not found: {0}</value>
+    <comment>{string file}</comment>
+  </data>
   <data name="IdentifierExpected" xml:space="preserve">
     <value>Identifier is expected instead of {0} at {1}</value>
     <comment>{string text, string position}</comment>

@@ -11,6 +11,11 @@ namespace Fusion {
 		private int line = 1;
 
 		public TokenStream(Assembler assembler, string file) {
+			if(!File.Exists(file)) {
+				string error = Resource.FileNotFound(file);
+				assembler.FatalError(error);
+				throw new FileNotFoundException(error);
+			}
 			this.Assembler = assembler;
 			this.Path = file;
 			this.reader = File.OpenText(file);

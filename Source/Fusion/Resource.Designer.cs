@@ -90,6 +90,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to File not found: {0}.
+		/// </summary>
+ 		public static string FileNotFound(string file) {
+			return string.Format(FormatCulture, ResourceManager.GetString("FileNotFound", Culture), file);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Identifier is expected instead of {0} at {1}.
 		/// </summary>
  		public static string IdentifierExpected(string text, string position) {
