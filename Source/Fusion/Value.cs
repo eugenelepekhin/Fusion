@@ -76,6 +76,9 @@ namespace Fusion {
 			}
 			return this;
 		}
+
+		public NumberValue ToBoolean() => (this.Value == 0) ? NumberValue.False : NumberValue.True;
+
 		#if DEBUG
 			public override string ToString() {
 				return string.Format(CultureInfo.InvariantCulture, "NumberValue(0x{0:X})", this.Value);

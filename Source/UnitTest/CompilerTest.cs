@@ -79,8 +79,8 @@ namespace UnitTest {
 			this.CompileTest("macro main{\"abc\"}", (byte)'a', (byte)'b', (byte)'c', 0);
 			this.CompileTest("macro main{a 5 a 7} macro a p{p}", 5, 7);
 			this.CompileTest("macro main{!3 !0 (+4) (-3) (~5)}", 0, 1, 4, (byte)((-3) & 0xFF), (byte)((~5) & 0xFF));
-			this.CompileTest("macro main{(0||0) (5||0) (0||6) (4||7)}", 0, 5, 6, 4);
-			this.CompileTest("macro main{(0&&0) (5&&0) (0&&6) (4&&7)}", 0, 0, 0, 7);
+			this.CompileTest("macro main{(0||0) (5||0) (0||6) (4||7)}", 0, 1, 1, 1);
+			this.CompileTest("macro main{(0&&0) (5&&0) (0&&6) (4&&7)}", 0, 0, 0, 1);
 			this.CompileTest("macro main{(0<0) (-1<0) (0<1) (-3<-5) (6<3) (4<7)}", 0, 1, 1, 0, 0, 1);
 			this.CompileTest("macro main{(0>0) (-1>0) (0>1) (-3>-5) (6>3) (4>7)}", 0, 0, 0, 1, 1, 0);
 			this.CompileTest("macro main{(0<=0) (-1<=0) (0<=1) (-3<=-5) (6<=3) (4<=7) (2<=2)}", 1, 1, 1, 0, 0, 1, 1);
@@ -138,15 +138,15 @@ namespace UnitTest {
 			this.CompileTest("macro main{0 ~a 2 a:3}", 0, (byte)(~3 & 0xFF), 2, 3);
 			this.CompileTest("macro main{0 m ~a 2 a:3} macro m x{x}", 0, (byte)(~3 & 0xFF), 2, 3);
 
-			this.CompileTest("macro main{0 a || 0 2 a:3}", 0, 3, 2, 3);
-			this.CompileTest("macro main{0 m a || 0 2 a:3} macro m x{x}", 0, 3, 2, 3);
-			this.CompileTest("macro main{0 0 || a 2 a:3}", 0, 3, 2, 3);
-			this.CompileTest("macro main{0 m 0 || a 2 a:3} macro m x{x}", 0, 3, 2, 3);
+			this.CompileTest("macro main{0 a || 0 2 a:3}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 m a || 0 2 a:3} macro m x{x}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 0 || a 2 a:3}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 m 0 || a 2 a:3} macro m x{x}", 0, 1, 2, 3);
 
-			this.CompileTest("macro main{0 a && 10 2 a:3}", 0, 10, 2, 3);
-			this.CompileTest("macro main{0 m a && 10 2 a:3} macro m x{x}", 0, 10, 2, 3);
-			this.CompileTest("macro main{0 10 && a 2 a:3}", 0, 3, 2, 3);
-			this.CompileTest("macro main{0 m 10 && a 2 a:3} macro m x{x}", 0, 3, 2, 3);
+			this.CompileTest("macro main{0 a && 10 2 a:3}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 m a && 10 2 a:3} macro m x{x}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 10 && a 2 a:3}", 0, 1, 2, 3);
+			this.CompileTest("macro main{0 m 10 && a 2 a:3} macro m x{x}", 0, 1, 2, 3);
 
 			this.CompileTest("macro main{0 a < 10 2 a:3}", 0, 1, 2, 3);
 			this.CompileTest("macro main{0 m a < 10 2 a:3} macro m x{x}", 0, 1, 2, 3);

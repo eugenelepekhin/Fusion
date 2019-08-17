@@ -228,6 +228,28 @@ namespace Fusion {
 		}
 	}
 
+	public class ToBoolean : Expression {
+		public Expression Operand { get; set; }
+		public Token PositionToken { get; set; }
+
+		public override void WriteText(TextWriter writer, int indent) {
+			throw new InvalidOperationException();
+		}
+
+		public override Value Evaluate(Context context, int address) {
+			Value value = this.Operand.Evaluate(context, address).ToSingular();
+			if(!value.IsComplete) {
+				return new ToBoolean() { Operand = (Expression)value, PositionToken = this.PositionToken };
+			}
+			NumberValue numberValue = value.ToNumber();
+			if(numberValue != null) {
+				return numberValue.ToBoolean();
+			}
+			context.Assembler.Error(Resource.NumberValueExpected(this.PositionToken.Position.ToString()));
+			return VoidValue.Value;
+		}
+	}
+
 	public class Binary : Expression {
 		public Expression Left { get; set; }
 		public Token Operation { get; set; }
@@ -279,15 +301,16 @@ namespace Fusion {
 			NumberValue leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value != 0) {
-					return leftNumber;
+					return leftNumber.ToBoolean();
 				}
 				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
-					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
+					//return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
+					return new ToBoolean() { Operand = (Expression)right, PositionToken = this.Operation };
 				}
 				NumberValue rightNumber = right.ToNumber();
 				if(rightNumber != null) {
-					return rightNumber;
+					return rightNumber.ToBoolean();
 				}
 			}
 			context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
@@ -302,15 +325,16 @@ namespace Fusion {
 			NumberValue leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value == 0) {
-					return leftNumber;
+					return leftNumber.ToBoolean();
 				}
 				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
-					return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
+					//return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
+					return new ToBoolean() { Operand = (Expression)right, PositionToken = this.Operation };
 				}
 				NumberValue rightNumber = right.ToNumber();
 				if(rightNumber != null) {
-					return right;
+					return rightNumber.ToBoolean();
 				}
 			}
 			context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
