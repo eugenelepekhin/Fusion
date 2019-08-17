@@ -83,20 +83,20 @@ namespace Fusion {
 		#endif
 	}
 
-	public class LabelValue : NumberValue {
-		public static readonly LabelValue Label = new LabelValue();
-		private LabelValue() : base(0) {}
-		public override Value WriteValue(Assembler assembler) {
-			assembler.Error(Resource.IncorrectValue("Label", assembler.BinaryFormatter.Position));
-			assembler.BinaryFormatter.Write(0xFF);
-			return this;
-		}
-		#if DEBUG
-			public override string ToString() {
-				return "LabelValue unresolved";
-			}
-		#endif
-	}
+	//public class LabelValue : NumberValue {
+	//	public static readonly LabelValue Label = new LabelValue();
+	//	private LabelValue() : base(0) {}
+	//	public override Value WriteValue(Assembler assembler) {
+	//		assembler.Error(Resource.IncorrectValue("Label", assembler.BinaryFormatter.Position));
+	//		assembler.BinaryFormatter.Write(0xFF);
+	//		return this;
+	//	}
+	//	#if DEBUG
+	//		public override string ToString() {
+	//			return "LabelValue unresolved";
+	//		}
+	//	#endif
+	//}
 
 	public class StringValue : Value {
 		public StringValue(string value) { this.Value = value; }
