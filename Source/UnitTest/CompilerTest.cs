@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using Fusion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -14,14 +16,16 @@ namespace UnitTest {
 	public class CompilerTest {
 		public TestContext TestContext { get; set; }
 
-		private byte[] Compile(string text, out int errorCount) {
+		private byte[] Compile(string text, out int errorCount, out string errors) {
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileTest.asm");
 			File.WriteAllText(file, text);
+			StringBuilder output = new StringBuilder();
 			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
 				using(BinaryWriter writer = new BinaryWriter(stream)) {
-					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer);
+					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output);
 					assembler.Compile(file);
 					errorCount = assembler.ErrorCount;
+					errors = output.ToString();
 					if(assembler.ErrorCount <= 0) {
 						writer.Flush();
 						return stream.ToArray();
@@ -29,6 +33,9 @@ namespace UnitTest {
 				}
 			}
 			return null;
+		}
+		private byte[] Compile(string text, out int errorCount) {
+			return this.Compile(text, out errorCount, out _);
 		}
 
 		private void CompileTest(string text, params byte[] expected) {
@@ -46,10 +53,11 @@ namespace UnitTest {
 			byte[] actual = this.Compile(text, out errorCount);
 			Assert.AreEqual(0, errorCount);
 			Assert.AreEqual(expected.Length * 2, actual.Length);
-			int i = 0;
 			using(MemoryStream stream = new MemoryStream(actual)) {
 				using(BinaryReader reader = new BinaryReader(stream)) {
-					Assert.AreEqual((int)reader.ReadInt16(), actual[i++]);
+					foreach(int expectedItem in expected) {
+						Assert.AreEqual((int)(ushort)reader.ReadInt16(), expectedItem);
+					}
 				}
 			}
 		}
@@ -62,9 +70,27 @@ namespace UnitTest {
 			int i = 0;
 			using(MemoryStream stream = new MemoryStream(actual)) {
 				using(BinaryReader reader = new BinaryReader(stream)) {
-					Assert.AreEqual(reader.ReadInt32(), actual[i++]);
+					foreach(int expectedItem in expected) {
+						Assert.AreEqual(reader.ReadInt32(), expectedItem);
+						//Assert.AreEqual(reader.ReadInt32(), actual[i++]);
+					}
 				}
 			}
+		}
+
+		private string CompileErrors(string text) {
+			int count;
+			string errors;
+			this.Compile(text, out count, out errors);
+			Assert.IsTrue(0 < count && !string.IsNullOrEmpty(errors), "Expecting compilation errors");
+			return errors;
+		}
+
+		private void CompileErrorsTest(string text, string errorFragment) {
+			string errors = this.CompileErrors(text);
+			StringAssert.Matches(errors, new Regex(errorFragment, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
+				"Expected error fragment ({0}) not found in error message: {1}", errorFragment, errors
+			);
 		}
 
 		/// <summary>
@@ -184,6 +210,14 @@ namespace UnitTest {
 			this.CompileTest("macro main{0 a:1 2 3 b:4 5 b-a}", 0, 1, 2, 3, 4, 5, 3);
 			this.CompileTest("macro main{0 a:1 2 3 b:4 5 m b,a} macro m max, min{max-min+10}", 0, 1, 2, 3, 4, 5, 13);
 			this.CompileTest("macro main{m b,a 0 a:1 2 3 b:4 5} macro m max, min{max-min+10}", 13, 0, 1, 2, 3, 4, 5);
+		}
+
+		/// <summary>
+		///A test for Compilation errors
+		///</summary>
+		[TestMethod()]
+		public void AssemblerCompileErrorTest() {
+			this.CompileErrorsTest("macro a x{if(0<x){x}}macro main{1 a m m:2}", "Condition is incomplete value");
 		}
 
 		/// <summary>
