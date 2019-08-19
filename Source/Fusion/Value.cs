@@ -130,7 +130,19 @@ namespace Fusion {
 
 	public class ListValue : Value {
 		public List<Value> List { get; } = new List<Value>();
-		public override int Size(Context context) { return this.List.Sum(v => v.Size(context)); }
+
+		private int size = -1;
+
+		public override int Size(Context context) {
+			if(this.size < 0) {
+				this.size = this.List.Sum(v => v.Size(context));
+			#if DEBUG
+			} else {
+				Debug.Assert(this.size == this.List.Sum(v => v.Size(context)));
+			#endif
+			}
+			return this.size;
+		}
 		public override Value WriteValue(Assembler assembler) {
 			foreach(Value value in this.List) {
 				value.WriteValue(assembler);

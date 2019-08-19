@@ -67,7 +67,6 @@ namespace UnitTest {
 			byte[] actual = this.Compile(text, out errorCount);
 			Assert.AreEqual(0, errorCount);
 			Assert.AreEqual(expected.Length * 4, actual.Length);
-			int i = 0;
 			using(MemoryStream stream = new MemoryStream(actual)) {
 				using(BinaryReader reader = new BinaryReader(stream)) {
 					foreach(int expectedItem in expected) {
