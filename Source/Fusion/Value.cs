@@ -152,23 +152,22 @@ namespace Fusion {
 
 		public override Value ToSingular() {
 			List<Value> list = new List<Value>(2);
-			void extract(IEnumerable<Value> values) {
-				if(values != null) {
-					foreach(Value value in values) {
-						if(!(value is VoidValue)) {
-							if(value is ListValue subList) {
-								extract(subList.List);
-							} else {
-								list.Add(value);
-							}
-
-							if(1 < list.Count) {
-								break;
-							}
+			bool extract(List<Value> values) {
+				foreach(Value value in values) {
+					if(value is ListValue listValue) {
+						if(extract(listValue.List)) {
+							return true;
+						}
+					} else if(!(value is VoidValue)) {
+						list.Add(value);
+						if(1 < list.Count) {
+							return true;
 						}
 					}
 				}
+				return false;
 			}
+
 			extract(this.List);
 
 			if(1 == list.Count) {
