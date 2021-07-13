@@ -34,5 +34,6 @@
 		</ItemGroup>
 
 		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" Condition="'$(Configuration)' == 'Release'" SkipUnchangedFiles="true"/>
+		<Copy SourceFiles="$(MSBuildThisFileDirectory)License.txt" DestinationFolder="$(TargetDir)" Condition="'$(Configuration)' == 'Release'" SkipUnchangedFiles="true"/>
 	</Target>
 </Project>
