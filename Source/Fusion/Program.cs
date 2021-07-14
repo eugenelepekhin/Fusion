@@ -4,11 +4,10 @@ using System.IO;
 using System.Threading;
 
 namespace Fusion {
-	public static class Program {
-		//Debug: "E:\Projects\Fusion\Test.asm" "E:\Projects\Fusion\Test.bin"
-		[SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
+	class Program {
 		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
-		public static int Main(string[] args) {
+		internal static int Main(string[] args) {
+			Console.Out.WriteLine(Resource.AppTitle(typeof(Program).Assembly.GetName().Version.ToString(3)));
 			int returnCode = 1;
 			try {
 				if(args == null || args.Length != 2) {
@@ -20,7 +19,6 @@ namespace Fusion {
 					using(MemoryStream bin = new MemoryStream(16 * 1024)) {
 						using(BinaryWriter writer = new BinaryWriter(bin)) {
 							Assembler assembler = new Assembler(Console.Error, Console.Out, writer);
-							//assembler.Compile(args[0]);
 							Exception exception = Program.RunOnBigStack(() => assembler.Compile(args[0]));
 							if(exception != null) {
 								if(exception is FileNotFoundException fileNotFoundException) {

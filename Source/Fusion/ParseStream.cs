@@ -85,6 +85,7 @@ namespace Fusion {
 			return token;
 		}
 
+		[SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
 		private void Open(string file) {
 			Debug.Assert(StringComparer.OrdinalIgnoreCase.Compare(file, Path.GetFullPath(file)) == 0, "Full path expected");
 			if(this.parsing.Contains(file)) {

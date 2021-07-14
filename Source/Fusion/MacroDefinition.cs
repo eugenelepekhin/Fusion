@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -9,8 +10,9 @@ using System.Text;
 namespace Fusion {
 	public class MacroDefinition {
 		public Token Name { get; private set; }
+		[SuppressMessage("Microsoft.Design", "CA1002:Do not expose generic lists")]
 		public List<Token> Parameter { get; private set; }
-		public List<Token> Label { get; private set; }
+		public IList<Token> Label { get; private set; }
 		public ExpressionList Body { get; set; }
 		public bool Atomic { get; set; }
 

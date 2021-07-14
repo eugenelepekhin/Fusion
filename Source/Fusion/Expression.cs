@@ -521,7 +521,7 @@ namespace Fusion {
 		public Token Name { get; set; }
 		public MacroDefinition Macro { get; set; }
 		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-		public List<Expression> Parameter { get; set; }
+		public IList<Expression> Parameter { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
@@ -561,7 +561,7 @@ namespace Fusion {
 
 	public class ExpressionList : Expression {
 		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-		public List<Expression> List { get; set; }
+		public IList<Expression> List { get; set; }
 
 		public override void WriteText(TextWriter writer, int indent) {
 			foreach(Expression expr in this.List) {
@@ -585,7 +585,7 @@ namespace Fusion {
 		}
 
 		public void WriteListing(Assembler assembler, ListValue result, int indent) {
-			this.List.Zip<Expression, Value, int>(result.List, (expr, value) => {
+			bool all = this.List.Zip<Expression, Value, int>(result.List, (expr, value) => {
 				ListValue resultList = value as ListValue;
 				if(expr is ExpressionList list) {
 					Debug.Assert(resultList != null);

@@ -104,7 +104,7 @@ namespace Fusion {
 		private static bool IsDecimalDigit(int c) { return '0' <= c && c <= '9'; }
 		private static bool IsHexadecimalDigit(int c) { return TokenStream.IsDecimalDigit(c) || ('a' <= c && c <= 'f') || ('A' <= c && c <= 'F'); }
 		private static bool IsLetter(int c) { return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_'; }
-		private static bool IsSeparator(int c) { return 0 <= "(){},:<>!=+-*/%&|^~".IndexOf((char)c); }
+		private static bool IsSeparator(int c) { return 0 <= "(){},:<>!=+-*/%&|^~".IndexOf((char)c, StringComparison.Ordinal); }
 
 		private int Skip() {
 			int c = this.reader.Peek();

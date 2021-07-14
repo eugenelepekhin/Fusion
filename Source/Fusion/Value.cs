@@ -129,7 +129,7 @@ namespace Fusion {
 	}
 
 	public class ListValue : Value {
-		public List<Value> List { get; } = new List<Value>();
+		public IList<Value> List { get; } = new List<Value>();
 
 		private int size = -1;
 
@@ -152,7 +152,7 @@ namespace Fusion {
 
 		public override Value ToSingular() {
 			List<Value> list = new List<Value>(2);
-			bool extract(List<Value> values) {
+			bool extract(IList<Value> values) {
 				foreach(Value value in values) {
 					if(value is ListValue listValue) {
 						if(extract(listValue.List)) {
@@ -198,13 +198,13 @@ namespace Fusion {
 				bool first = true;
 				foreach(Value value in this.List) {
 					if(!first) {
-						text.Append(" ");
+						text.Append(' ');
 					} else {
 						first = false;
 					}
 					text.Append(value.ToString());
 				}
-				text.Append(")");
+				text.Append(')');
 				return text.ToString();
 			}
 		#endif

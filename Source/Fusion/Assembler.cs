@@ -24,7 +24,7 @@ namespace Fusion {
 		private readonly BinaryWriter writer;
 
 		public int ErrorCount { get; private set; }
-		private bool fatalError = false;
+		private bool fatalError;
 		public bool CanContinue { get { return !this.fatalError && this.ErrorCount < 10; } }
 
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]

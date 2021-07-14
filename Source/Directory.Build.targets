@@ -1,39 +1,35 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<Target Name="BuildResourceWrappers" BeforeTargets="BeforeBuild" Condition="'$(AssemblyName)' == 'Fusion'">
+<Project>
+	<Target Name="CopyTools" AfterTargets="AfterBuild">
 		<PropertyGroup>
-			<ResourceWrapperGeneratorCommand>"$(SolutionDir)Tools\ResourceWrapper.Generator.exe" /p "$(ProjectPath)"</ResourceWrapperGeneratorCommand>
-			<PseudoBuildDefined>$(DefineConstants.Contains("Pseudo"))</PseudoBuildDefined>
-			<ResourceWrapperGeneratorCommand Condition="$(PseudoBuildDefined)">$(ResourceWrapperGeneratorCommand) Pseudo=$(RootNamespace).Properties.Resources</ResourceWrapperGeneratorCommand>
-
-			<TempFile>$(MSBuildProjectFullPath).versiontemp</TempFile>
-			<VersionInfoFile>$(MSBuildProjectDirectory)\VersionInfo.cs</VersionInfoFile>
-			<VersionString>1.$([System.DateTime]::UtcNow.ToString("yy.MM.dd"))</VersionString>
-			<VersionInfo>
-// Do not change this file manually as it will be regenerated during the next build. To change version edit project file instead.
-[assembly: System.Reflection.AssemblyVersion("$(VersionString)")]
-[assembly: System.Reflection.AssemblyFileVersion("$(VersionString)")]
-			</VersionInfo>
+			<ToolsFolder>$(MSBuildThisFileDirectory)Tools</ToolsFolder>
 		</PropertyGroup>
-		<!--<Message Importance="high" Text=">>> Building Resource Wrappers: $(ResourceWrapperGeneratorCommand)"/>-->
-		<Exec Command="$(ResourceWrapperGeneratorCommand)"/>
 
-		<!-- Write to temp file and read back version text to avoid unneeded compilation. -->
-		<WriteLinesToFile File="$(TempFile)" Lines="$(VersionInfo)" Overwrite="true" />
-		<ReadLinesFromFile File="$(TempFile)">
-			<Output TaskParameter="Lines" PropertyName="VersionInfoToBe" />
-		</ReadLinesFromFile>
-		<Delete Files="$(TempFile)" />
-		<ReadLinesFromFile File="$(VersionInfoFile)">
-			<Output TaskParameter="Lines" PropertyName="VersionInfoAsIs" />
-		</ReadLinesFromFile>
-		<WriteLinesToFile File="$(VersionInfoFile)" Lines="$(VersionInfo)" Overwrite="true" Condition=" '$(VersionInfoToBe)' != '$(VersionInfoAsIs)' and '$(Configuration)' == 'Release' "/>
+		<Copy Condition="$(MSBuildProjectDirectory.StartsWith($(ToolsFolder)))" SourceFiles="$(TargetPath)" DestinationFolder="$(ToolsFolder)" SkipUnchangedFiles="true"/>
+	</Target>
 
+	<Target Name="GenerateResourceWrappers" BeforeTargets="BeforeBuild" Condition="'@(EmbeddedResource)' != '' and '$(MSBuildProjectName)' == 'Fusion'">
+		<PropertyGroup>
+			<ResourceWrapperGeneratorCommand>"$(MSBuildThisFileDirectory)Tools\ResourceWrapper.Generator.exe" /f "$(MSBuildProjectDirectory)" /n "$(RootNamespace)" /a "@(EmbeddedResource)"</ResourceWrapperGeneratorCommand>
+			<PseudoBuildDefined>$(DefineConstants.Contains("Pseudo"))</PseudoBuildDefined>
+			<ResourceWrapperGeneratorCommand Condition="$(PseudoBuildDefined)">$(ResourceWrapperGeneratorCommand) /Pseudo</ResourceWrapperGeneratorCommand>
+		</PropertyGroup>
+
+		<Exec Condition="'%(EmbeddedResource.Generator)'!='' and '%(EmbeddedResource.LastGenOutput)' != ''"
+			Command="$(ResourceWrapperGeneratorCommand) /r &quot;%(EmbeddedResource.Identity)&quot; /g &quot;%(EmbeddedResource.Generator)&quot; /cs &quot;%(EmbeddedResource.LastGenOutput)&quot; /rn &quot;%(EmbeddedResource.CustomToolNamespace)&quot;"
+		/>
+	</Target>
+
+	<Target Name="CopyLicenseFile" AfterTargets="AfterBuild" Condition="Exists('$(MSBuildThisFileDirectory)License.txt') and '$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
+		<Copy SourceFiles="$(MSBuildThisFileDirectory)License.txt" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
+		<Copy SourceFiles="$(MSBuildThisFileDirectory)fusion.cmd" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
+	</Target>
+
+	<Target Name="CopyDocFiles" AfterTargets="AfterBuild" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
 		<ItemGroup>
 			<DocsItems Include="$(MSBuildThisFileDirectory)\Docs\*.*"/>
 		</ItemGroup>
 
-		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" Condition="'$(Configuration)' == 'Release'" SkipUnchangedFiles="true"/>
-		<Copy SourceFiles="$(MSBuildThisFileDirectory)License.txt" DestinationFolder="$(TargetDir)" Condition="'$(Configuration)' == 'Release'" SkipUnchangedFiles="true"/>
+		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
 	</Target>
 </Project>
