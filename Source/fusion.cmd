@@ -1,2 +1,3 @@
 @echo off
-dotnet Fusion.dll %1 %2
+set location=%~dp0
+dotnet "%location%Fusion.dll" "%~f1" "%~f2"

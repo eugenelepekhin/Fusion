@@ -32,4 +32,36 @@
 
 		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
 	</Target>
+
+	<Target Name="ZipResult" AfterTargets="AfterBuild; CopyLicenseFile; CopyDocFiles" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
+		<ItemGroup>
+			<ZipItem Include="$(TargetDir)BNF.txt"/>
+			<ZipItem Include="$(TargetDir)Example.txt"/>
+			<ZipItem Include="$(TargetDir)Fusion Language v1.docx"/>
+			<ZipItem Include="$(TargetDir)fusion.cmd"/>
+			<ZipItem Include="$(TargetDir)Fusion.dll"/>
+			<ZipItem Include="$(TargetDir)Fusion.pdb"/>
+			<ZipItem Include="$(TargetDir)Fusion.runtimeconfig.json"/>
+			<ZipItem Include="$(TargetDir)LabelExample.txt"/>
+			<ZipItem Include="$(TargetDir)License.txt"/>
+			<ZipItem Include="$(TargetDir)ZeroingBlock.txt"/>
+		</ItemGroup>
+
+		<PropertyGroup>
+			<ZipApp>$(ProgramW6432)\7-Zip\7z.exe</ZipApp>
+			<ZipFileName>$(TargetDir)Fusion.zip</ZipFileName>
+
+			<ItemList>@(ZipItem)</ItemList>
+			<Quotes>" "</Quotes>
+			<QuotedList>"$(ItemList.Replace(";", $(Quotes)))"</QuotedList>
+
+			<ZipCmd>"$(ZipApp)" a "$(ZipFileName)" -mx9 $(QuotedList)</ZipCmd>
+		</PropertyGroup>
+
+		<PropertyGroup>
+		</PropertyGroup>
+
+		<Message Condition="!Exists('$(ZipApp)')" Importance="high" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating sip file"/>
+		<Exec Condition="Exists('$(ZipApp)')" Command="$(ZipCmd)"/>
+	</Target>
 </Project>
