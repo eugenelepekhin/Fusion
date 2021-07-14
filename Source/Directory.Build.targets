@@ -58,10 +58,7 @@
 			<ZipCmd>"$(ZipApp)" a "$(ZipFileName)" -mx9 $(QuotedList)</ZipCmd>
 		</PropertyGroup>
 
-		<PropertyGroup>
-		</PropertyGroup>
-
-		<Message Condition="!Exists('$(ZipApp)')" Importance="high" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating sip file"/>
+		<Message Condition="!Exists('$(ZipApp)')" Importance="high" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating zip file"/>
 		<Exec Condition="Exists('$(ZipApp)')" Command="$(ZipCmd)"/>
 	</Target>
 </Project>
