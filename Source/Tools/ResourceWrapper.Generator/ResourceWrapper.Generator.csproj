@@ -8,7 +8,6 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>ResourceWrapper.Generator</RootNamespace>
     <AssemblyName>ResourceWrapper.Generator</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
