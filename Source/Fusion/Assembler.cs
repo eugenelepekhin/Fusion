@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Fusion {
 	public class Assembler {
@@ -74,7 +72,7 @@ namespace Fusion {
 				Macro = main,
 				Parameter = new List<Expression>(0)
 			};
-			Value value = call.Evaluate(new Context() { Assembler = this, Macro = main }, 0);
+			Value value = call.Evaluate(new Context(this, main), 0);
 			if(0 < this.ErrorCount) return;
 			ListValue listValue = value as ListValue;
 			Debug.Assert(listValue != null);

@@ -1,15 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Fusion {
 	public class Context {
-		public Assembler Assembler { get; set; }
-		public MacroDefinition Macro { get; set; }
+		public Assembler Assembler { get; }
+		public MacroDefinition Macro { get; }
+		public Context Parent { get; }
+		public Call Call { get; }
+
 		private List<Value> argument;
 		private Dictionary<string, int> label;
+
+		public Context(Assembler assembler, MacroDefinition macro) {
+			this.Assembler = assembler;
+			this.Macro = macro;
+		}
+
+		public Context(Context parent, MacroDefinition macro, Call call) :this(parent.Assembler, macro) {
+			this.Parent = parent;
+			this.Call = call;
+		}
 
 		public void AddArgument(Value value) {
 			if(this.argument == null) {
@@ -47,6 +60,18 @@ namespace Fusion {
 		public int LabelValue(Token labelName) {
 			Debug.Assert(this.IsLabelDefined(labelName));
 			return this.label[labelName.Value];
+		}
+
+		public string PositionStack(Token token) {
+			StringBuilder text = new StringBuilder();
+			text.Append(token.Position.ToString());
+			Context context = this;
+			while(context.Parent != null && context.Parent.Call != null) {
+				text.AppendLine();
+				text.Append(Resource.UserError("\t", context.Call.Name.Position.ToString()));
+				context = context.Parent;
+			}
+			return text.ToString();
 		}
 
 		#if DEBUG

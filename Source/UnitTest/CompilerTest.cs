@@ -218,6 +218,11 @@ namespace UnitTest {
 		public void AssemblerCompileErrorTest() {
 			this.CompileErrorsTest("macro a x{if(0<x){x}}macro main{1 a m m:2}", "Condition is incomplete value");
 			this.CompileErrorsTest("macro main{2345678901}", "Bad format of number:");
+
+			this.CompileErrorsTest("macro two{1 2} macro main{print two}", "String value expected at");
+			this.CompileErrorsTest("macro a{error\"hello world\"}\nmacro main\n{a}", @"hello world\s*at.*\(1\)\s*.*at.*\(3\)\s*$");
+			this.CompileErrorsTest("macro neg a{-a}\nmacro main{neg \"string\"}", @"Single number value expected\s*at.*\(1\)\s*.*at.*\(2\)\s*$");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a || b){1}else{2}}\nmacro main{toBool 0, two}", @"Single number value expected\s*at.*\(1\)\s*.*at.*\(2\)\s*$");
 		}
 
 		/// <summary>

@@ -174,17 +174,17 @@ namespace Fusion {
 				if(stringValue != null) {
 					this.message = stringValue.Value;
 				} else {
-					context.Assembler.Error(Resource.StringValueExpected(this.Token.Position.ToString()));
+					context.Assembler.Error(Resource.StringValueExpected(context.PositionStack(this.Token)));
 				}
 				if(this.message != null) {
 					if(this.Token.TextEqual(Assembler.ErrorName)) {
-						context.Assembler.Error(Resource.UserError(this.message, this.Token.Position.ToString()));
+						context.Assembler.Error(Resource.UserError(this.message, context.PositionStack(this.Token)));
 					} else {
-						context.Assembler.StandardOutput.WriteLine(Resource.UserError(this.message, this.Token.Position.ToString()));
+						context.Assembler.StandardOutput.WriteLine(Resource.UserError(this.message, context.PositionStack(this.Token)));
 					}
 				}
 			} else {
-				context.Assembler.Error(Resource.IncompleteError(this.Token.Position.ToString()));
+				context.Assembler.Error(Resource.IncompleteError(context.PositionStack(this.Token)));
 			}
 			return VoidValue.Value;
 		}
@@ -213,7 +213,7 @@ namespace Fusion {
 			}
 			NumberValue number = operand.ToNumber();
 			if(number == null) {
-				context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			switch(this.Operation.Value) {
@@ -245,7 +245,7 @@ namespace Fusion {
 			if(numberValue != null) {
 				return numberValue.ToBoolean();
 			}
-			context.Assembler.Error(Resource.NumberValueExpected(this.PositionToken.Position.ToString()));
+			context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.PositionToken)));
 			return VoidValue.Value;
 		}
 	}
@@ -313,7 +313,7 @@ namespace Fusion {
 					return rightNumber.ToBoolean();
 				}
 			}
-			context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+			context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 			return VoidValue.Value;
 		}
 
@@ -337,7 +337,7 @@ namespace Fusion {
 					return rightNumber.ToBoolean();
 				}
 			}
-			context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+			context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 			return VoidValue.Value;
 		}
 
@@ -358,7 +358,7 @@ namespace Fusion {
 				if(rightNumber != null) {
 					return probe(Math.Sign((long)leftNumber.Value - (long)rightNumber.Value)) ? NumberValue.True : NumberValue.False;
 				}
-				context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			StringValue leftStr = left.ToStringValue();
@@ -367,10 +367,10 @@ namespace Fusion {
 				if(rightStr != null) {
 					return probe(StringComparer.Ordinal.Compare(leftStr.Value, rightStr.Value)) ? NumberValue.True : NumberValue.False;
 				}
-				context.Assembler.Error(Resource.StringValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.StringValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			context.Assembler.Error(Resource.StringOrNumberValueExpected(this.Operation.Position.ToString()));
+			context.Assembler.Error(Resource.StringOrNumberValueExpected(context.PositionStack(this.Operation)));
 			return VoidValue.Value;
 		}
 
@@ -379,7 +379,7 @@ namespace Fusion {
 			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
 				if((left.IsComplete && left is StringValue) || (right.IsComplete && right is StringValue)) {
-					context.Assembler.Error(Resource.IncompleteString(this.Operation.Position.ToString()));
+					context.Assembler.Error(Resource.IncompleteString(context.PositionStack(this.Operation)));
 				}
 				return new Binary() {
 					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
@@ -394,7 +394,7 @@ namespace Fusion {
 				if(rightNumber != null) {
 					return new NumberValue(leftNumber.Value + rightNumber.Value);
 				}
-				context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			StringValue leftStr = left.ToStringValue();
@@ -403,10 +403,10 @@ namespace Fusion {
 				if(rightStr != null) {
 					return new StringValue(leftStr.Value + rightStr.Value);
 				}
-				context.Assembler.Error(Resource.StringValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.StringValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			context.Assembler.Error(Resource.StringOrNumberValueExpected(this.Operation.Position.ToString()));
+			context.Assembler.Error(Resource.StringOrNumberValueExpected(context.PositionStack(this.Operation)));
 			return VoidValue.Value;
 		}
 
@@ -423,12 +423,12 @@ namespace Fusion {
 			}
 			NumberValue leftNumber = left.ToNumber();
 			if(leftNumber == null) {
-				context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			NumberValue rightNumber = right.ToNumber();
 			if(rightNumber == null) {
-				context.Assembler.Error(Resource.NumberValueExpected(this.Operation.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			return new NumberValue(operation(leftNumber.Value, rightNumber.Value));
@@ -467,7 +467,7 @@ namespace Fusion {
 				int thenSize = this.Then.Size(context);
 				int elseSize = (this.Else != null) ? this.Else.Size(context) : 0;
 				if(thenSize != elseSize) {
-					context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
+					context.Assembler.Error(Resource.IncompleteCondition(context.PositionStack(this.IfToken)));
 					return VoidValue.Value;
 				}
 				return new If() {
@@ -480,7 +480,7 @@ namespace Fusion {
 			}
 			NumberValue number = condition.ToNumber();
 			if(number == null) {
-				context.Assembler.Error(Resource.NumberValueExpected(this.IfToken.Position.ToString()));
+				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.IfToken)));
 				return VoidValue.Value;
 			}
 			if(number.Value != 0) {
@@ -510,7 +510,7 @@ namespace Fusion {
 			} else {
 				int size = this.Then.Size(context);
 				if(size != this.Else.Size(context)) {
-					context.Assembler.Error(Resource.IncompleteCondition(this.IfToken.Position.ToString()));
+					context.Assembler.Error(Resource.IncompleteCondition(context.PositionStack(this.IfToken)));
 				}
 				return size;
 			}
@@ -538,9 +538,7 @@ namespace Fusion {
 
 		public override Value Evaluate(Context context, int address) {
 			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
-			Context callContext = new Context() {
-				Assembler = context.Assembler, Macro = this.Macro
-			};
+			Context callContext = new Context(context, this.Macro, this);
 			foreach(Expression arg in this.Parameter) {
 				callContext.AddArgument(arg.Evaluate(context, 0));
 			}
@@ -549,9 +547,7 @@ namespace Fusion {
 
 		public override int Size(Context context) {
 			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
-			Context callContext = new Context() {
-				Assembler = context.Assembler, Macro = this.Macro
-			};
+			Context callContext = new Context(context, this.Macro, this);
 			foreach(Expression arg in this.Parameter) {
 				callContext.AddArgument(arg.Evaluate(context, 0));
 			}
