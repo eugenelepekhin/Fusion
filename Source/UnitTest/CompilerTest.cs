@@ -217,6 +217,7 @@ namespace UnitTest {
 		[TestMethod()]
 		public void AssemblerCompileErrorTest() {
 			this.CompileErrorsTest("macro a x{if(0<x){x}}macro main{1 a m m:2}", "Condition is incomplete value");
+			this.CompileErrorsTest("macro main{2345678901}", "Bad format of number:");
 		}
 
 		/// <summary>

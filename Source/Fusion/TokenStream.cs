@@ -134,6 +134,7 @@ namespace Fusion {
 			StringBuilder text = new StringBuilder(34);
 			text.Append((char)c);
 			Func<int, bool> valid;
+			bool isDecimal = false;
 			int minLenght = 1;
 			int maxLenght = 10;
 			this.reader.Read();
@@ -154,10 +155,12 @@ namespace Fusion {
 					break;
 				default:
 					valid = TokenStream.IsDecimalDigit;
+					isDecimal = true;
 					break;
 				}
 			} else {
 				valid = TokenStream.IsDecimalDigit;
+				isDecimal = true;
 			}
 			c = this.reader.Peek();
 			Position p = new Position(this.Path, this.line);
@@ -175,8 +178,12 @@ namespace Fusion {
 				this.SkipLine();
 				return new Token(p, TokenType.Error, text.ToString());
 			}
-			//TODO: still possible to have bad number here. Validate the parsed number.
-			return new Token(p, TokenType.Number, text.ToString());
+			string value = text.ToString();
+			if(isDecimal && !int.TryParse(value, out int _)) {
+				this.Assembler.Error(Resource.BadNumberFormat(value, p.ToString()));
+				return new Token(p, TokenType.Error, value);
+			}
+			return new Token(p, TokenType.Number, value);
 		}
 
 		private Token String() {
