@@ -157,15 +157,18 @@
     <comment>{string file, string position}</comment>
   </data>
   <data name="IncompleteCondition" xml:space="preserve">
-    <value>Condition is incomplete value. Only already defined labels can be used in condition at {0}</value>
+    <value>Condition is incomplete value. Only already defined labels can be used in condition:
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="IncompleteError" xml:space="preserve">
-    <value>Inconclusive error message at {0}</value>
+    <value>Inconclusive error message
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="IncompleteString" xml:space="preserve">
-    <value>String concatenation is incomplete value. Only already defined labels can be used in string concatenation at {0}</value>
+    <value>String concatenation is incomplete value. Only already defined labels can be used in string concatenation:
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="IncorrectNumber" xml:space="preserve">
@@ -210,7 +213,8 @@
     <comment>{string path}</comment>
   </data>
   <data name="NumberValueExpected" xml:space="preserve">
-    <value>Single number value expected at {0}</value>
+    <value>Single number value expected:
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="ParameterKeyword" xml:space="preserve">
@@ -229,11 +233,13 @@
     <value>Identifier, literal, "(", or keyword</value>
   </data>
   <data name="StringOrNumberValueExpected" xml:space="preserve">
-    <value>Number or string value expected at {0}</value>
+    <value>Number or string value expected:
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="StringValueExpected" xml:space="preserve">
-    <value>String value expected at {0}</value>
+    <value>String value expected:
+{0}</value>
     <comment>{string position}</comment>
   </data>
   <data name="SummaryErrors" xml:space="preserve">
@@ -259,7 +265,12 @@
     <value>Usage: fusion &lt;InputFileName.asm&gt; &lt;OutputFileName.bin&gt;</value>
   </data>
   <data name="UserError" xml:space="preserve">
-    <value>{0} at {1}</value>
+    <value>{0}:
+{1}</value>
     <comment>{string message, string position}</comment>
+  </data>
+  <data name="UserErrorPosition" xml:space="preserve">
+    <value>	in macro {0} at {1}</value>
+    <comment>{string macroName, string position}</comment>
   </data>
 </root>

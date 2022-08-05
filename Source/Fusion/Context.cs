@@ -64,11 +64,10 @@ namespace Fusion {
 
 		public string PositionStack(Token token) {
 			StringBuilder text = new StringBuilder();
-			text.Append(token.Position.ToString());
 			Context context = this;
-			while(context.Parent != null && context.Parent.Call != null) {
-				text.AppendLine();
-				text.Append(Resource.UserError("\t", context.Call.Name.Position.ToString()));
+			while(context != null && token != null) {
+				text.AppendLine(Resource.UserErrorPosition(context.Macro.Name.Value, token.Position.ToString()));
+				token = context.Call?.Name;
 				context = context.Parent;
 			}
 			return text.ToString();

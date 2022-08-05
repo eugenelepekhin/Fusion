@@ -67,12 +67,7 @@ namespace Fusion {
 		public void Expand() {
 			MacroDefinition main = this.Macro[Assembler.MainName];
 			Debug.Assert(main.Parameter.Count == 0);
-			Call call = new Call() {
-				Name = new Token(new Position(string.Empty, 1), TokenType.Identifier, Assembler.MainName),
-				Macro = main,
-				Parameter = new List<Expression>(0)
-			};
-			Value value = call.Evaluate(new Context(this, main), 0);
+			Value value = main.Body.Evaluate(new Context(this, main), 0);
 			if(0 < this.ErrorCount) return;
 			ListValue listValue = value as ListValue;
 			Debug.Assert(listValue != null);

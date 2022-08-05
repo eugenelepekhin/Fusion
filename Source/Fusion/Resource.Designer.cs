@@ -125,21 +125,24 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Condition is incomplete value. Only already defined labels can be used in condition at {0}.
+		/// Looks up a localized string similar to Condition is incomplete value. Only already defined labels can be used in condition:
+		/// {0}.
 		/// </summary>
  		public static string IncompleteCondition(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("IncompleteCondition", Culture), position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Inconclusive error message at {0}.
+		/// Looks up a localized string similar to Inconclusive error message
+		/// {0}.
 		/// </summary>
  		public static string IncompleteError(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("IncompleteError", Culture), position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to String concatenation is incomplete value. Only already defined labels can be used in string concatenation at {0}.
+		/// Looks up a localized string similar to String concatenation is incomplete value. Only already defined labels can be used in string concatenation:
+		/// {0}.
 		/// </summary>
  		public static string IncompleteString(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("IncompleteString", Culture), position);
@@ -223,7 +226,8 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Single number value expected at {0}.
+		/// Looks up a localized string similar to Single number value expected:
+		/// {0}.
 		/// </summary>
  		public static string NumberValueExpected(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("NumberValueExpected", Culture), position);
@@ -258,14 +262,16 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Number or string value expected at {0}.
+		/// Looks up a localized string similar to Number or string value expected:
+		/// {0}.
 		/// </summary>
  		public static string StringOrNumberValueExpected(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("StringOrNumberValueExpected", Culture), position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to String value expected at {0}.
+		/// Looks up a localized string similar to String value expected:
+		/// {0}.
 		/// </summary>
  		public static string StringValueExpected(string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("StringValueExpected", Culture), position);
@@ -314,10 +320,18 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to {0} at {1}.
+		/// Looks up a localized string similar to {0}:
+		/// {1}.
 		/// </summary>
  		public static string UserError(string message, string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("UserError", Culture), message, position);
+		}
+
+		/// <summary>
+		/// Looks up a localized string similar to in macro {0} at {1}.
+		/// </summary>
+ 		public static string UserErrorPosition(string macroName, string position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("UserErrorPosition", Culture), macroName, position);
 		}
 	}
 }
