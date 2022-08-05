@@ -623,8 +623,10 @@ namespace Fusion {
 		private static void WriteText(Assembler assembler, Value value) {
 			NumberValue n = value.ToNumber();
 			if(n != null) {
-				string format = string.Format(CultureInfo.InvariantCulture, "{{0:X{0}}} ", assembler.BinaryFormatter.CellSize / 4);
-				assembler.StandardOutput.Write(format, n.Value);
+				int cellSize = assembler.BinaryFormatter.CellSize;
+				int result = (cellSize == 32) ? n.Value : n.Value & ((1 << cellSize) - 1);
+				string format = string.Format(CultureInfo.InvariantCulture, "{{0:X{0}}} ", cellSize / 4);
+				assembler.StandardOutput.Write(format, result);
 			} else {
 				StringValue s = value.ToStringValue();
 				if(s is StringValue) {
