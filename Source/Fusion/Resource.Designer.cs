@@ -212,7 +212,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Macro main should not has any parameters..
+		/// Looks up a localized string similar to Macro main should not have any parameters..
 		/// </summary>
  		public static string MainPararameters {
 			get { return ResourceManager.GetString("MainPararameters", Culture); }

@@ -129,6 +129,7 @@ namespace UnitTest {
 			this.CompileTest("macro main{if(0){5}else{6}}", 6);
 			this.CompileTest("macro main{if(0){5}}");
 			this.CompileTest("macro main{if(3){5}}", 5);
+			this.CompileTest("macro m n{if(n<3){2}else{3}} macro main{1 (m a) a:3}", 1, 2, 3);
 
 			//test calls
 			this.CompileTest("macro main{a 5 b 7} macro a p{p} macro b d{d*2}", 5, 14);
@@ -216,6 +217,13 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void AssemblerCompileErrorTest() {
+			this.CompileErrorsTest("macro hello {1}", "Macro \"main\" is missing");
+			this.CompileErrorsTest("macro main arg {1 arg}", "Macro main should not have any parameters");
+
+			this.CompileErrorsTest("binary 8 binary 8 macro main{1}", "Binary type already defined at");
+			this.CompileErrorsTest("binary 16 binary 8 macro main{1}", "Binary type already defined at");
+			this.CompileErrorsTest("binary 13 macro main{1}", "Expected binary format type 8, 16, or 32 instead of 13 at");
+
 			this.CompileErrorsTest("macro a x{if(0<x){x}}macro main{1 a m m:2}", "Condition is incomplete value");
 			this.CompileErrorsTest("macro main{2345678901}", "Bad format of number:");
 
@@ -226,6 +234,8 @@ namespace UnitTest {
 
 			this.CompileErrorsTest("macro main{300}", @"Attempt to write too big number \(300\)");
 			this.CompileErrorsTest("binary 16 macro main{70000}", @"Attempt to write too big number \(70000\)");
+
+			this.CompileErrorsTest("macro foo a{if(a<3){1}else{2 3}} macro main{1 foo a 2 a:3 4}", "foo");
 		}
 
 		/// <summary>

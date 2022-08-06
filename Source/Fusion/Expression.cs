@@ -469,9 +469,10 @@ namespace Fusion {
 					context.Assembler.Error(Resource.IncompleteCondition(context.PositionStack(this.IfToken)));
 					return VoidValue.Value;
 				}
+				Debug.Assert(condition is Expression);
 				return new If() {
 					IfToken = this.IfToken,
-					Condition = this.Condition,
+					Condition = (Expression)condition,
 					Then = this.Then,
 					Else = this.Else,
 					Context = context

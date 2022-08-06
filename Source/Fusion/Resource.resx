@@ -206,7 +206,7 @@
     <value>Macro "main" is missing.</value>
   </data>
   <data name="MainPararameters" xml:space="preserve">
-    <value>Macro main should not has any parameters.</value>
+    <value>Macro main should not have any parameters.</value>
   </data>
   <data name="MessageOnStack" xml:space="preserve">
     <value>{0}:
