@@ -223,6 +223,9 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro a{error\"hello world\"}\nmacro main\n{a}", @"hello world:\s*in macro a at.*\(1\)\s*in macro main at.*\(3\)\s*$");
 			this.CompileErrorsTest("macro neg a{-a}\nmacro main{neg \"string\"}", @"Single number value expected:\s*.*\(1\)\s*.*\(2\)\s*$");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a || b){1}else{2}}\nmacro main{toBool 0, two}", @"Single number value expected:");
+
+			this.CompileErrorsTest("macro main{300}", @"Attempt to write too big number \(300\)");
+			this.CompileErrorsTest("binary 16 macro main{70000}", @"Attempt to write too big number \(70000\)");
 		}
 
 		/// <summary>

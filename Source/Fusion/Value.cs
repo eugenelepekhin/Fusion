@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -63,16 +61,23 @@ namespace Fusion {
 	}
 
 	public class NumberValue : Value {
-		public static readonly NumberValue False = new NumberValue(0);
-		public static readonly NumberValue True = new NumberValue(1);
-		public NumberValue(int value) { this.Value = value; }
+		public static readonly NumberValue False = new NumberValue(null, null, 0);
+		public static readonly NumberValue True = new NumberValue(null, null, 1);
 		public int Value { get; private set; }
+		public Context Context { get; private set; }
+		public Token Token { get; private set; }
+		public NumberValue(Context context, Token token, int value) {
+			this.Context = context;
+			this.Token = token;
+			this.Value = value;
+		}
 		public override int Size(Context context) { return 1; }
 		public override Value WriteValue(Assembler assembler) {
 			int value = this.Value;
 			string error = assembler.BinaryFormatter.Write(value);
 			if(error != null) {
-				assembler.Error(error);
+				Debug.Assert(this.Context != null && this.Token != null);
+				assembler.Error(Resource.MessageOnStack(error, this.Context.PositionStack(this.Token)));
 			}
 			return this;
 		}
@@ -115,9 +120,10 @@ namespace Fusion {
 				}
 				message = assembler.BinaryFormatter.Write((char)0);
 				error = error ?? message;
-				if(error != null) {
-					assembler.Error(error);
-				}
+				Debug.Assert(error == null);
+				//if(error != null) {
+				//	assembler.Error(error);
+				//}
 			}
 			return this;
 		}

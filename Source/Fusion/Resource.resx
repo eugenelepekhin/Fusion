@@ -208,6 +208,11 @@
   <data name="MainPararameters" xml:space="preserve">
     <value>Macro main should not has any parameters.</value>
   </data>
+  <data name="MessageOnStack" xml:space="preserve">
+    <value>{0}:
+{1}</value>
+    <comment>{string message, string position}</comment>
+  </data>
   <data name="MultipleInclusions" xml:space="preserve">
     <value>File included more then once: "{0}"</value>
     <comment>{string path}</comment>
@@ -263,11 +268,6 @@
   </data>
   <data name="Usage" xml:space="preserve">
     <value>Usage: fusion &lt;InputFileName.asm&gt; &lt;OutputFileName.bin&gt;</value>
-  </data>
-  <data name="UserError" xml:space="preserve">
-    <value>{0}:
-{1}</value>
-    <comment>{string message, string position}</comment>
   </data>
   <data name="UserErrorPosition" xml:space="preserve">
     <value>	in macro {0} at {1}</value>

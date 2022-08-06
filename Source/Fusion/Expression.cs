@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Fusion {
 	public abstract class Expression : Value {
@@ -65,7 +64,7 @@ namespace Fusion {
 			context = this.Context ?? context;
 			Debug.Assert(context != null);
 			if(context.IsLabelDefined(this.Name)) {
-				return new NumberValue(context.LabelValue(this.Name));
+				return new  NumberValue(context, this.Name, context.LabelValue(this.Name));
 			} else {
 				return new LabelReference() { Name = this.Name, Context = context };
 			}
@@ -115,7 +114,7 @@ namespace Fusion {
 
 		public override Value Evaluate(Context context, int address) {
 			if(this.Value.IsNumber()) {
-				return new NumberValue(this.Value.Number);
+				return new NumberValue(context, this.Value, this.Value.Number);
 			} else {
 				return new StringValue(this.Value.Value);
 			}
@@ -178,9 +177,9 @@ namespace Fusion {
 				}
 				if(this.message != null) {
 					if(this.Token.TextEqual(Assembler.ErrorName)) {
-						context.Assembler.Error(Resource.UserError(this.message, context.PositionStack(this.Token)));
+						context.Assembler.Error(Resource.MessageOnStack(this.message, context.PositionStack(this.Token)));
 					} else {
-						context.Assembler.StandardOutput.WriteLine(Resource.UserError(this.message, context.PositionStack(this.Token)));
+						context.Assembler.StandardOutput.WriteLine(Resource.MessageOnStack(this.message, context.PositionStack(this.Token)));
 					}
 				}
 			} else {
@@ -219,8 +218,8 @@ namespace Fusion {
 			switch(this.Operation.Value) {
 			case "!": return (number.Value == 0) ? NumberValue.True : NumberValue.False;
 			case "+": return number;
-			case "-": return new NumberValue(-number.Value);
-			case "~": return new NumberValue(~number.Value);
+			case "-": return new NumberValue(context, this.Operation, -number.Value);
+			case "~": return new NumberValue(context, this.Operation, ~number.Value);
 			default:
 				Debug.Fail("Unknown unary operator");
 				throw new InvalidOperationException();
@@ -392,7 +391,7 @@ namespace Fusion {
 			if(leftNumber != null) {
 				NumberValue rightNumber = right.ToNumber();
 				if(rightNumber != null) {
-					return new NumberValue(leftNumber.Value + rightNumber.Value);
+					return new NumberValue(context, this.Operation, leftNumber.Value + rightNumber.Value);
 				}
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
@@ -431,7 +430,7 @@ namespace Fusion {
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			return new NumberValue(operation(leftNumber.Value, rightNumber.Value));
+			return new NumberValue(context, this.Operation, operation(leftNumber.Value, rightNumber.Value));
 		}
 	}
 

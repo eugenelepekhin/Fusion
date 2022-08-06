@@ -219,6 +219,14 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to {0}:
+		/// {1}.
+		/// </summary>
+ 		public static string MessageOnStack(string message, string position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("MessageOnStack", Culture), message, position);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to File included more then once: "{0}".
 		/// </summary>
  		public static string MultipleInclusions(string path) {
@@ -317,14 +325,6 @@ namespace Fusion {
 		/// </summary>
  		public static string Usage {
 			get { return ResourceManager.GetString("Usage", Culture); }
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to {0}:
-		/// {1}.
-		/// </summary>
- 		public static string UserError(string message, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("UserError", Culture), message, position);
 		}
 
 		/// <summary>
