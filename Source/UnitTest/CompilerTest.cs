@@ -98,7 +98,7 @@ namespace UnitTest {
 			this.CompileTest("macro main{1}", 1);
 			this.CompileTest("macro main{1 2 0xb 0b10100101}", 1, 2, 0xb, 0xa5);
 			this.CompileTest("macro main{2 a: 3 a}", 2, 3, 1);
-			this.CompileTest("macro main{\"abc\"}", (byte)'a', (byte)'b', (byte)'c', 0);
+			this.CompileTest("macro main{\"abc\\td\\ne\"}", (byte)'a', (byte)'b', (byte)'c', (byte)'\t', (byte)'d', (byte)'\n', (byte)'e', 0);
 			this.CompileTest("macro main{a 5 a 7} macro a p{p}", 5, 7);
 			this.CompileTest("macro main{!3 !0 (+4) (-3) (~5)}", 0, 1, 4, (byte)((-3) & 0xFF), (byte)((~5) & 0xFF));
 			this.CompileTest("macro main{(0||0) (5||0) (0||6) (4||7)}", 0, 1, 1, 1);
@@ -127,6 +127,8 @@ namespace UnitTest {
 			this.CompileTest("macro main{if(0){5}}");
 			this.CompileTest("macro main{if(3){5}}", 5);
 			this.CompileTest("macro m n{if(n<3){2}else{3}} macro main{1 (m a) a:3}", 1, 2, 3);
+
+			this.CompileTest("macro quote n{n} macro abs n{if(0<=n){quote n}else{quote -n}} macro main{1 abs 2 3}", 1, 2, 3);
 
 			this.CompileTest("macro m v{print \"hello \"+v} macro main{m 1}");
 
@@ -254,6 +256,11 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(b != a){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(b != a){1}else{2}}\nmacro main{toBool \"hello\", two}", @"Single number value expected:");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a != b){1}else{2}}\nmacro main{toBool \"hello\", two}", @"Single number value expected:");
+
+			this.CompileErrorsTest("macro main{1 a:2 3 a:4 5}", "Label a redefined in macro main at");
+			this.CompileErrorsTest("macro main{1 print\"hello \" + label 2 label:3}", "String concatenation is incomplete value. Only already defined labels can be used in string concatenation");
+			this.CompileErrorsTest("macro main{1 print label 2 label:3}", "Inconclusive error message");
+			this.CompileErrorsTest("macro two{1 2} macro main{1 if(0 || two){error 3} 2 label:4}", "Single number value expected:");
 
 			this.CompileErrorsTest("macro main{300}", @"Attempt to write too big number \(300\)");
 			this.CompileErrorsTest("binary 16 macro main{70000}", @"Attempt to write too big number \(70000\)");
