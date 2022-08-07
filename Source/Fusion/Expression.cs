@@ -447,12 +447,10 @@ namespace Fusion {
 			writer.WriteLine(") {");
 			this.Then.WriteText(writer, indent + 1);
 			if(this.Else != null) {
-				writer.WriteLine();
 				Expression.Indent(writer, indent);
 				writer.WriteLine("} else {");
 				this.Else.WriteText(writer, indent + 1);
 			}
-			writer.WriteLine();
 			Expression.Indent(writer, indent);
 			writer.WriteLine("}");
 		}

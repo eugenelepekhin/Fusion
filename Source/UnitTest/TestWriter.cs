@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using Fusion;
@@ -15,13 +16,28 @@ namespace UnitTest {
 
 		public override Encoding Encoding { get { return Encoding.UTF8; } }
 
-		public override void WriteLine(string value) {
-			// escape formatting characters.
-			this.TestContext.WriteLine(value.Replace("{", "{{").Replace("}", "}}"));
+		public override void Write(char value) {
+			this.Write(value.ToString());
+		}
 
+		public override void Write(string value) {
+			#if DEBUG
+				Debug.Write(value);
+			#else
+				this.TestContext.Write(value);
+			#endif
 			if(this.Output != null) {
-				this.Output.AppendLine(value);
+				this.Output.Append(value);
 			}
+		}
+
+		public override void WriteLine() {
+			this.Write(Environment.NewLine);
+		}
+
+		public override void WriteLine(string value) {
+			this.Write(value);
+			this.WriteLine();
 		}
 	}
 

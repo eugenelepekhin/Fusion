@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using Fusion;
@@ -41,8 +38,8 @@ namespace UnitTest {
 		private void CompileTest(string text, params byte[] expected) {
 			int errorCount;
 			byte[] actual = this.Compile(text, out errorCount);
-			Assert.AreEqual(0, errorCount);
-			Assert.AreEqual(expected.Length, actual.Length);
+			Assert.AreEqual(0, errorCount, "Expecting compilation pass without errors, while actually it's {0} errors", errorCount);
+			Assert.AreEqual(expected.Length, actual.Length, "Expecting {0} bytes output, while actually it's {1}", expected.Length, actual.Length);
 			for(int i = 0; i < expected.Length; i++) {
 				Assert.AreEqual(expected[i], actual[i]);
 			}
@@ -131,6 +128,8 @@ namespace UnitTest {
 			this.CompileTest("macro main{if(3){5}}", 5);
 			this.CompileTest("macro m n{if(n<3){2}else{3}} macro main{1 (m a) a:3}", 1, 2, 3);
 
+			this.CompileTest("macro m v{print \"hello \"+v} macro main{m 1}");
+
 			//test calls
 			this.CompileTest("macro main{a 5 b 7} macro a p{p} macro b d{d*2}", 5, 14);
 			this.CompileTest("macro main{1 a} macro a{2 3}", 1, 2, 3);
@@ -210,6 +209,8 @@ namespace UnitTest {
 			this.CompileTest("macro main{0 a:1 2 3 b:4 5 b-a}", 0, 1, 2, 3, 4, 5, 3);
 			this.CompileTest("macro main{0 a:1 2 3 b:4 5 m b,a} macro m max, min{max-min+10}", 0, 1, 2, 3, 4, 5, 13);
 			this.CompileTest("macro main{m b,a 0 a:1 2 3 b:4 5} macro m max, min{max-min+10}", 13, 0, 1, 2, 3, 4, 5);
+
+			this.CompileTest("atomic macro atomicFoo n{if(n<3){11}else{12}} macro main{1 atomicFoo 2 3}", 1, 11, 3);
 		}
 
 		/// <summary>
@@ -224,6 +225,23 @@ namespace UnitTest {
 			this.CompileErrorsTest("binary 16 binary 8 macro main{1}", "Binary type already defined at");
 			this.CompileErrorsTest("binary 13 macro main{1}", "Expected binary format type 8, 16, or 32 instead of 13 at");
 
+			this.CompileErrorsTest("atomic atomic main{1}", "macro, include, or binary expected at");
+			this.CompileErrorsTest("macro {1}", "\"{\" expected instead of 1 at");
+			this.CompileErrorsTest("macro 3{2} macro main{1 3}", ""); //ignore error message here for now: Compiled file get changed between passes
+			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");
+
+			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4", "Macro foo already contains parameter a at");
+			this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword macro at");
+			this.CompileErrorsTest("macro foo print{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword print at");
+			this.CompileErrorsTest("macro foo error{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword error at");
+			this.CompileErrorsTest("macro foo if{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword if at");
+			this.CompileErrorsTest("macro foo else{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword else at");
+
+			this.CompileErrorsTest("macro main{", "Unexpected end of file at");
+			this.CompileErrorsTest("macro main{(", "Unexpected end of file at");
+
+			this.CompileErrorsTest("macro main{1 foo 2 3}", "Undefined macro foo at");
+
 			this.CompileErrorsTest("macro a x{if(0<x){x}}macro main{1 a m m:2}", "Condition is incomplete value");
 			this.CompileErrorsTest("macro main{2345678901}", "Bad format of number:");
 
@@ -231,11 +249,16 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro a{error\"hello world\"}\nmacro main\n{a}", @"hello world:\s*in macro a at.*\(1\)\s*in macro main at.*\(3\)\s*$");
 			this.CompileErrorsTest("macro neg a{-a}\nmacro main{neg \"string\"}", @"Single number value expected:\s*.*\(1\)\s*.*\(2\)\s*$");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a || b){1}else{2}}\nmacro main{toBool 0, two}", @"Single number value expected:");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a && b){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a != b){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(b != a){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(b != a){1}else{2}}\nmacro main{toBool \"hello\", two}", @"Single number value expected:");
+			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a != b){1}else{2}}\nmacro main{toBool \"hello\", two}", @"Single number value expected:");
 
 			this.CompileErrorsTest("macro main{300}", @"Attempt to write too big number \(300\)");
 			this.CompileErrorsTest("binary 16 macro main{70000}", @"Attempt to write too big number \(70000\)");
 
-			this.CompileErrorsTest("macro foo a{if(a<3){1}else{2 3}} macro main{1 foo a 2 a:3 4}", "foo");
+			this.CompileErrorsTest("macro foo a{if(a<3){1}else{2 3}} macro main{1 foo a 2 a:3 4}", "Condition is incomplete value. Only already defined labels can be used in condition:");
 		}
 
 		/// <summary>
