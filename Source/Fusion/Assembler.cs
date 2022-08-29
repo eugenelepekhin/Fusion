@@ -260,6 +260,9 @@ namespace Fusion {
 				Token colon = stream.Next();
 				if(colon.IsSeparator(":")) {
 					Debug.Assert(macro.Label.Any(other => other.Equals(token)), "unknown label");
+					if(token.IsIdentifier(Assembler.PrintName, Assembler.ErrorName, Assembler.IfName, Assembler.ElseName)) {
+						this.Error(Resource.LabelKeyword(token.Value, token.Position.ToString()));
+					}
 					return new Label() { Name = token };
 				} else {
 					stream.Return(colon);

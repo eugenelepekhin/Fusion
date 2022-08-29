@@ -213,6 +213,13 @@ namespace UnitTest {
 			this.CompileTest("macro main{m b,a 0 a:1 2 3 b:4 5} macro m max, min{max-min+10}", 13, 0, 1, 2, 3, 4, 5);
 
 			this.CompileTest("atomic macro atomicFoo n{if(n<3){11}else{12}} macro main{1 atomicFoo 2 3}", 1, 11, 3);
+
+			// label keyword
+			this.CompileTest("macro main{1 2 3 binary: 4 5 binary 6}", 1, 2, 3, 4, 5, 3, 6);
+			this.CompileTest("macro main{1 2 3 main: 4 5 main 6}", 1, 2, 3, 4, 5, 3, 6);
+			this.CompileTest("macro main{1 2 3 atomic: 4 5 atomic 6}", 1, 2, 3, 4, 5, 3, 6);
+			this.CompileTest("macro main{1 2 3 atomic: 4 5 atomic 6}", 1, 2, 3, 4, 5, 3, 6);
+			this.CompileTest("macro main{1 2 3 macro: 4 5 macro 6}", 1, 2, 3, 4, 5, 3, 6);
 		}
 
 		/// <summary>
@@ -233,11 +240,11 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");
 
 			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4", "Macro foo already contains parameter a at");
-			this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword macro at");
-			this.CompileErrorsTest("macro foo print{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword print at");
-			this.CompileErrorsTest("macro foo error{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword error at");
-			this.CompileErrorsTest("macro foo if{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword if at");
-			this.CompileErrorsTest("macro foo else{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword else at");
+			this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"macro\" at");
+			this.CompileErrorsTest("macro foo print{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"print\" at");
+			this.CompileErrorsTest("macro foo error{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"error\" at");
+			this.CompileErrorsTest("macro foo if{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"if\" at");
+			this.CompileErrorsTest("macro foo else{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"else\" at");
 
 			this.CompileErrorsTest("macro main{", "Unexpected end of file at");
 			this.CompileErrorsTest("macro main{(", "Unexpected end of file at");
@@ -266,6 +273,12 @@ namespace UnitTest {
 			this.CompileErrorsTest("binary 16 macro main{70000}", @"Attempt to write too big number \(70000\)");
 
 			this.CompileErrorsTest("macro foo a{if(a<3){1}else{2 3}} macro main{1 foo a 2 a:3 4}", "Condition is incomplete value. Only already defined labels can be used in condition:");
+
+			// label keyword
+			this.CompileErrorsTest("macro main{1 2 print: 3 4 print 5}", "Label can not be a keyword \"print\" at");
+			this.CompileErrorsTest("macro main{1 2 error: 3 4 error 5}", "Label can not be a keyword \"error\" at");
+			this.CompileErrorsTest("macro main{1 2 if: 3 4 if 5}", "Label can not be a keyword \"if\" at");
+			this.CompileErrorsTest("macro main{1 2 else: 3 4 else 5}", "Label can not be a keyword \"else\" at");
 		}
 
 		/// <summary>

@@ -177,6 +177,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to Label can not be a keyword "{0}" at {1}.
+		/// </summary>
+ 		public static string LabelKeyword(string keyword, string position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("LabelKeyword", Culture), keyword, position);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Label {0} redefined in macro {1} at {2}.
 		/// </summary>
  		public static string LabelRedefined(string label, string macro, string position) {
@@ -242,7 +249,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Name of parameter can not be a keyword {0} at {1}.
+		/// Looks up a localized string similar to Name of parameter can not be a keyword "{0}" at {1}.
 		/// </summary>
  		public static string ParameterKeyword(string keyword, string position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("ParameterKeyword", Culture), keyword, position);
