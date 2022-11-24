@@ -177,6 +177,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to Label {0} hides parameter in macro {1} at {2}.
+		/// </summary>
+ 		public static string LabelHidesParameter(string label, string macro, string position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("LabelHidesParameter", Culture), label, macro, position);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Label can not be a keyword "{0}" at {1}.
 		/// </summary>
  		public static string LabelKeyword(string keyword, string position) {

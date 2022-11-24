@@ -171,6 +171,8 @@ namespace Fusion {
 							if(prev.IsIdentifier()) {
 								if(macroDefinition.Label.Any(other => other.Equals(prev))) {
 									this.Error(Resource.LabelRedefined(prev.Value, macroDefinition.Name.Value, prev.Position.ToString()));
+								} else if(macroDefinition.Parameter.Any(param => param.Equals(prev))) {
+									this.Error(Resource.LabelHidesParameter(prev.Value, macroDefinition.Name.Value, prev.Position.ToString()));
 								} else {
 									macroDefinition.Label.Add(prev);
 								}

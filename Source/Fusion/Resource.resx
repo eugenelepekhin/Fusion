@@ -186,6 +186,10 @@
     <value>{0} is expected instead of {1} at {2}</value>
     <comment>{string expected, string actual, string position}</comment>
   </data>
+  <data name="LabelHidesParameter" xml:space="preserve">
+    <value>Label {0} hides parameter in macro {1} at {2}</value>
+    <comment>{string label, string macro, string position}</comment>
+  </data>
   <data name="LabelKeyword" xml:space="preserve">
     <value>Label can not be a keyword "{0}" at {1}</value>
     <comment>{string keyword, string position}</comment>

@@ -279,6 +279,9 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro main{1 2 error: 3 4 error 5}", "Label can not be a keyword \"error\" at");
 			this.CompileErrorsTest("macro main{1 2 if: 3 4 if 5}", "Label can not be a keyword \"if\" at");
 			this.CompileErrorsTest("macro main{1 2 else: 3 4 else 5}", "Label can not be a keyword \"else\" at");
+
+			// label hides parameter
+			this.CompileErrorsTest("macro a b{b 1 b: 2} macro main{a 8}", "Label b hides parameter in macro a at");
 		}
 
 		/// <summary>
