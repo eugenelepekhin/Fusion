@@ -126,7 +126,7 @@ namespace Fusion {
 					}
 					if(!this.CanContinue || token.IsEos()) break;
 					Token name = stream.Next();
-					if(!token.IsIdentifier()) {
+					if(!name.IsIdentifier()) {
 						this.Error(Resource.MacroNameExpected(name.Value, name.Position.ToString()));
 						continue;
 					}
