@@ -11,9 +11,9 @@ namespace UnitTest {
 	///</summary>
 	[TestClass()]
 	public class TokenStreamTest {
-		public TestContext TestContext { get; set; }
+		public TestContext? TestContext { get; set; }
 
-		private void TestNextToken(TokenStream ts, int line, TokenType tokenType, string value) {
+		private void TestNextToken(TokenStream ts, int line, TokenType tokenType, string? value) {
 			int errorCount = ts.Assembler.ErrorCount;
 			Token token = ts.Next();
 			Assert.AreEqual(errorCount, ts.Assembler.ErrorCount, "Unexpected error");
@@ -34,6 +34,11 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void TokenStreamNextTest() {
+			Assert.IsNotNull(this.TestContext);
+			Assert.IsNotNull(this.TestContext.TestRunDirectory);
+			Assert.IsNotNull(this.TestContext.TestDeploymentDir);
+			Assert.IsNotNull(this.TestContext.TestName);
+
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "TokenStreamNextTest.asm");
 			File.WriteAllText(file, Resource.TokenStreamNextTest);
@@ -79,6 +84,11 @@ namespace UnitTest {
 
 		[TestMethod()]
 		public void TokenStreamNextPathStringTest() {
+			Assert.IsNotNull(this.TestContext);
+			Assert.IsNotNull(this.TestContext.TestRunDirectory);
+			Assert.IsNotNull(this.TestContext.TestDeploymentDir);
+			Assert.IsNotNull(this.TestContext.TestName);
+
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "TokenStreamNextPathStringTest.asm");
 			File.WriteAllText(file, "\"hello\\world\"");

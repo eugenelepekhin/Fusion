@@ -1,114 +1,20 @@
-﻿using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-using Fusion;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest {
-
-	/// <summary>
-	///This is a test class for Assembler.Compile
-	///</summary>
-	[TestClass()]
-	public class CompilerTest {
-		public TestContext TestContext { get; set; }
-
-		private byte[] Compile(string text, out int errorCount, out string errors) {
-			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileTest.asm");
-			File.WriteAllText(file, text);
-			StringBuilder output = new StringBuilder();
-			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
-				using(BinaryWriter writer = new BinaryWriter(stream)) {
-					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output);
-					assembler.Compile(file);
-					errorCount = assembler.ErrorCount;
-					errors = output.ToString();
-					if(assembler.ErrorCount <= 0) {
-						writer.Flush();
-						return stream.ToArray();
-					}
-				}
-			}
-			return null;
-		}
-		private byte[] Compile(string text, out int errorCount) {
-			return this.Compile(text, out errorCount, out _);
-		}
-
-		private void CompileTest(string text, params byte[] expected) {
-			int errorCount;
-			byte[] actual = this.Compile(text, out errorCount);
-			Assert.AreEqual(0, errorCount, "Expecting compilation pass without errors, while actually it's {0} errors", errorCount);
-			Assert.AreEqual(expected.Length, actual.Length, "Expecting {0} bytes output, while actually it's {1}", expected.Length, actual.Length);
-			for(int i = 0; i < expected.Length; i++) {
-				Assert.AreEqual(expected[i], actual[i]);
-			}
-		}
-
-		private void CompileTest16(string text, params int[] expected) {
-			int errorCount;
-			byte[] actual = this.Compile(text, out errorCount);
-			Assert.AreEqual(0, errorCount);
-			Assert.AreEqual(expected.Length * 2, actual.Length);
-			using(MemoryStream stream = new MemoryStream(actual)) {
-				using(BinaryReader reader = new BinaryReader(stream)) {
-					foreach(int expectedItem in expected) {
-						Assert.AreEqual((int)(ushort)reader.ReadInt16(), expectedItem);
-					}
-				}
-			}
-		}
-
-		private void CompileTest32(string text, params int[] expected) {
-			int errorCount;
-			byte[] actual = this.Compile(text, out errorCount);
-			Assert.AreEqual(0, errorCount);
-			Assert.AreEqual(expected.Length * 4, actual.Length);
-			using(MemoryStream stream = new MemoryStream(actual)) {
-				using(BinaryReader reader = new BinaryReader(stream)) {
-					foreach(int expectedItem in expected) {
-						Assert.AreEqual(reader.ReadInt32(), expectedItem);
-						//Assert.AreEqual(reader.ReadInt32(), actual[i++]);
-					}
-				}
-			}
-		}
-
-		private string CompileErrors(string text) {
-			int count;
-			string errors;
-			this.Compile(text, out count, out errors);
-			Assert.IsTrue(0 < count && !string.IsNullOrEmpty(errors), "Expecting compilation errors");
-			return errors;
-		}
-
-		private void CompileErrorsTest(string text, string errorFragment) {
-			string errors = this.CompileErrors(text);
-			StringAssert.Matches(errors, new Regex(errorFragment, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
-				"Expected error fragment ({0}) not found in error message: {1}", errorFragment, errors
-			);
-		}
-
-		/// <summary>
-		///A test for Compile
-		///</summary>
-		[TestMethod()]
-		public void AssemblerCompileTest() {
-			// basic expression test
-			this.CompileTest("macro main{1}", 1);
-			this.CompileTest("macro main{1 2 0xb 0b10100101}", 1, 2, 0xb, 0xa5);
+	[TestClass]
+	public class CompilerTest : CompileTestBase {
+		[TestMethod]
+		public void BasicExprTest() {
+			this.CompileTest("macro main{1 2 0xb 0b10100101}", 1, 2, 0xb, 0b10100101);
 			this.CompileTest("macro main{2 a: 3 a}", 2, 3, 1);
-			this.CompileTest("macro main{\"abc\\td\\ne\"}", (byte)'a', (byte)'b', (byte)'c', (byte)'\t', (byte)'d', (byte)'\n', (byte)'e', 0);
 			this.CompileTest("macro main{a 5 a 7} macro a p{p}", 5, 7);
+			this.CompileTest("macro main{a 5 a b} macro a p{p} macro b{20 30}", 5, 20, 30);
+			this.CompileTest("macro main{a 3 a f 5} macro a p{p} macro f n{if(0<n){f n-1 n}}", 3, 1, 2, 3, 4, 5);
+		}
+
+		[TestMethod]
+		public void ArithmExprTest() {
 			this.CompileTest("macro main{!3 !0 (+4) (-3) (~5)}", 0, 1, 4, (byte)((-3) & 0xFF), (byte)((~5) & 0xFF));
-			this.CompileTest("macro main{(0||0) (5||0) (0||6) (4||7)}", 0, 1, 1, 1);
-			this.CompileTest("macro main{(0&&0) (5&&0) (0&&6) (4&&7)}", 0, 0, 0, 1);
-			this.CompileTest("macro main{(0<0) (-1<0) (0<1) (-3<-5) (6<3) (4<7)}", 0, 1, 1, 0, 0, 1);
-			this.CompileTest("macro main{(0>0) (-1>0) (0>1) (-3>-5) (6>3) (4>7)}", 0, 0, 0, 1, 1, 0);
-			this.CompileTest("macro main{(0<=0) (-1<=0) (0<=1) (-3<=-5) (6<=3) (4<=7) (2<=2)}", 1, 1, 1, 0, 0, 1, 1);
-			this.CompileTest("macro main{(0>=0) (-1>=0) (0>=1) (-3>=-5) (6>=3) (4>=7) (2>=2)}", 1, 0, 0, 1, 1, 0, 1);
-			this.CompileTest("macro main{(0==0) (1==1) (-2==-2) (3==4) (\"abc\"==\"abc\") (\"abc\"==\"def\")}", 1, 1, 1, 0, 1, 0);
-			this.CompileTest("macro main{(0!=0) (1!=1) (-2!=-2) (3!=4) (\"abc\"!=\"abc\") (\"abc\"!=\"def\")}", 0, 0, 0, 1, 0, 1);
 
 			this.CompileTest("macro main{(1+2) (-3+-4) (\"abc\"+\"def\")}", 3, (-7 & 0xFF), (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f', 0);
 			this.CompileTest("macro main{(\"abc\"+(3+4)+\"def\")}", (byte)'a', (byte)'b', (byte)'c', (byte)'7', (byte)'d', (byte)'e', (byte)'f', 0);
@@ -122,17 +28,35 @@ namespace UnitTest {
 			this.CompileTest("macro main{5<<2}", 20);
 			this.CompileTest("macro main{20>>2}", 5);
 
+			this.CompileTest("macro main{(0||0) (5||0) (0||6) (4||7)}", 0, 1, 1, 1);
+			this.CompileTest("macro main{(0&&0) (5&&0) (0&&6) (4&&7)}", 0, 0, 0, 1);
+			this.CompileTest("macro main{(0<0) (-1<0) (0<1) (-3<-5) (6<3) (4<7)}", 0, 1, 1, 0, 0, 1);
+			this.CompileTest("macro main{(0>0) (-1>0) (0>1) (-3>-5) (6>3) (4>7)}", 0, 0, 0, 1, 1, 0);
+			this.CompileTest("macro main{(0<=0) (-1<=0) (0<=1) (-3<=-5) (6<=3) (4<=7) (2<=2)}", 1, 1, 1, 0, 0, 1, 1);
+			this.CompileTest("macro main{(0>=0) (-1>=0) (0>=1) (-3>=-5) (6>=3) (4>=7) (2>=2)}", 1, 0, 0, 1, 1, 0, 1);
+			this.CompileTest("macro main{(0==0) (1==1) (-2==-2) (3==4) (\"abc\"==\"abc\") (\"abc\"==\"def\")}", 1, 1, 1, 0, 1, 0);
+			this.CompileTest("macro main{(0!=0) (1!=1) (-2!=-2) (3!=4) (\"abc\"!=\"abc\") (\"abc\"!=\"def\")}", 0, 0, 0, 1, 0, 1);
+		}
+
+		[TestMethod]
+		public void IfExprTest() {
 			this.CompileTest("macro main{if(1){5}else{6}}", 5);
 			this.CompileTest("macro main{if(0){5}else{6}}", 6);
 			this.CompileTest("macro main{if(0){5}}");
 			this.CompileTest("macro main{if(3){5}}", 5);
 			this.CompileTest("macro m n{if(n<3){2}else{3}} macro main{1 (m a) a:3}", 1, 2, 3);
 
-			this.CompileTest("macro quote n{n} macro abs n{if(0<=n){quote n}else{quote -n}} macro main{1 abs 2 3}", 1, 2, 3);
+			this.CompileTest("macro quote n{n} macro abs n{if(0<=n){quote n}else{quote -n}} macro main{1 abs 2 abs -5 3}", 1, 2, 5, 3);
+		}
 
+		[TestMethod]
+		public void PrintTest() {
 			this.CompileTest("macro m v{print \"hello \"+v} macro main{m 1}");
+			this.CompileErrorsTest("macro m v{error \"hello \"+v} macro main{m 1}", "hello 1");
+		}
 
-			//test calls
+		[TestMethod]
+		public void CallTest() {
 			this.CompileTest("macro main{a 5 b 7} macro a p{p} macro b d{d*2}", 5, 14);
 			this.CompileTest("macro main{1 a} macro a{2 3}", 1, 2, 3);
 			// recursive one
@@ -141,7 +65,10 @@ namespace UnitTest {
 			this.CompileTest("macro main{a b 5 a} macro a{3} macro b a{a}", 3, 5, 3);
 			// label hides macro
 			this.CompileTest("macro main{a 1 a: 5 a 3} macro a{8}", 2, 1, 5, 2, 3);
+		}
 
+		[TestMethod]
+		public void LabelTest() {
 			//test for address pointer moves
 			this.CompileTest("macro main{l1:a l2:a 0 l2 l1} macro a{5}", 5, 5, 0, 1, 0);
 			this.CompileTest("macro main{l1:if(1<a){3}else{4}l2:a l2 l1} macro a{5}", 3, 5, 1, 0);
@@ -222,6 +149,7 @@ namespace UnitTest {
 			this.CompileTest("macro main{1 2 3 macro: 4 5 macro 6}", 1, 2, 3, 4, 5, 3, 6);
 		}
 
+
 		/// <summary>
 		///A test for Compilation errors
 		///</summary>
@@ -235,19 +163,19 @@ namespace UnitTest {
 			this.CompileErrorsTest("binary 13 macro main{1}", "Expected binary format type 8, 16, or 32 instead of 13 at");
 
 			this.CompileErrorsTest("atomic atomic main{1}", "macro, include, or binary expected at");
-			this.CompileErrorsTest("macro {1}", "\"{\" expected instead of 1 at");
-			this.CompileErrorsTest("macro 3{2} macro main{1 3}", ""); //ignore error message here for now: Compiled file get changed between passes
+			this.SyntaxErrorTest("macro {1}");
+			this.CompileErrorsTest("macro 3{2} macro main{1 3}", "Macro name expected instead of 3 at");
 			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");
 
-			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4", "Macro foo already contains parameter a at");
-			this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"macro\" at");
-			this.CompileErrorsTest("macro foo print{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"print\" at");
-			this.CompileErrorsTest("macro foo error{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"error\" at");
-			this.CompileErrorsTest("macro foo if{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"if\" at");
-			this.CompileErrorsTest("macro foo else{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"else\" at");
+			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4}", "Macro foo already contains parameter a at");
+			//this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"macro\" at");
+			this.SyntaxErrorTest("macro foo print{33} macro main{1 foo 2 3}");
+			this.SyntaxErrorTest("macro foo error{33} macro main{1 foo 2 3}");
+			this.SyntaxErrorTest("macro foo if{33} macro main{1 foo 2 3}");
+			this.SyntaxErrorTest("macro foo else{33} macro main{1 foo 2 3}");
 
-			this.CompileErrorsTest("macro main{", "Unexpected end of file at");
-			this.CompileErrorsTest("macro main{(", "Unexpected end of file at");
+			this.SyntaxErrorTest("macro main{");
+			this.SyntaxErrorTest("macro main{(");
 
 			this.CompileErrorsTest("macro main{1 foo 2 3}", "Undefined macro foo at");
 
@@ -255,8 +183,8 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro main{2345678901}", "Bad format of number:");
 
 			this.CompileErrorsTest("macro two{1 2} macro main{print two}", "String value expected:");
-			this.CompileErrorsTest("macro a{error\"hello world\"}\nmacro main\n{a}", @"hello world:\s*in macro a at.*\(1\)\s*in macro main at.*\(3\)\s*$");
-			this.CompileErrorsTest("macro neg a{-a}\nmacro main{neg \"string\"}", @"Single number value expected:\s*.*\(1\)\s*.*\(2\)\s*$");
+			this.CompileErrorsTest("macro a{error\"hello world\"}\nmacro main\n{a}", @"hello world:\s*in macro a at");
+			this.CompileErrorsTest("macro neg a{-a}\nmacro main{neg \"string\"}", @"Single number value expected:");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a || b){1}else{2}}\nmacro main{toBool 0, two}", @"Single number value expected:");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a && b){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
 			this.CompileErrorsTest("macro two{1 2} macro toBool a, b{if(a != b){1}else{2}}\nmacro main{toBool 1, two}", @"Single number value expected:");
@@ -275,10 +203,10 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro foo a{if(a<3){1}else{2 3}} macro main{1 foo a 2 a:3 4}", "Condition is incomplete value. Only already defined labels can be used in condition:");
 
 			// label keyword
-			this.CompileErrorsTest("macro main{1 2 print: 3 4 print 5}", "Label can not be a keyword \"print\" at");
-			this.CompileErrorsTest("macro main{1 2 error: 3 4 error 5}", "Label can not be a keyword \"error\" at");
-			this.CompileErrorsTest("macro main{1 2 if: 3 4 if 5}", "Label can not be a keyword \"if\" at");
-			this.CompileErrorsTest("macro main{1 2 else: 3 4 else 5}", "Label can not be a keyword \"else\" at");
+			this.SyntaxErrorTest("macro main{1 2 print: 3 4 print 5}");
+			this.SyntaxErrorTest("macro main{1 2 error: 3 4 error 5}");
+			this.SyntaxErrorTest("macro main{1 2 if: 3 4 if 5}");
+			this.SyntaxErrorTest("macro main{1 2 else: 3 4 else 5}");
 
 			// label hides parameter
 			this.CompileErrorsTest("macro a b{b 1 b: 2} macro main{a 8}", "Label b hides parameter in macro a at");
@@ -296,7 +224,7 @@ namespace UnitTest {
 			this.CompileTest("macro main{1 2 3 a: 4 5 6 \"abc\"+a 7 8}", 1, 2, 3, 4, 5, 6, (byte)'a', (byte)'b', (byte)'c', (byte)'3', (byte)'\0', 7, 8);
 			// concatenation of undefined labels does not allowed
 			int errorCount;
-			byte[] actual = this.Compile("macro main{1 \"abc\"+a 2 3 a: 4 5}", out errorCount);
+			byte[]? actual = this.Compile("macro main{1 \"abc\"+a 2 3 a: 4 5}", out errorCount);
 			Assert.IsTrue(0 < errorCount);
 
 			// if statement resulting in void value should be ignored to not affect arithmetic

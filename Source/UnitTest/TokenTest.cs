@@ -11,7 +11,7 @@ namespace UnitTest {
 	///</summary>
 	[TestClass()]
 	public class TokenTest {
-		public TestContext TestContext { get; set; }
+		public TestContext? TestContext { get; set; }
 
 		private void TestTokenNumber(string text, int value) {
 			Token token = new Token(new Position("test", 2), TokenType.Number, text);

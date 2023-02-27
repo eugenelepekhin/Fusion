@@ -13,7 +13,7 @@ namespace UnitTest {
 	///</summary>
 	[TestClass()]
 	public class AssemblerTest {
-		public TestContext TestContext { get; set; }
+		public TestContext? TestContext { get; set; }
 
 		private void ValidateParameters(Assembler assembler, string macro, params string[] expected) {
 			List<Token> actual = assembler.Macro[macro].Parameter;
@@ -29,6 +29,11 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void AssemblerCompileFirstPassTest() {
+			Assert.IsNotNull(this.TestContext);
+			Assert.IsNotNull(this.TestContext.TestRunDirectory);
+			Assert.IsNotNull(this.TestContext.TestDeploymentDir);
+			Assert.IsNotNull(this.TestContext.TestName);
+
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileFirstPassTest.asm");
 			File.WriteAllText(file, Resource.AssemblerCompileFirstPassTest);
@@ -52,6 +57,11 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void AssemblerCompileSecondPassTest() {
+			Assert.IsNotNull(this.TestContext);
+			Assert.IsNotNull(this.TestContext.TestRunDirectory);
+			Assert.IsNotNull(this.TestContext.TestDeploymentDir);
+			Assert.IsNotNull(this.TestContext.TestName);
+
 			Assembler assembler1 = AssemblerFactory.Create(this.TestContext);
 			string file = Path.Combine(this.TestContext.TestDeploymentDir, "AssemblerCompileSecondPassTest.asm");
 			File.WriteAllText(file, Resource.AssemblerCompileSecondPassTest);

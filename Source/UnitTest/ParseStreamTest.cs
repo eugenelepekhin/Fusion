@@ -11,12 +11,16 @@ namespace UnitTest {
 	/// </summary>
 	[TestClass()]
 	public class ParseStreamTest {
-		public TestContext TestContext { get; set; }
+		public TestContext? TestContext { get; set; }
 
-		private string CreateChain(params string[] content) {
+		private string? CreateChain(params string[] content) {
+			Assert.IsNotNull(this.TestContext);
+			Assert.IsNotNull(this.TestContext.TestRunDirectory);
+			Assert.IsNotNull(this.TestContext.TestDeploymentDir);
+			Assert.IsNotNull(this.TestContext.TestName);
 			int index = 0;
-			string prev = null;
-			string path = null;
+			string? prev = null;
+			string? path = null;
 			foreach(string text in content) {
 				string name = this.TestContext.TestName + ++index + ".asm";
 				string value = string.Format("\r\n; hello world {0}\r\n", index);
@@ -31,7 +35,7 @@ namespace UnitTest {
 			return path;
 		}
 
-		private void TestFirst(ParseStream stream, TokenType tokenType, string value) {
+		private void TestFirst(ParseStream stream, TokenType tokenType, string? value) {
 			Token token = stream.First();
 			Assert.AreEqual(tokenType, token.TokenType);
 			Assert.AreEqual(value, token.Value);
@@ -48,8 +52,9 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void ParseStreamFirstTest() {
+			Assert.IsNotNull(this.TestContext);
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
-			string file = this.CreateChain("abc 123", "def 456");
+			string? file = this.CreateChain("abc 123", "def 456");
 			using(ParseStream stream = new ParseStream(assembler, file)) {
 				this.TestFirst(stream, TokenType.Identifier, "abc");
 				this.TestFirst(stream, TokenType.Number, "123");
@@ -64,8 +69,9 @@ namespace UnitTest {
 		///</summary>
 		[TestMethod()]
 		public void ParseStreamNextTest() {
+			Assert.IsNotNull(this.TestContext);
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
-			string file = this.CreateChain("abc 123", "def 456");
+			string? file = this.CreateChain("abc 123", "def 456");
 			using(ParseStream stream = new ParseStream(assembler, file)) {
 				this.TestFirst(stream, TokenType.Identifier, "abc");
 				this.TestNext(stream, TokenType.Number, "123");
@@ -77,8 +83,9 @@ namespace UnitTest {
 
 		[TestMethod()]
 		public void ParseStreamNextErrorTest() {
+			Assert.IsNotNull(this.TestContext);
 			Assembler assembler = AssemblerFactory.Create(this.TestContext);
-			string file = this.CreateChain("abc 0b 123", "def 0x abc");
+			string? file = this.CreateChain("abc 0b 123", "def 0x abc");
 			using(ParseStream stream = new ParseStream(assembler, file)) {
 				this.TestFirst(stream, TokenType.Identifier, "abc");
 				this.TestNext(stream, TokenType.Error, "0b");

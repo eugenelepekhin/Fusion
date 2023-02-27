@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace UnitTest {
 	public class TestWriter : TextWriter {
 		private TestContext TestContext { get; set; }
-		public StringBuilder Output { get; set; }
+		public StringBuilder? Output { get; set; }
 
 		public TestWriter(TestContext testContext) {
 			this.TestContext = testContext;
@@ -20,7 +20,7 @@ namespace UnitTest {
 			this.Write(value.ToString());
 		}
 
-		public override void Write(string value) {
+		public override void Write(string? value) {
 			#if DEBUG
 				Debug.Write(value);
 			#else
@@ -35,14 +35,14 @@ namespace UnitTest {
 			this.Write(Environment.NewLine);
 		}
 
-		public override void WriteLine(string value) {
+		public override void WriteLine(string? value) {
 			this.Write(value);
 			this.WriteLine();
 		}
 	}
 
 	public static class AssemblerFactory {
-		public static Assembler Create(TestContext testContext, BinaryWriter writer, StringBuilder output) {
+		public static Assembler Create(TestContext testContext, BinaryWriter writer, StringBuilder? output) {
 			TestWriter testWriter = new TestWriter(testContext);
 			testWriter.Output = output;
 			return new Assembler(testWriter, testWriter, writer);
