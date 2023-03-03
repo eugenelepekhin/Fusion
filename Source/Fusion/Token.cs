@@ -11,7 +11,7 @@ namespace Fusion {
 		public string Value { get; private set; }
 
 		public Token(Position position, TokenType tokenType, string value) {
-			Debug.Assert(!string.IsNullOrEmpty(value) || tokenType == Fusion.TokenType.Eos);
+			Debug.Assert(value != null || tokenType == Fusion.TokenType.Eos);
 			this.Position = position;
 			this.TokenType = tokenType;
 			this.Value = value;

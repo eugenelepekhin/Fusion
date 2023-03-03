@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Fusion;
+﻿using Fusion;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest {
