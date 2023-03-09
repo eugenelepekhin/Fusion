@@ -35,12 +35,14 @@
 
 	<Target Name="ZipResult" AfterTargets="AfterBuild; CopyLicenseFile; CopyDocFiles" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
 		<ItemGroup>
-			<ZipItem Include="$(TargetDir)BNF.txt"/>
+			<ZipItem Include="$(MSBuildProjectDirectory)\FusionLexer.g4"/>
+			<ZipItem Include="$(MSBuildProjectDirectory)\FusionParser.g4"/>
 			<ZipItem Include="$(TargetDir)Example.txt"/>
 			<ZipItem Include="$(TargetDir)Fusion Language v1.docx"/>
 			<ZipItem Include="$(TargetDir)fusion.cmd"/>
 			<ZipItem Include="$(TargetDir)Fusion.dll"/>
 			<ZipItem Include="$(TargetDir)Fusion.pdb"/>
+			<ZipItem Include="$(TargetDir)Antlr4.Runtime.dll"/>
 			<ZipItem Include="$(TargetDir)Fusion.runtimeconfig.json"/>
 			<ZipItem Include="$(TargetDir)LabelExample.txt"/>
 			<ZipItem Include="$(TargetDir)License.txt"/>
