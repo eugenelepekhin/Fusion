@@ -13,14 +13,14 @@ namespace Fusion {
 		public abstract int Size(Context context);
 		public abstract Value WriteValue(Assembler assembler);
 
-		public NumberValue ToNumber() {
+		public NumberValue? ToNumber() {
 			if(this.ToSingular() is NumberValue number) {
 				return number;
 			}
 			return null;
 		}
 
-		public StringValue ToStringValue() {
+		public StringValue? ToStringValue() {
 			Value value = this.ToSingular();
 			if(value is StringValue str) {
 				return str;
@@ -36,7 +36,7 @@ namespace Fusion {
 		}
 
 		public ListValue ToList() {
-			ListValue list = this as ListValue;
+			ListValue? list = this as ListValue;
 			if(list != null) {
 				return list;
 			}
@@ -61,20 +61,21 @@ namespace Fusion {
 	}
 
 	public class NumberValue : Value {
-		public static readonly NumberValue False = new NumberValue(null, null, 0);
-		public static readonly NumberValue True = new NumberValue(null, null, 1);
-		public int Value { get; private set; }
-		public Context Context { get; private set; }
-		public Token Token { get; private set; }
+		public Context Context { get; }
+		public Token Token { get; }
+		public int Value { get; }
 		public NumberValue(Context context, Token token, int value) {
 			this.Context = context;
 			this.Token = token;
 			this.Value = value;
 		}
+		public NumberValue(Context context, Token token, bool value) : this(context, token, value ? 1 : 0) {
+		}
+
 		public override int Size(Context context) { return 1; }
 		public override Value WriteValue(Assembler assembler) {
 			int value = this.Value;
-			string error = assembler.BinaryFormatter.Write(value);
+			string? error = assembler.BinaryFormatter.Write(value);
 			if(error != null) {
 				Debug.Assert(this.Context != null && this.Token != null);
 				assembler.Error(Resource.MessageOnStack(error, this.Context.PositionStack(this.Token)));
@@ -82,7 +83,7 @@ namespace Fusion {
 			return this;
 		}
 
-		public NumberValue ToBoolean() => (this.Value == 0) ? NumberValue.False : NumberValue.True;
+		public NumberValue ToBoolean() => new NumberValue(this.Context, this.Token, this.Value != 0);
 
 		#if DEBUG
 			public override string ToString() {
@@ -107,13 +108,14 @@ namespace Fusion {
 	//}
 
 	public class StringValue : Value {
+		public string Value { get; }
 		public StringValue(string value) { this.Value = value; }
-		public string Value { get; private set; }
 		public override int Size(Context context) { return this.Value.Length + 1; }
 		public override Value WriteValue(Assembler assembler) {
+			// TODO: can it be null here?
 			if(this.Value != null) {
-				string error = null;
-				string message;
+				string? error = null;
+				string? message;
 				foreach(char c in this.Value) {
 					message = assembler.BinaryFormatter.Write(c);
 					error = error ?? message;
@@ -183,13 +185,13 @@ namespace Fusion {
 			return this;
 		}
 
-		public void ResolveLabels() {
+		public void ResolveLabels(Context context) {
 			for(int i = 0; i < this.List.Count; i++) {
 				if(this.List[i] is ListValue listValue) {
-					listValue.ResolveLabels();
+					listValue.ResolveLabels(context);
 				} else {
 					if(this.List[i] is Expression expression) {
-						this.List[i] = expression.Evaluate(null, 0);
+						this.List[i] = expression.Evaluate(context, 0);
 						Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
 						this.List[i].Address = expression.Address;
 					}

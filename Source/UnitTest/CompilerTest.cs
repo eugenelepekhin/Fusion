@@ -162,7 +162,7 @@ namespace UnitTest {
 			this.CompileErrorsTest("binary 16 binary 8 macro main{1}", "Binary type already defined at");
 			this.CompileErrorsTest("binary 13 macro main{1}", "Expected binary format type 8, 16, or 32 instead of 13 at");
 
-			this.CompileErrorsTest("atomic atomic main{1}", "macro, include, or binary expected at");
+			this.SyntaxErrorTest("atomic atomic main{1}");
 			this.SyntaxErrorTest("macro {1}");
 			this.CompileErrorsTest("macro 3{2} macro main{1 3}", "Macro name expected instead of 3 at");
 			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");

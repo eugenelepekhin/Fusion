@@ -10,9 +10,9 @@ options {
 	The predicates field will be set before the second pass begins.
 	*/
 	public Predicates predicates = null;
-	bool IsMacroN() => true; //predicates.IsMacroN(CurrentToken.Text);
-	bool IsMacro0() => false; //predicates.IsMacro0(CurrentToken.Text);
-	bool IsNotMacro() => false; //predicates.IsNotMacro(CurrentToken.Text);
+	bool IsMacroN() => predicates.IsMacroN(CurrentToken.Text);
+	bool IsMacro0() => predicates.IsMacro0(CurrentToken.Text);
+	bool IsNotMacro() => predicates.IsNotMacro(CurrentToken.Text);
 }
 
 fusionProgram: (binaryDecalration | include | macro)* EOF;	// binaryDecalration may only occurred once

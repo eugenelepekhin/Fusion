@@ -121,40 +121,37 @@
     <value>Fusion version {0}</value>
     <comment>{string version}</comment>
   </data>
+  <data name="ArgumentCount" xml:space="preserve">
+    <value>Number of actual arguments {0} not equal to number of declared parameters {1} in macro {2}</value>
+    <comment>{int arguments, int parameters, string macro}</comment>
+  </data>
   <data name="BadNumberFormat" xml:space="preserve">
     <value>Bad format of number: '{0}' at {1}</value>
-    <comment>{string number, string position}</comment>
-  </data>
-  <data name="BeginExpected" xml:space="preserve">
-    <value>"{{" expected instead of {0} at {1}</value>
-    <comment>{string token, string position}</comment>
+    <comment>{string number, Position position}</comment>
   </data>
   <data name="BinaryTypeExpected" xml:space="preserve">
     <value>Expected binary format type 8, 16, or 32 instead of {0} at {1}</value>
-    <comment>{string text, string position}</comment>
+    <comment>{string text, Position position}</comment>
   </data>
   <data name="BinaryTypeRedefined" xml:space="preserve">
     <value>Binary type already defined at {0}</value>
-    <comment>{string position}</comment>
+    <comment>{Position position}</comment>
   </data>
   <data name="FileChanged" xml:space="preserve">
-    <value>Compiled file get changed between passes.</value>
+    <value>File {0} was modified after compilation started</value>
+    <comment>{string file}</comment>
   </data>
   <data name="FileNotFound" xml:space="preserve">
     <value>File not found: {0}</value>
     <comment>{string file}</comment>
   </data>
-  <data name="IdentifierExpected" xml:space="preserve">
-    <value>Identifier is expected instead of {0} at {1}</value>
-    <comment>{string text, string position}</comment>
-  </data>
-  <data name="IncludeFileMissing" xml:space="preserve">
-    <value>Missing file name for include at {0}</value>
-    <comment>{string position}</comment>
-  </data>
   <data name="IncludeFileNotFound" xml:space="preserve">
     <value>Include file "{0}" not found at {1}</value>
-    <comment>{string file, string position}</comment>
+    <comment>{string file, Position position}</comment>
+  </data>
+  <data name="IncludeFolderNotFound" xml:space="preserve">
+    <value>Include folder {0} not found</value>
+    <comment>{string folder}</comment>
   </data>
   <data name="IncompleteCondition" xml:space="preserve">
     <value>Condition is incomplete value. Only already defined labels can be used in condition:
@@ -175,40 +172,17 @@
     <value>Attempt to write too big number ({0}) to the output at offset {1}. The value replaced with 0x{2:X}</value>
     <comment>{int value, long offset, int replaced}</comment>
   </data>
-  <data name="IncorrectValue" xml:space="preserve">
-    <value>Incorrect value of type {0} is written to the output at offset {1}. The value replaced with 0xFF</value>
-    <comment>{string type, long offset}</comment>
-  </data>
-  <data name="InternalError" xml:space="preserve">
-    <value>Internal assembler error.</value>
-  </data>
-  <data name="ItemExpected" xml:space="preserve">
-    <value>{0} is expected instead of {1} at {2}</value>
-    <comment>{string expected, string actual, string position}</comment>
-  </data>
   <data name="LabelHidesParameter" xml:space="preserve">
     <value>Label {0} hides parameter in macro {1} at {2}</value>
-    <comment>{string label, string macro, string position}</comment>
-  </data>
-  <data name="LabelKeyword" xml:space="preserve">
-    <value>Label can not be a keyword "{0}" at {1}</value>
-    <comment>{string keyword, string position}</comment>
+    <comment>{string label, string macro, Position position}</comment>
   </data>
   <data name="LabelRedefined" xml:space="preserve">
     <value>Label {0} redefined in macro {1} at {2}</value>
-    <comment>{string label, string macro, string position}</comment>
-  </data>
-  <data name="MacroExpected" xml:space="preserve">
-    <value>macro, include, or binary expected at {0}</value>
-    <comment>{string position}</comment>
-  </data>
-  <data name="MacroNameExpected" xml:space="preserve">
-    <value>Macro name expected instead of {0} at {1}</value>
-    <comment>{string text, string position}</comment>
+    <comment>{string label, string macro, Position position}</comment>
   </data>
   <data name="MacroNameRedefinition" xml:space="preserve">
     <value>Macro {0} redefined at {1}</value>
-    <comment>{string name, string position}</comment>
+    <comment>{string name, Position position}</comment>
   </data>
   <data name="MainMissing" xml:space="preserve">
     <value>Macro "main" is missing.</value>
@@ -221,10 +195,6 @@
 {1}</value>
     <comment>{string message, string position}</comment>
   </data>
-  <data name="MultipleInclusions" xml:space="preserve">
-    <value>File included more then once: "{0}"</value>
-    <comment>{string path}</comment>
-  </data>
   <data name="NumberValueExpected" xml:space="preserve">
     <value>Single number value expected:
 {0}</value>
@@ -232,18 +202,15 @@
   </data>
   <data name="ParameterKeyword" xml:space="preserve">
     <value>Name of parameter can not be a keyword "{0}" at {1}</value>
-    <comment>{string keyword, string position}</comment>
+    <comment>{string keyword, Position position}</comment>
   </data>
   <data name="ParameterRedefinition" xml:space="preserve">
     <value>Macro {0} already contains parameter {1} at {2}</value>
-    <comment>{string macro, string parameter, string position}</comment>
+    <comment>{string macro, string parameter, Position position}</comment>
   </data>
   <data name="PositionText" xml:space="preserve">
-    <value>{0} ({1})</value>
-    <comment>{string file, int line}</comment>
-  </data>
-  <data name="PrimaryItem" xml:space="preserve">
-    <value>Identifier, literal, "(", or keyword</value>
+    <value>{0} ({1}, {2})</value>
+    <comment>{string file, int line, int column}</comment>
   </data>
   <data name="StringOrNumberValueExpected" xml:space="preserve">
     <value>Number or string value expected:
@@ -262,23 +229,20 @@
   <data name="SummarySuccess" xml:space="preserve">
     <value>Compilation is successful</value>
   </data>
+  <data name="SyntaxError" xml:space="preserve">
+    <value>{0} ({1}, {2}): Syntax error: {3}</value>
+    <comment>{string file, int line, int column, string message}</comment>
+  </data>
   <data name="UndefinedMacro" xml:space="preserve">
     <value>Undefined macro {0} at {1}</value>
-    <comment>{string name, string poisition}</comment>
-  </data>
-  <data name="UnexpectedChar" xml:space="preserve">
-    <value>Unexpected char '{0}' (0x{1:X}) in {2}</value>
-    <comment>{char c, int value, string position}</comment>
-  </data>
-  <data name="UnexpectedEOF" xml:space="preserve">
-    <value>Unexpected end of file at {0}</value>
-    <comment>{string position}</comment>
+    <comment>{string name, Position poisition}</comment>
   </data>
   <data name="Usage" xml:space="preserve">
-    <value>Usage: fusion &lt;InputFileName.asm&gt; &lt;OutputFileName.bin&gt;</value>
+    <value>Usage: fusion [options] &lt;InputFileName.asm&gt; &lt;OutputFileName.bin&gt;
+available options:</value>
   </data>
   <data name="UserErrorPosition" xml:space="preserve">
     <value>	in macro {0} at {1}</value>
-    <comment>{string macroName, string position}</comment>
+    <comment>{string macroName, Position position}</comment>
   </data>
 </root>

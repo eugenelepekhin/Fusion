@@ -62,38 +62,38 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Bad format of number: '{0}' at {1}.
+		/// Looks up a localized string similar to Number of actual arguments {0} not equal to number of declared parameters {1} in macro {2}.
 		/// </summary>
- 		public static string BadNumberFormat(string number, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("BadNumberFormat", Culture), number, position);
+ 		public static string ArgumentCount(int arguments, int parameters, string macro) {
+			return string.Format(FormatCulture, ResourceManager.GetString("ArgumentCount", Culture), arguments, parameters, macro);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to "{{" expected instead of {0} at {1}.
+		/// Looks up a localized string similar to Bad format of number: '{0}' at {1}.
 		/// </summary>
- 		public static string BeginExpected(string token, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("BeginExpected", Culture), token, position);
+ 		public static string BadNumberFormat(string number, Position position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("BadNumberFormat", Culture), number, position);
 		}
 
 		/// <summary>
 		/// Looks up a localized string similar to Expected binary format type 8, 16, or 32 instead of {0} at {1}.
 		/// </summary>
- 		public static string BinaryTypeExpected(string text, string position) {
+ 		public static string BinaryTypeExpected(string text, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("BinaryTypeExpected", Culture), text, position);
 		}
 
 		/// <summary>
 		/// Looks up a localized string similar to Binary type already defined at {0}.
 		/// </summary>
- 		public static string BinaryTypeRedefined(string position) {
+ 		public static string BinaryTypeRedefined(Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("BinaryTypeRedefined", Culture), position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Compiled file get changed between passes..
+		/// Looks up a localized string similar to File {0} was modified after compilation started.
 		/// </summary>
- 		public static string FileChanged {
-			get { return ResourceManager.GetString("FileChanged", Culture); }
+ 		public static string FileChanged(string file) {
+			return string.Format(FormatCulture, ResourceManager.GetString("FileChanged", Culture), file);
 		}
 
 		/// <summary>
@@ -104,24 +104,17 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Identifier is expected instead of {0} at {1}.
-		/// </summary>
- 		public static string IdentifierExpected(string text, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("IdentifierExpected", Culture), text, position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Missing file name for include at {0}.
-		/// </summary>
- 		public static string IncludeFileMissing(string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("IncludeFileMissing", Culture), position);
-		}
-
-		/// <summary>
 		/// Looks up a localized string similar to Include file "{0}" not found at {1}.
 		/// </summary>
- 		public static string IncludeFileNotFound(string file, string position) {
+ 		public static string IncludeFileNotFound(string file, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("IncludeFileNotFound", Culture), file, position);
+		}
+
+		/// <summary>
+		/// Looks up a localized string similar to Include folder {0} not found.
+		/// </summary>
+ 		public static string IncludeFolderNotFound(string folder) {
+			return string.Format(FormatCulture, ResourceManager.GetString("IncludeFolderNotFound", Culture), folder);
 		}
 
 		/// <summary>
@@ -156,65 +149,23 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Incorrect value of type {0} is written to the output at offset {1}. The value replaced with 0xFF.
-		/// </summary>
- 		public static string IncorrectValue(string type, long offset) {
-			return string.Format(FormatCulture, ResourceManager.GetString("IncorrectValue", Culture), type, offset);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Internal assembler error..
-		/// </summary>
- 		public static string InternalError {
-			get { return ResourceManager.GetString("InternalError", Culture); }
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to {0} is expected instead of {1} at {2}.
-		/// </summary>
- 		public static string ItemExpected(string expected, string actual, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("ItemExpected", Culture), expected, actual, position);
-		}
-
-		/// <summary>
 		/// Looks up a localized string similar to Label {0} hides parameter in macro {1} at {2}.
 		/// </summary>
- 		public static string LabelHidesParameter(string label, string macro, string position) {
+ 		public static string LabelHidesParameter(string label, string macro, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("LabelHidesParameter", Culture), label, macro, position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Label can not be a keyword "{0}" at {1}.
-		/// </summary>
- 		public static string LabelKeyword(string keyword, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("LabelKeyword", Culture), keyword, position);
 		}
 
 		/// <summary>
 		/// Looks up a localized string similar to Label {0} redefined in macro {1} at {2}.
 		/// </summary>
- 		public static string LabelRedefined(string label, string macro, string position) {
+ 		public static string LabelRedefined(string label, string macro, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("LabelRedefined", Culture), label, macro, position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to macro, include, or binary expected at {0}.
-		/// </summary>
- 		public static string MacroExpected(string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("MacroExpected", Culture), position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Macro name expected instead of {0} at {1}.
-		/// </summary>
- 		public static string MacroNameExpected(string text, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("MacroNameExpected", Culture), text, position);
 		}
 
 		/// <summary>
 		/// Looks up a localized string similar to Macro {0} redefined at {1}.
 		/// </summary>
- 		public static string MacroNameRedefinition(string name, string position) {
+ 		public static string MacroNameRedefinition(string name, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("MacroNameRedefinition", Culture), name, position);
 		}
 
@@ -241,13 +192,6 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to File included more then once: "{0}".
-		/// </summary>
- 		public static string MultipleInclusions(string path) {
-			return string.Format(FormatCulture, ResourceManager.GetString("MultipleInclusions", Culture), path);
-		}
-
-		/// <summary>
 		/// Looks up a localized string similar to Single number value expected:
 		/// {0}.
 		/// </summary>
@@ -258,29 +202,22 @@ namespace Fusion {
 		/// <summary>
 		/// Looks up a localized string similar to Name of parameter can not be a keyword "{0}" at {1}.
 		/// </summary>
- 		public static string ParameterKeyword(string keyword, string position) {
+ 		public static string ParameterKeyword(string keyword, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("ParameterKeyword", Culture), keyword, position);
 		}
 
 		/// <summary>
 		/// Looks up a localized string similar to Macro {0} already contains parameter {1} at {2}.
 		/// </summary>
- 		public static string ParameterRedefinition(string macro, string parameter, string position) {
+ 		public static string ParameterRedefinition(string macro, string parameter, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("ParameterRedefinition", Culture), macro, parameter, position);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to {0} ({1}).
+		/// Looks up a localized string similar to {0} ({1}, {2}).
 		/// </summary>
- 		public static string PositionText(string file, int line) {
-			return string.Format(FormatCulture, ResourceManager.GetString("PositionText", Culture), file, line);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Identifier, literal, "(", or keyword.
-		/// </summary>
- 		public static string PrimaryItem {
-			get { return ResourceManager.GetString("PrimaryItem", Culture); }
+ 		public static string PositionText(string file, int line, int column) {
+			return string.Format(FormatCulture, ResourceManager.GetString("PositionText", Culture), file, line, column);
 		}
 
 		/// <summary>
@@ -314,28 +251,22 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to {0} ({1}, {2}): Syntax error: {3}.
+		/// </summary>
+ 		public static string SyntaxError(string file, int line, int column, string message) {
+			return string.Format(FormatCulture, ResourceManager.GetString("SyntaxError", Culture), file, line, column, message);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Undefined macro {0} at {1}.
 		/// </summary>
- 		public static string UndefinedMacro(string name, string poisition) {
+ 		public static string UndefinedMacro(string name, Position poisition) {
 			return string.Format(FormatCulture, ResourceManager.GetString("UndefinedMacro", Culture), name, poisition);
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Unexpected char '{0}' (0x{1:X}) in {2}.
-		/// </summary>
- 		public static string UnexpectedChar(char c, int value, string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("UnexpectedChar", Culture), c, value, position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Unexpected end of file at {0}.
-		/// </summary>
- 		public static string UnexpectedEOF(string position) {
-			return string.Format(FormatCulture, ResourceManager.GetString("UnexpectedEOF", Culture), position);
-		}
-
-		/// <summary>
-		/// Looks up a localized string similar to Usage: fusion <InputFileName.asm> <OutputFileName.bin>.
+		/// Looks up a localized string similar to Usage: fusion [options] <InputFileName.asm> <OutputFileName.bin>
+		/// available options:.
 		/// </summary>
  		public static string Usage {
 			get { return ResourceManager.GetString("Usage", Culture); }
@@ -344,7 +275,7 @@ namespace Fusion {
 		/// <summary>
 		/// Looks up a localized string similar to in macro {0} at {1}.
 		/// </summary>
- 		public static string UserErrorPosition(string macroName, string position) {
+ 		public static string UserErrorPosition(string macroName, Position position) {
 			return string.Format(FormatCulture, ResourceManager.GetString("UserErrorPosition", Culture), macroName, position);
 		}
 	}

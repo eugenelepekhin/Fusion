@@ -4,15 +4,15 @@ using System.IO;
 namespace Fusion {
 	public abstract class BinaryFormatter {
 		public abstract int CellSize { get; }
-		protected BinaryWriter Writer { get; private set; }
+		protected BinaryWriter Writer { get; }
 		public long	Position { get { return this.Writer.BaseStream.Position; } }
 
 		protected BinaryFormatter(BinaryWriter writer) {
 			this.Writer = writer;
 		}
 
-		public abstract string Write(char value);
-		public abstract string Write(int value);
+		public abstract string? Write(char value);
+		public abstract string? Write(int value);
 	}
 
 	public class BinaryFormatter8 : BinaryFormatter {
@@ -21,13 +21,13 @@ namespace Fusion {
 		public BinaryFormatter8(BinaryWriter writer) : base(writer) {
 		}
 
-		public override string Write(char value) {
+		public override string? Write(char value) {
 			this.Writer.Write((byte)(value & 0xFF));
 			return null;
 		}
 
-		public override string Write(int value) {
-			string error = null;
+		public override string? Write(int value) {
+			string? error = null;
 			if(0xFF < Math.Abs(value)) {
 				error = Resource.IncorrectNumber(value, this.Position, 0xFF);
 				value = 0xFF;
@@ -43,13 +43,13 @@ namespace Fusion {
 		public BinaryFormatter16(BinaryWriter writer) : base(writer) {
 		}
 
-		public override string Write(char value) {
+		public override string? Write(char value) {
 			this.Writer.Write((short)(value & 0xFF));
 			return null;
 		}
 
-		public override string Write(int value) {
-			string error = null;
+		public override string? Write(int value) {
+			string? error = null;
 			if(0xFFFF < Math.Abs(value)) {
 				error = Resource.IncorrectNumber(value, this.Position, 0xFFFF);
 				value = 0xFFFF;
@@ -65,12 +65,12 @@ namespace Fusion {
 		public BinaryFormatter32(BinaryWriter writer) : base(writer) {
 		}
 
-		public override string Write(char value) {
+		public override string? Write(char value) {
 			this.Writer.Write((int)(value & 0xFF));
 			return null;
 		}
 
-		public override string Write(int value) {
+		public override string? Write(int value) {
 			this.Writer.Write(value);
 			return null;
 		}

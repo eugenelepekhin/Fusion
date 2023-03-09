@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
@@ -7,7 +8,7 @@ namespace Fusion {
 	class Program {
 		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
 		internal static int Main(string[] args) {
-			Console.Out.WriteLine(Resource.AppTitle(typeof(Program).Assembly.GetName().Version.ToString(3)));
+			Console.Out.WriteLine(Resource.AppTitle(typeof(Program).Assembly.GetName().Version!.ToString(3)));
 			int returnCode = 1;
 			try {
 				if(args == null || args.Length != 2) {
@@ -18,8 +19,8 @@ namespace Fusion {
 				} else {
 					using(MemoryStream bin = new MemoryStream(16 * 1024)) {
 						using(BinaryWriter writer = new BinaryWriter(bin)) {
-							Assembler assembler = new Assembler(Console.Error, Console.Out, writer);
-							Exception exception = Program.RunOnBigStack(() => assembler.Compile(args[0]));
+							Assembler assembler = new Assembler(Console.Error, Console.Out, writer, new List<string>());
+							Exception? exception = Program.RunOnBigStack(() => assembler.Compile(args[0]));
 							if(exception != null) {
 								if(exception is FileNotFoundException fileNotFoundException) {
 									//assembler.ErrorOutput.WriteLine(fileNotFoundException.Message);
@@ -55,8 +56,8 @@ namespace Fusion {
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
-		private static Exception RunOnBigStack(Action action) {
-			Exception exception = null;
+		private static Exception? RunOnBigStack(Action action) {
+			Exception? exception = null;
 			void Run() {
 				try {
 					action();

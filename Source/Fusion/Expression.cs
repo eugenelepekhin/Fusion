@@ -18,13 +18,6 @@ namespace Fusion {
 			}
 		}
 
-		public override string ToString() {
-			using(StringWriter writer = new StringWriter(CultureInfo.InvariantCulture)) {
-				this.WriteText(writer, 0);
-				return writer.ToString();
-			}
-		}
-
 		public abstract Value Evaluate(Context context, int address);
 
 		public override int Size(Context context) {
@@ -34,10 +27,23 @@ namespace Fusion {
 		public override Value WriteValue(Assembler assembler) {
 			throw new InvalidOperationException();
 		}
+
+		#if DEBUG
+			public override string ToString() {
+				using(StringWriter writer = new StringWriter(CultureInfo.InvariantCulture)) {
+					this.WriteText(writer, 0);
+					return writer.ToString();
+				}
+			}
+		#endif
 	}
 
 	public class Label : Expression {
-		public Token Name { get; set; }
+		public Token Name { get; }
+
+		public Label(Token name) {
+			this.Name = name;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
@@ -53,8 +59,13 @@ namespace Fusion {
 	}
 
 	public class LabelReference : Expression {
-		public Token Name { get; set; }
-		private Context Context { get; set; }
+		public Token Name { get; }
+		private Context? Context { get; }
+
+		public LabelReference(Token name, Context? context) {
+			this.Name = name;
+			this.Context = context;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
@@ -66,13 +77,17 @@ namespace Fusion {
 			if(context.IsLabelDefined(this.Name)) {
 				return new  NumberValue(context, this.Name, context.LabelValue(this.Name));
 			} else {
-				return new LabelReference() { Name = this.Name, Context = context };
+				return new LabelReference(this.Name, context);
 			}
 		}
 	}
 
 	public class ValueExpression : Expression {
-		public Value Value { get; set; }
+		public Value Value { get; }
+
+		public ValueExpression(Value value) {
+			this.Value = value;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			throw new InvalidOperationException();
@@ -86,9 +101,14 @@ namespace Fusion {
 	}
 
 	public class Literal : Expression {
-		public Token Value { get; set; }
+		public Token Value { get; }
+
+		public Literal(Token value) {
+			this.Value = value;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
+			Debug.Assert(this.Value.Value != null);
 			if(this.Value.IsString()) {
 				writer.Write("\"");
 				foreach(char c in this.Value.Value) {
@@ -116,6 +136,7 @@ namespace Fusion {
 			if(this.Value.IsNumber()) {
 				return new NumberValue(context, this.Value, this.Value.Number);
 			} else {
+				Debug.Assert(this.Value.Value != null);
 				return new StringValue(this.Value.Value);
 			}
 		}
@@ -124,14 +145,20 @@ namespace Fusion {
 			if(this.Value.IsNumber()) {
 				return 1;
 			} else {
+				Debug.Assert(this.Value.Value != null);
 				return this.Value.Value.Length + 1;
 			}
 		}
 	}
 
 	public class Parameter : Expression {
-		public MacroDefinition Macro { get; set; }
-		public Token ParameterName { get; set; }
+		public MacroDefinition Macro { get; }
+		public Token ParameterName { get; }
+
+		public Parameter(MacroDefinition macro, Token parameterName) {
+			this.Macro = macro;
+			this.ParameterName = parameterName;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.ParameterName.Value);
@@ -149,18 +176,22 @@ namespace Fusion {
 	}
 
 	public class Print : Expression {
-		public Token Token { get; set; }
-		public Expression Text { get; set; }
+		public Token Token { get; }
+		public Expression Text { get; }
 
-		private string message;
+		private string? message;
+
+		public Print(Token token, Expression text) {
+			this.Token = token;
+			this.Text = text;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
-			Expression.Indent(writer, indent);
 			writer.Write(this.Token.Value);
 			writer.Write(" ");
 			this.Text.WriteText(writer, 0);
-			writer.WriteLine();
 			if(this.message != null) {
+				writer.WriteLine();
 				writer.WriteLine(this.message);
 			}
 		}
@@ -169,7 +200,7 @@ namespace Fusion {
 			Value text = this.Text.Evaluate(context, 0);
 			if(text.IsComplete) {
 				this.message = null;
-				StringValue stringValue = text.ToStringValue();
+				StringValue? stringValue = text.ToStringValue();
 				if(stringValue != null) {
 					this.message = stringValue.Value;
 				} else {
@@ -192,9 +223,15 @@ namespace Fusion {
 	}
 
 	public class Unary : Expression {
-		public Token Operation { get; set; }
-		public Expression Operand { get; set; }
-		private Context Context { get; set; }
+		public Token Operation { get; }
+		public Expression Operand { get; }
+		private Context? Context { get; }
+
+		public Unary(Token operation, Expression operand, Context? context) {
+			this.Operation = operation;
+			this.Operand = operand;
+			this.Context = context;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Operation.Value);
@@ -208,15 +245,15 @@ namespace Fusion {
 			Debug.Assert(context != null);
 			Value operand = this.Operand.Evaluate(context, 0).ToSingular();
 			if(!operand.IsComplete) {
-				return new Unary() { Operation = this.Operation, Operand = (Expression)operand, Context = context };
+				return new Unary(this.Operation, (Expression)operand, context);
 			}
-			NumberValue number = operand.ToNumber();
+			NumberValue? number = operand.ToNumber();
 			if(number == null) {
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
 			switch(this.Operation.Value) {
-			case "!": return (number.Value == 0) ? NumberValue.True : NumberValue.False;
+			case "!": return new NumberValue(context, this.Operation, number.Value == 0);
 			case "+": return number;
 			case "-": return new NumberValue(context, this.Operation, -number.Value);
 			case "~": return new NumberValue(context, this.Operation, ~number.Value);
@@ -228,8 +265,13 @@ namespace Fusion {
 	}
 
 	public class ToBoolean : Expression {
-		public Expression Operand { get; set; }
-		public Token PositionToken { get; set; }
+		public Expression Operand { get; }
+		public Token PositionToken { get; }
+
+		public ToBoolean(Expression operand, Token positionToken) {
+			this.Operand = operand;
+			this.PositionToken = positionToken;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			throw new InvalidOperationException();
@@ -238,9 +280,9 @@ namespace Fusion {
 		public override Value Evaluate(Context context, int address) {
 			Value value = this.Operand.Evaluate(context, address).ToSingular();
 			if(!value.IsComplete) {
-				return new ToBoolean() { Operand = (Expression)value, PositionToken = this.PositionToken };
+				return new ToBoolean((Expression)value, this.PositionToken);
 			}
-			NumberValue numberValue = value.ToNumber();
+			NumberValue? numberValue = value.ToNumber();
 			if(numberValue != null) {
 				return numberValue.ToBoolean();
 			}
@@ -249,21 +291,29 @@ namespace Fusion {
 		}
 	}
 
-	public class Binary : Expression {
-		public Expression Left { get; set; }
-		public Token Operation { get; set; }
-		public Expression Right { get; set; }
-		private Context Context { get; set; }
+	public class BinaryExpr : Expression {
+		public Expression Left { get; }
+		public Token Operation { get; }
+		public Expression Right { get; }
+		private Context? Context { get; }
+
+		public BinaryExpr(Expression left, Token operation, Expression right, Context? context) {
+			this.Left = left;
+			this.Operation = operation;
+			this.Right = right;
+			this.Context = context;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
+			writer.Write("(");
 			this.Left.WriteText(writer, 0);
 			writer.Write(" ");
 			writer.Write(this.Operation.Value);
 			writer.Write(" ");
 			this.Right.WriteText(writer, 0);
+			writer.Write(")");
 		}
 
-		[SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity")]
 		public override Value Evaluate(Context context, int address) {
 			context = this.Context ?? context;
 			Debug.Assert(context != null);
@@ -295,9 +345,9 @@ namespace Fusion {
 		private Value BooleanOr(Context context) {
 			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete) {
-				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = context };
+				return new BinaryExpr((Expression)left, this.Operation, this.Right, context);
 			}
-			NumberValue leftNumber = left.ToNumber();
+			NumberValue? leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value != 0) {
 					return leftNumber.ToBoolean();
@@ -305,9 +355,9 @@ namespace Fusion {
 				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
 					//return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
-					return new ToBoolean() { Operand = (Expression)right, PositionToken = this.Operation };
+					return new ToBoolean((Expression)right, this.Operation);
 				}
-				NumberValue rightNumber = right.ToNumber();
+				NumberValue? rightNumber = right.ToNumber();
 				if(rightNumber != null) {
 					return rightNumber.ToBoolean();
 				}
@@ -319,9 +369,9 @@ namespace Fusion {
 		private Value BooleanAnd(Context context) {
 			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete) {
-				return new Binary() { Left = (Expression)left, Operation = this.Operation, Right = this.Right, Context = context };
+				return new BinaryExpr((Expression)left, this.Operation, this.Right, context);
 			}
-			NumberValue leftNumber = left.ToNumber();
+			NumberValue? leftNumber = left.ToNumber();
 			if(leftNumber != null) {
 				if(leftNumber.Value == 0) {
 					return leftNumber.ToBoolean();
@@ -329,9 +379,9 @@ namespace Fusion {
 				Value right = this.Right.Evaluate(context, 0).ToSingular();
 				if(!right.IsComplete) {
 					//return new Binary() { Left = new ValueExpression() { Value = left }, Operation = this.Operation, Right = (Expression)right, Context = context };
-					return new ToBoolean() { Operand = (Expression)right, PositionToken = this.Operation };
+					return new ToBoolean((Expression)right, this.Operation);
 				}
-				NumberValue rightNumber = right.ToNumber();
+				NumberValue? rightNumber = right.ToNumber();
 				if(rightNumber != null) {
 					return rightNumber.ToBoolean();
 				}
@@ -344,27 +394,27 @@ namespace Fusion {
 			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
-				return new Binary() {
-					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
-					Operation = this.Operation,
-					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = context
-				};
+				return new BinaryExpr(
+					left.IsComplete ? new ValueExpression(left) : (Expression)left,
+					this.Operation,
+					right.IsComplete ? new ValueExpression(right) : (Expression)right,
+					context
+				);
 			}
-			NumberValue leftNumber = left.ToNumber();
+			NumberValue? leftNumber = left.ToNumber();
 			if(leftNumber != null) {
-				NumberValue rightNumber = right.ToNumber();
+				NumberValue? rightNumber = right.ToNumber();
 				if(rightNumber != null) {
-					return probe(Math.Sign((long)leftNumber.Value - (long)rightNumber.Value)) ? NumberValue.True : NumberValue.False;
+					return new NumberValue(context, this.Operation, probe(Math.Sign((long)leftNumber.Value - (long)rightNumber.Value)));
 				}
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			StringValue leftStr = left.ToStringValue();
+			StringValue? leftStr = left.ToStringValue();
 			if(leftStr != null) {
-				StringValue rightStr = right.ToStringValue();
+				StringValue? rightStr = right.ToStringValue();
 				if(rightStr != null) {
-					return probe(StringComparer.Ordinal.Compare(leftStr.Value, rightStr.Value)) ? NumberValue.True : NumberValue.False;
+					return new NumberValue(context, this.Operation, probe(StringComparer.Ordinal.Compare(leftStr.Value, rightStr.Value)));
 				}
 				context.Assembler.Error(Resource.StringValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
@@ -380,25 +430,25 @@ namespace Fusion {
 				if((left.IsComplete && left is StringValue) || (right.IsComplete && right is StringValue)) {
 					context.Assembler.Error(Resource.IncompleteString(context.PositionStack(this.Operation)));
 				}
-				return new Binary() {
-					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
-					Operation = this.Operation,
-					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = context
-				};
+				return new BinaryExpr(
+					left.IsComplete ? new ValueExpression(left) : (Expression)left,
+					this.Operation,
+					right.IsComplete ? new ValueExpression(right) : (Expression)right,
+					context
+				);
 			}
-			NumberValue leftNumber = left.ToNumber();
+			NumberValue? leftNumber = left.ToNumber();
 			if(leftNumber != null) {
-				NumberValue rightNumber = right.ToNumber();
+				NumberValue? rightNumber = right.ToNumber();
 				if(rightNumber != null) {
 					return new NumberValue(context, this.Operation, leftNumber.Value + rightNumber.Value);
 				}
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			StringValue leftStr = left.ToStringValue();
+			StringValue? leftStr = left.ToStringValue();
 			if(leftStr != null) {
-				StringValue rightStr = right.ToStringValue();
+				StringValue? rightStr = right.ToStringValue();
 				if(rightStr != null) {
 					return new StringValue(leftStr.Value + rightStr.Value);
 				}
@@ -413,19 +463,14 @@ namespace Fusion {
 			Value left = this.Left.Evaluate(context, 0).ToSingular();
 			Value right = this.Right.Evaluate(context, 0).ToSingular();
 			if(!left.IsComplete || !right.IsComplete) {
-				return new Binary() {
-					Left = left.IsComplete ? new ValueExpression() { Value = left } : (Expression)left,
-					Operation = this.Operation,
-					Right = right.IsComplete ? new ValueExpression() { Value = right } : (Expression)right,
-					Context = context
-				};
+				return new BinaryExpr(left.IsComplete ? new ValueExpression(left) : (Expression)left, this.Operation, right.IsComplete ? new ValueExpression(right) : (Expression)right, context);
 			}
-			NumberValue leftNumber = left.ToNumber();
+			NumberValue? leftNumber = left.ToNumber();
 			if(leftNumber == null) {
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
 			}
-			NumberValue rightNumber = right.ToNumber();
+			NumberValue? rightNumber = right.ToNumber();
 			if(rightNumber == null) {
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.Operation)));
 				return VoidValue.Value;
@@ -434,12 +479,20 @@ namespace Fusion {
 		}
 	}
 
-	public class If : Expression {
-		public Token IfToken { get; set; }
-		public Expression Condition { get; set; }
-		public ExpressionList Then { get; set; }
-		public ExpressionList Else { get; set; }
-		private Context Context {get; set; }
+	public class IfExpr : Expression {
+		public Token IfToken { get; }
+		public Expression Condition { get; }
+		public ExpressionList Then { get; }
+		public ExpressionList? Else { get; }
+		private Context? Context {get; }
+
+		public IfExpr(Token ifToken, Expression condition, ExpressionList then, ExpressionList? @else, Context? context) {
+			this.IfToken = ifToken;
+			this.Condition = condition;
+			this.Then = then;
+			this.Else = @else;
+			this.Context = context;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write("if(");
@@ -468,15 +521,9 @@ namespace Fusion {
 					return VoidValue.Value;
 				}
 				Debug.Assert(condition is Expression);
-				return new If() {
-					IfToken = this.IfToken,
-					Condition = (Expression)condition,
-					Then = this.Then,
-					Else = this.Else,
-					Context = context
-				};
+				return new IfExpr(this.IfToken, (Expression)condition, this.Then, this.Else, context);
 			}
-			NumberValue number = condition.ToNumber();
+			NumberValue? number = condition.ToNumber();
 			if(number == null) {
 				context.Assembler.Error(Resource.NumberValueExpected(context.PositionStack(this.IfToken)));
 				return VoidValue.Value;
@@ -495,7 +542,7 @@ namespace Fusion {
 			}
 			Value condition = this.Condition.Evaluate(context, 0).ToSingular();
 			if(condition.IsComplete) {
-				NumberValue number = condition.ToNumber();
+				NumberValue? number = condition.ToNumber();
 				if(number != null) {
 					if(number.Value != 0) {
 						return this.Then.Size(context);
@@ -515,38 +562,44 @@ namespace Fusion {
 		}
 	}
 
-	public class Call : Expression {
-		public Token Name { get; set; }
-		public MacroDefinition Macro { get; set; }
-		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-		public IList<Expression> Parameter { get; set; }
+	public class CallExpr : Expression {
+		public Token Name { get; }
+		public MacroDefinition Macro { get; }
+		//[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+		public IList<Expression> Argument { get; }
+
+		public CallExpr(Token name, MacroDefinition macro, IList<Expression> argument) {
+			this.Name = name;
+			this.Macro = macro;
+			this.Argument = argument;
+		}
 
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
-			if(0 < this.Parameter.Count) {
-				for(int i = 0; i < this.Parameter.Count; i++) {
+			if(0 < this.Argument.Count) {
+				for(int i = 0; i < this.Argument.Count; i++) {
 					if(0 < i) {
 						writer.Write(",");
 					}
 					writer.Write(" ");
-					this.Parameter[i].WriteText(writer, 0);
+					this.Argument[i].WriteText(writer, 0);
 				}
 			}
 		}
 
 		public override Value Evaluate(Context context, int address) {
-			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
+			Debug.Assert(this.Macro.Parameters.Count == this.Argument.Count);
 			Context callContext = new Context(context, this.Macro, this);
-			foreach(Expression arg in this.Parameter) {
+			foreach(Expression arg in this.Argument) {
 				callContext.AddArgument(arg.Evaluate(context, 0));
 			}
 			return this.Macro.Body.Evaluate(callContext, address);
 		}
 
 		public override int Size(Context context) {
-			Debug.Assert(this.Macro.Parameter.Count == this.Parameter.Count);
+			Debug.Assert(this.Macro.Parameters.Count == this.Argument.Count);
 			Context callContext = new Context(context, this.Macro, this);
-			foreach(Expression arg in this.Parameter) {
+			foreach(Expression arg in this.Argument) {
 				callContext.AddArgument(arg.Evaluate(context, 0));
 			}
 			return this.Macro.Body.Size(callContext);
@@ -555,11 +608,11 @@ namespace Fusion {
 
 	public class ExpressionList : Expression {
 		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-		public IList<Expression> List { get; set; }
+		public IList<Expression> List { get; } = new List<Expression>();
 
 		public override void WriteText(TextWriter writer, int indent) {
 			foreach(Expression expr in this.List) {
-				Expression.Indent(writer, indent);
+				Expression.Indent(writer, (expr is Label) ? (indent - 1) : indent);
 				expr.WriteText(writer, indent);
 				writer.WriteLine();
 			}
@@ -580,13 +633,13 @@ namespace Fusion {
 
 		public void WriteListing(Assembler assembler, ListValue result, int indent) {
 			bool all = this.List.Zip<Expression, Value, int>(result.List, (expr, value) => {
-				ListValue resultList = value as ListValue;
+				ListValue? resultList = value as ListValue;
 				if(expr is ExpressionList list) {
 					Debug.Assert(resultList != null);
 					list.WriteListing(assembler, resultList, indent);
 					return 0;
 				}
-				if(expr is Call call) {
+				if(expr is CallExpr call) {
 					Debug.Assert(resultList != null);
 					call.WriteText(assembler.StandardOutput, indent);
 					assembler.StandardOutput.WriteLine();
@@ -619,14 +672,14 @@ namespace Fusion {
 		}
 
 		private static void WriteText(Assembler assembler, Value value) {
-			NumberValue n = value.ToNumber();
+			NumberValue? n = value.ToNumber();
 			if(n != null) {
 				int cellSize = assembler.BinaryFormatter.CellSize;
 				int result = (cellSize == 32) ? n.Value : n.Value & ((1 << cellSize) - 1);
 				string format = string.Format(CultureInfo.InvariantCulture, "{{0:X{0}}} ", cellSize / 4);
 				assembler.StandardOutput.Write(format, result);
 			} else {
-				StringValue s = value.ToStringValue();
+				StringValue? s = value.ToStringValue();
 				if(s is StringValue) {
 					assembler.StandardOutput.Write("{0} ", s.Value);
 				} else {

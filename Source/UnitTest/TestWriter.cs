@@ -45,7 +45,7 @@ namespace UnitTest {
 		public static Assembler Create(TestContext testContext, BinaryWriter writer, StringBuilder? output) {
 			TestWriter testWriter = new TestWriter(testContext);
 			testWriter.Output = output;
-			return new Assembler(testWriter, testWriter, writer);
+			return new Assembler(testWriter, testWriter, writer, new List<string>());
 		}
 
 		public static Assembler Create(TestContext testContext, BinaryWriter writer) {
