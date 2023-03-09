@@ -20,9 +20,9 @@ namespace Fusion {
 		}
 
 		public override void ExitMacroName([NotNull] FusionParser.MacroNameContext context) {
-			Debug.Assert(this.mode == 1);
 			this.nameCount++;
 			if(this.nameCount == 1) {
+				Debug.Assert(this.mode == 1);
 				string text = context.Start.Text;
 				if(this.Assembler.Macro.TryGetValue(text, out var macro)) {
 					this.CurrentMacro = macro;

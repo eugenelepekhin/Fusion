@@ -164,7 +164,7 @@ namespace UnitTest {
 
 			this.SyntaxErrorTest("atomic atomic main{1}");
 			this.SyntaxErrorTest("macro {1}");
-			this.CompileErrorsTest("macro 3{2} macro main{1 3}", "Macro name expected instead of 3 at");
+			this.SyntaxErrorTest("macro 3{2} macro main{1 3}");
 			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");
 
 			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4}", "Macro foo already contains parameter a at");

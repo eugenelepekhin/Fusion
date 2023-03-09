@@ -95,8 +95,8 @@ namespace Fusion {
 
 		public override Expression VisitLiteral([NotNull] FusionParser.LiteralContext context) {
 			Token start = new Token((context.NumberLiteral() == null) ? TokenType.String : TokenType.Number, context.Start, this.File);
-			Debug.Assert(!string.IsNullOrWhiteSpace(start.Value));
-			if(start.TokenType == TokenType.Number && !Token.IsValidNumber(start.Value)) {
+			Debug.Assert(start.IsString() || !string.IsNullOrWhiteSpace(start.Value));
+			if(start.TokenType == TokenType.Number && !Token.IsValidNumber(start.Value!)) {
 				this.Assembler.Error(Resource.BadNumberFormat(start.Value, start.Position));
 				return new ValueExpression(VoidValue.Value);
 			}
