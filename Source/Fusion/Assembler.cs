@@ -8,7 +8,7 @@ namespace Fusion {
 	public class Assembler {
 
 		//private const string BinaryName = "binary";
-		//private const string MainName = "main";
+		private const string MainName = "main";
 		//private const string AtomicName = "atomic";
 		//private const string MacroName = "macro";
 		public const string PrintName = "print";
@@ -78,7 +78,7 @@ namespace Fusion {
 
 		private void Expand() {
 			MacroDefinition? main = null;
-			if(!this.Macro.TryGetValue("main", out main)) {
+			if(!this.Macro.TryGetValue(Assembler.MainName, out main)) {
 				this.Error(Resource.MainMissing);
 				return;
 			}

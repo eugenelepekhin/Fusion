@@ -60,7 +60,6 @@ namespace Fusion {
 		public bool IsComparison() { return this.TokenType == Fusion.TokenType.Comparison; }
 		public bool IsComparison(string data) { return this.IsComparison() && this.TextEqual(data); }
 		public bool IsComparison(params string[] oneOf) { return this.IsComparison() && this.TextEqual(oneOf); }
-		public bool IsEos() { return this.TokenType == Fusion.TokenType.Eos; }
 		public bool IsError() { return this.TokenType == Fusion.TokenType.Error; }
 
 		public bool Equals(Token? other) {
@@ -166,8 +165,8 @@ namespace Fusion {
 			return false;
 		}
 
-#if DEBUG
-		public override string ToString() {
+		#if DEBUG
+			public override string ToString() {
 				return string.Format(CultureInfo.InvariantCulture, "{0} \"{1}\" @ line {2}", this.TokenType, this.Value, this.Position.Line);
 			}
 		#endif

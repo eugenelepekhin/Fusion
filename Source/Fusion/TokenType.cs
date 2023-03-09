@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Fusion {
 	[SuppressMessage("Microsoft.Naming", "CA1720: Identifiers should not contain type names")]
@@ -10,7 +9,6 @@ namespace Fusion {
 		Separator,
 		Operator,
 		Comparison,
-		Eos,
 		Error
 	}
 }

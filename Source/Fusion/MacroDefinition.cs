@@ -18,6 +18,7 @@ namespace Fusion {
 			this.Parameters = parametes;
 			this.Labels = new List<Token>();
 			this.Body = new ExpressionList();
+			this.Atomic = atomic;
 		}
 
 		public bool IsParameter(Token name) {

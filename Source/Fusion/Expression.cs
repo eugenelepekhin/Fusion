@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -565,7 +564,6 @@ namespace Fusion {
 	public class CallExpr : Expression {
 		public Token Name { get; }
 		public MacroDefinition Macro { get; }
-		//[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public IList<Expression> Argument { get; }
 
 		public CallExpr(Token name, MacroDefinition macro, IList<Expression> argument) {
@@ -607,7 +605,6 @@ namespace Fusion {
 	}
 
 	public class ExpressionList : Expression {
-		[SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
 		public IList<Expression> List { get; } = new List<Expression>();
 
 		public override void WriteText(TextWriter writer, int indent) {

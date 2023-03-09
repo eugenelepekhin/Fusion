@@ -22,7 +22,7 @@ namespace Fusion {
 			if(this.Assembler.Macro.TryGetValue(name, out MacroDefinition? macro)) {
 				Debug.Assert(macro != null);
 				this.currentMacro = macro;
-				macro.Body = (ExpressionList)Visit(context.macroBody().exprList());
+				macro.Body = (ExpressionList)this.Visit(context.macroBody().exprList());
 			} else {
 				this.Assembler.FatalError(Resource.FileChanged(this.File));
 			}
@@ -33,7 +33,7 @@ namespace Fusion {
 			ExpressionList expressionList = new ExpressionList();
 			if(0 < context.ChildCount) {
 				foreach(IParseTree childContext in context.children) {
-					expressionList.List.Add(Visit(childContext));
+					expressionList.List.Add(this.Visit(childContext));
 				}
 				return expressionList;
 			}
@@ -45,11 +45,17 @@ namespace Fusion {
 		}
 
 		public override Expression VisitPrint([NotNull] FusionParser.PrintContext context) {
-			return new Print(new Token(TokenType.Identifier, context.Start, this.File), Visit(context.expr()));
+			return new Print(new Token(TokenType.Identifier, context.Start, this.File), this.Visit(context.expr()));
 		}
 
 		public override Expression VisitIf([NotNull] FusionParser.IfContext context) {
-			return new IfExpr(new Token(TokenType.Identifier, context.Start, this.File), then: (ExpressionList)Visit(context.trueBranch), @else: (context.falseBranch != null) ? ((ExpressionList)Visit(context.falseBranch)) : null, condition: Visit(context.cond), context: null);
+			return new IfExpr(
+				new Token(TokenType.Identifier, context.Start, this.File),
+				condition: this.Visit(context.cond),
+				then: (ExpressionList)this.Visit(context.trueBranch),
+				@else: (context.falseBranch != null) ? ((ExpressionList)this.Visit(context.falseBranch)) : null,
+				context: null
+			);
 		}
 
 		public override Expression VisitCall([NotNull] FusionParser.CallContext context) {
@@ -57,8 +63,7 @@ namespace Fusion {
 			Debug.Assert(!string.IsNullOrWhiteSpace(name.Value));
 			if(this.Assembler.Macro.TryGetValue(name.Value, out var macro)) {
 				FusionParser.ArgumentsContext args = context.arguments();
-				List<Expression> arguments = ((args != null) ? (from e in args.expr()
-																select Visit(e)).ToList() : new List<Expression>());
+				List<Expression> arguments = (args != null) ? args.expr().Select(e => this.Visit(e)).ToList() : new List<Expression>();
 				if(arguments.Count == macro.Parameters.Count) {
 					return new CallExpr(name, macro, arguments);
 				}
@@ -70,15 +75,15 @@ namespace Fusion {
 		}
 
 		public override Expression VisitParenExpr([NotNull] FusionParser.ParenExprContext context) {
-			return Visit(context.expr());
+			return this.Visit(context.expr());
 		}
 
 		public override Expression VisitUnary([NotNull] FusionParser.UnaryContext context) {
-			return new Unary(new Token(TokenType.Operator, context.Start, this.File), Visit(context.expr()), null);
+			return new Unary(new Token(TokenType.Operator, context.Start, this.File), this.Visit(context.expr()), null);
 		}
 
 		public override Expression VisitBin([NotNull] FusionParser.BinContext context) {
-			return new BinaryExpr(Visit(context.left), right: Visit(context.right), operation: new Token(TokenType.Operator, context.op, this.File), context: null);
+			return new BinaryExpr(this.Visit(context.left), new Token(TokenType.Operator, context.op, this.File), this.Visit(context.right), context: null);
 		}
 
 		public override Expression VisitLocalName([NotNull] FusionParser.LocalNameContext context) {
