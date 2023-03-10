@@ -127,6 +127,7 @@ namespace Fusion {
 			for(int i = 2; i < text.Length; i++) {
 				char c = text[i];
 				if(!Token.IsNumberDecorator(c)) {
+					Debug.Assert('0' <= c && c <= '1');
 					value = value * 2 + text[i] - '0';
 				}
 			}
@@ -138,6 +139,7 @@ namespace Fusion {
 			for(int i = 1; i < text.Length; i++) {
 				char c = text[i];
 				if(!Token.IsNumberDecorator(c)) {
+					Debug.Assert('0' <= c && c <= '7');
 					value = value * 8 + (c - '0');
 				}
 			}
@@ -167,7 +169,7 @@ namespace Fusion {
 
 		#if DEBUG
 			public override string ToString() {
-				return string.Format(CultureInfo.InvariantCulture, "{0} \"{1}\" @ line {2}", this.TokenType, this.Value, this.Position.Line);
+				return string.Format(CultureInfo.InvariantCulture, "{0} \"{1}\" @ {2}x{3}", this.TokenType, this.Value, this.Position.Line, this.Position.Column);
 			}
 		#endif
 	}

@@ -189,12 +189,10 @@ namespace Fusion {
 			for(int i = 0; i < this.List.Count; i++) {
 				if(this.List[i] is ListValue listValue) {
 					listValue.ResolveLabels(context);
-				} else {
-					if(this.List[i] is Expression expression) {
-						this.List[i] = expression.Evaluate(context, 0);
-						Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
-						this.List[i].Address = expression.Address;
-					}
+				} else if(this.List[i] is Expression expression) {
+					this.List[i] = expression.Evaluate(context, 0);
+					Debug.Assert(this.List[i].IsComplete, "Expression expected to be evaluated");
+					this.List[i].Address = expression.Address;
 				}
 			}
 		}

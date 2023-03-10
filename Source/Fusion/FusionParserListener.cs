@@ -16,6 +16,7 @@ namespace Fusion {
 
 		public override void EnterMacro([NotNull] FusionParser.MacroContext context) {
 			Debug.Assert(this.mode == 0);
+			Debug.Assert(this.nameCount == 0);
 			this.mode = 1;
 		}
 
@@ -24,10 +25,10 @@ namespace Fusion {
 			if(this.nameCount == 1) {
 				Debug.Assert(this.mode == 1);
 				string text = context.Start.Text;
-				if(this.Assembler.Macro.TryGetValue(text, out var macro)) {
-					this.CurrentMacro = macro;
-					this.mode = 2;
-				}
+				Debug.Assert(this.Assembler.Macro.ContainsKey(text));
+				this.CurrentMacro = this.Assembler.Macro[text];
+				Debug.Assert(this.CurrentMacro != null);
+				this.mode = 2;
 			}
 		}
 

@@ -12,7 +12,7 @@ namespace Fusion {
 		//private const string AtomicName = "atomic";
 		//private const string MacroName = "macro";
 		public const string PrintName = "print";
-		public  const string ErrorName = "error";
+		public const string ErrorName = "error";
 		public const string IfName = "if";
 		public const string ElseName = "else";
 
@@ -32,8 +32,8 @@ namespace Fusion {
 		private IEnumerable<string> searchPath;
 		public IEnumerable<string> SearchPath { 
 			get {
-				if(!string.IsNullOrWhiteSpace(root)) {
-					yield return root;
+				if(this.root != null) {
+					yield return this.root;
 				} else {
 					yield return Environment.CurrentDirectory;
 				}
@@ -69,6 +69,12 @@ namespace Fusion {
 
 		public void Compile(string file) {
 			this.root = Path.GetDirectoryName(file);
+			if(this.root != null) {
+				this.root = this.root.Trim();
+				if(this.root.Length == 0) {
+					this.root = null;
+				}
+			}
 			this.FirstPassParse(file);
 			if(0 < this.ErrorCount) return;
 			this.SecondPassParse();
@@ -94,16 +100,16 @@ namespace Fusion {
 			ListValue? listValue = value as ListValue;
 			Debug.Assert(listValue != null);
 			listValue.ResolveLabels(context);
-			if(0 >= this.ErrorCount) {
+			if(this.ErrorCount == 0) {
 				listValue.WriteValue(this);
-				if(0 >= ErrorCount) {
+				if(this.ErrorCount == 0) {
 					main.Body.WriteListing(this, listValue, 0);
 				}
 			}
 		}
 
 		public void FirstPassParse(string file) {
-			FirstPassParser? parser = Parser<FirstPassParser>(file, 1);
+			FirstPassParser? parser = this.Parser<FirstPassParser>(file, 1);
 			if(parser != null) {
 				FirstPassParser.FusionProgramContext programContext = parser.fusionProgram();
 				if(this.ErrorCount == 0) {
@@ -116,16 +122,16 @@ namespace Fusion {
 		private void SecondPassParse() {
 			FusionParserListener listener = new FusionParserListener(this);
 			Predicates predicates = new Predicates(this, listener);
-			foreach(string file in Files.Keys) {
+			foreach(string file in this.Files.Keys) {
 				if(!this.CanContinue) {
 					break;
 				}
-				FusionParser? parser = Parser<FusionParser>(file, 2);
+				FusionParser? parser = this.Parser<FusionParser>(file, 2);
 				if(parser != null) {
 					parser.AddParseListener(listener);
 					parser.predicates = predicates;
 					FusionParser.FusionProgramContext programContext = parser.fusionProgram();
-					if(ErrorCount == 0) {
+					if(this.ErrorCount == 0) {
 						SecondPass secondPass = new SecondPass(this, file);
 						secondPass.VisitFusionProgram(programContext);
 					}
@@ -144,6 +150,8 @@ namespace Fusion {
 			case 32:
 				this.BinaryFormatter = new BinaryFormatter32(this.writer);
 				break;
+			default:
+				throw new InvalidOperationException();
 			}
 		}
 

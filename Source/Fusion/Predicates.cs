@@ -15,7 +15,7 @@ namespace Fusion {
 		private int ParamCount(string name) {
 			MacroDefinition? parsingMacro = this.Listener.CurrentMacro;
 			Debug.Assert(parsingMacro != null);
-			if(!parsingMacro.Parameters.Any((Token token) => token.Value == name) && !parsingMacro.Labels.Any((Token token) => token.Value == name) && Assembler.Macro.TryGetValue(name, out var macro)) {
+			if(!parsingMacro.IsParameter(name) && !parsingMacro.IsLabel(name) && Assembler.Macro.TryGetValue(name, out var macro)) {
 				return macro.Parameters.Count;
 			}
 			return -1;

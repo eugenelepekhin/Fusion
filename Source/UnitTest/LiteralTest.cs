@@ -26,6 +26,7 @@ namespace UnitTest {
 			this.CompileTest32("binary 32 macro main{2'147_48'36_47}", int.MaxValue);
 
 			this.CompileErrorsTest("binary 32 macro main{123x45}", "Undefined macro x45 at");
+			this.CompileErrorsTest("binary 32 macro main{123A45}", "Undefined macro A45 at");
 			this.SyntaxErrorTest("binary 32 macro main{'123x45}");
 
 			// binary number
@@ -41,6 +42,8 @@ namespace UnitTest {
 			this.CompileTest("macro main{0b0'1_111'1'11}", 0b01111111);
 			this.CompileTest32("binary 32 macro main{0b0_1'101_101'011'011_1_00_1110'1'11_0101'1011}", 0b01101101011011100111011101011011);
 			this.CompileTest32("binary 32 macro main{0b0'111111_11'1'111_111111'111_1111_11'1'1'1_1}", int.MaxValue);
+
+			this.CompileTest("macro main{0b12}", 1, 2);
 
 			this.CompileTest("macro main{0b0020}", 0, 20);
 
@@ -85,6 +88,7 @@ namespace UnitTest {
 			this.CompileCharTest("macro main{\"abc\\td\\ne\"}", "abc\td\ne");
 			this.CompileCharTest(@"macro main{""\""\\\0\a\b\f\n\r\t\v""}", "\"\\\0\a\b\f\n\r\t\v");
 			this.CompileCharTest("macro main{\"a \r\nb \"}", "a \r\nb ");
+			this.CompileCharTest("macro main{\" \"}", " "); // just whitespace in the string will not be trimmed away.
 
 			this.SyntaxErrorTest("macro main{\"abc}");
 		}

@@ -21,12 +21,15 @@ namespace Fusion {
 			this.Atomic = atomic;
 		}
 
-		public bool IsParameter(Token name) {
-			return this.Parameters.Any(t => t.Equals(name));
-		}
+		public bool IsParameter(Token name) => this.Parameters.Any(t => t.Equals(name));
+		public bool IsParameter(string name) => this.Parameters.Any(p => p.Value == name);
 
-		public bool IsLabel(Token name) {
-			return this.Labels.Any(t => t.Equals(name));
+		public bool IsLabel(Token name) => this.Labels.Any(t => t.Equals(name));
+		public bool IsLabel(string name) => this.Labels.Any(l => l.Value == name);
+
+		public void AddLabel(Token name) {
+			Debug.Assert(!this.IsLabel(name));
+			this.Labels.Add(name);
 		}
 
 		public void Write(TextWriter writer) {

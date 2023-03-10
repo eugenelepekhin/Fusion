@@ -22,6 +22,7 @@ namespace Fusion {
 
 		public override int VisitBinaryDecalration([NotNull] FirstPassParser.BinaryDecalrationContext context) {
 			IToken outputBitsPerNumber = context.outputBitsPerNumber().Start;
+			Debug.Assert(outputBitsPerNumber != null);
 			Token width = new Token(TokenType.Number, outputBitsPerNumber, this.SourceFile);
 			if(binDefined) {
 				this.Assembler.Error(Resource.BinaryTypeRedefined(width.Position));
@@ -63,22 +64,20 @@ namespace Fusion {
 			Debug.Assert(!string.IsNullOrWhiteSpace(name.Value));
 			bool atomic = context.Atomic() != null;
 			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
-			List<Token>? parameters = null;
+			List<Token>? parameters = new List<Token>();
 			if(parameterListContext != null) {
-				parameters = context.parameterList().parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)).ToList();
+				parameters.AddRange(context.parameterList().parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)));
 				HashSet<string> paramNames = new HashSet<string>();
 				foreach(Token param in parameters) {
 					Debug.Assert(!string.IsNullOrWhiteSpace(param.Value));
 					if(!paramNames.Add(param.Value)) {
 						this.Assembler.Error(Resource.ParameterRedefinition(name.Value, param.Value, param.Position));
 					}
-					if(param.IsIdentifier(Assembler.PrintName, Assembler.ErrorName, Assembler.IfName, Assembler.ElseName)) {
-						this.Assembler.Error(Resource.ParameterKeyword(param.Value, param.Position));
-					}
+					Debug.Assert(!param.IsIdentifier(Assembler.ErrorName, Assembler.PrintName, Assembler.IfName, Assembler.ElseName));
 				}
 			}
 			FirstPassParser.ExprListContext body = context.macroBody().exprList();
-			this.currentMacro = new MacroDefinition(name, atomic, parameters ?? new List<Token>());
+			this.currentMacro = new MacroDefinition(name, atomic, parameters);
 			if(this.Assembler.Macro.ContainsKey(name.Value)) {
 				this.Assembler.Error(Resource.MacroNameRedefinition(name.Value, name.Position));
 			} else {
@@ -90,15 +89,15 @@ namespace Fusion {
 		public override int VisitLabel([NotNull] FirstPassParser.LabelContext context) {
 			Debug.Assert(this.currentMacro != null);
 			Token name = new Token(TokenType.Identifier, context.labelName().Start, this.SourceFile);
-			if(this.currentMacro.Labels.Any((Token t) => t.Value == name.Value)) {
+			if(this.currentMacro.IsLabel(name)) {
 				this.Assembler.Error(Resource.LabelRedefined(name.Value, this.currentMacro.Name.Value, name.Position));
 				return 1;
 			}
-			if(this.currentMacro.Parameters.Any((Token arg) => arg.Value == name.Value)) {
+			if(this.currentMacro.IsParameter(name)) {
 				this.Assembler.Error(Resource.LabelHidesParameter(name.Value, this.currentMacro.Name.Value, name.Position));
 				return 1;
 			}
-			this.currentMacro.Labels.Add(name);
+			this.currentMacro.AddLabel(name);
 			return 0;
 		}
 	}

@@ -87,11 +87,12 @@ namespace Fusion {
 		}
 
 		public override Expression VisitLocalName([NotNull] FusionParser.LocalNameContext context) {
+			Debug.Assert(this.currentMacro != null);
 			Token name = new Token(TokenType.Identifier, context.Start, this.File);
-			if(this.currentMacro!.IsLabel(name)) {
+			if(this.currentMacro.IsLabel(name)) {
 				return new LabelReference(name, null);
 			}
-			if(this.currentMacro!.IsParameter(name)) {
+			if(this.currentMacro.IsParameter(name)) {
 				return new Parameter(this.currentMacro, name);
 			}
 			this.Assembler.Error(Resource.UndefinedMacro(name.Value, name.Position));
