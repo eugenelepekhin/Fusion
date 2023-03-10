@@ -78,6 +78,9 @@ namespace Fusion {
 		internal static int Main(string[] args) {
 			Console.Out.WriteLine(Resource.AppTitle(typeof(Program).Assembly.GetName().Version!.ToString(3)));
 			int returnCode = 1;
+			#if DEBUG
+				Stopwatch stopwatch = Stopwatch.StartNew();
+			#endif
 			try {
 				Arguments arguments = new Arguments();
 				if(arguments.Parse(args)) {
@@ -113,6 +116,9 @@ namespace Fusion {
 			} catch(Exception exception) {
 				Console.Error.WriteLine(exception.ToString());
 			}
+			#if DEBUG
+				Debug.WriteLine($"Finished in {stopwatch.Elapsed}");
+			#endif
 			return returnCode;
 		}
 
