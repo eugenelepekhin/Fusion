@@ -133,7 +133,7 @@ namespace Fusion {
 					FusionParser.FusionProgramContext programContext = parser.fusionProgram();
 					if(this.ErrorCount == 0) {
 						#if DEBUG
-							Debug.WriteLine("Second pass parse tree:");
+							Debug.WriteLine($"Second pass parse tree for file: {file}");
 							Debug.WriteLine(ParseTreePrinter.Text(programContext));
 						#endif
 						SecondPass secondPass = new SecondPass(this, file);
