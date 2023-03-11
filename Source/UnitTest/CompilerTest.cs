@@ -65,6 +65,9 @@ namespace UnitTest {
 			this.CompileTest("macro main{a b 5 a} macro a{3} macro b a{a}", 3, 5, 3);
 			// label hides macro
 			this.CompileTest("macro main{a 1 a: 5 a 3} macro a{8}", 2, 1, 5, 2, 3);
+
+			// mix of parameters and macro calls
+			this.CompileTest("macro main{test 1, 2, 3} macro test a,b,c{sum b,mul a,sum b,c} macro mul a,b{a*b} macro sum a,b{a+b}", 7);
 		}
 
 		[TestMethod]

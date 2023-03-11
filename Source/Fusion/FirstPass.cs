@@ -66,7 +66,7 @@ namespace Fusion {
 			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
 			List<Token>? parameters = new List<Token>();
 			if(parameterListContext != null) {
-				parameters.AddRange(context.parameterList().parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)));
+				parameters.AddRange(parameterListContext.parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)));
 				HashSet<string> paramNames = new HashSet<string>();
 				foreach(Token param in parameters) {
 					Debug.Assert(!string.IsNullOrWhiteSpace(param.Value));

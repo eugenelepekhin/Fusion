@@ -55,5 +55,5 @@ expr: If Open cond=expr Close Begin trueBranch=exprList End (Else Begin falseBra
 	| StringLiteral						#Literal
 	;
 
-arguments: expr (Comma expr)*?;
+arguments: expr (Comma expr)*;
 name: (Identifier | Atomic | Macro | Binary | Include);

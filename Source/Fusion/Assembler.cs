@@ -132,6 +132,10 @@ namespace Fusion {
 					parser.predicates = predicates;
 					FusionParser.FusionProgramContext programContext = parser.fusionProgram();
 					if(this.ErrorCount == 0) {
+						#if DEBUG
+							Debug.WriteLine("Second pass parse tree:");
+							Debug.WriteLine(ParseTreePrinter.Text(programContext));
+						#endif
 						SecondPass secondPass = new SecondPass(this, file);
 						secondPass.VisitFusionProgram(programContext);
 					}
