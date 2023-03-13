@@ -39,6 +39,15 @@ namespace UnitTest {
 		}
 
 		[TestMethod]
+		public void ExprPrecedenceTest() {
+			this.CompileTest("macro main{(2+3)*4}", 20);
+			this.CompileTest("macro main{2+3*4}", 14);
+			this.CompileTest("macro a{7} macro main{a+a*a}", 7+7*7);
+			this.CompileTest("macro add a,b{a+b} macro main{add 1,2+3}", 1 + 2 + 3);
+			this.CompileTest("macro dub a{a*2} macro main{dub 2+3 (dub 2)+3}", 10, 7);
+		}
+
+		[TestMethod]
 		public void IfExprTest() {
 			this.CompileTest("macro main{if(1){5}else{6}}", 5);
 			this.CompileTest("macro main{if(0){5}else{6}}", 6);
@@ -68,6 +77,8 @@ namespace UnitTest {
 
 			// mix of parameters and macro calls
 			this.CompileTest("macro main{test 1, 2, 3} macro test a,b,c{sum b,mul a,sum b,c} macro mul a,b{a*b} macro sum a,b{a+b}", 7);
+
+			this.CompileTest("macro a p{p+1} macro b{3} macro c p{p*2} macro d p{p+10} macro f p{p+4} macro g{5} macro main{a b c d f g}", 4, 19 * 2);
 		}
 
 		[TestMethod]

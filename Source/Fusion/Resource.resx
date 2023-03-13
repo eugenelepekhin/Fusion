@@ -145,12 +145,16 @@
     <value>File not found: {0}</value>
     <comment>{string file}</comment>
   </data>
+  <data name="FolderNotFound" xml:space="preserve">
+    <value>Output folder not found: {0}</value>
+    <comment>{string folder}</comment>
+  </data>
   <data name="IncludeFileNotFound" xml:space="preserve">
     <value>Include file "{0}" not found at {1}</value>
     <comment>{string file, Position position}</comment>
   </data>
   <data name="IncludeFolderNotFound" xml:space="preserve">
-    <value>Include folder {0} not found</value>
+    <value>Include folder "{0}" not found</value>
     <comment>{string folder}</comment>
   </data>
   <data name="IncompleteCondition" xml:space="preserve">

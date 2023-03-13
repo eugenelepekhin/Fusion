@@ -34,7 +34,7 @@ namespace Fusion {
 				}
 				string? outDir = Path.GetDirectoryName(arguments[1]);
 				if(!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir)) {
-					Console.Error.WriteLine(Resource.FileNotFound(arguments[1]));
+					Console.Error.WriteLine(Resource.FolderNotFound(arguments[1]));
 					Program.Usage(null, commandLine.Help());
 					return false;
 				}

@@ -132,7 +132,7 @@ namespace Fusion {
 					parser.predicates = predicates;
 					FusionParser.FusionProgramContext programContext = parser.fusionProgram();
 					if(this.ErrorCount == 0) {
-						#if DEBUG
+						#if DEBUG // && false
 							Debug.WriteLine($"Second pass parse tree for file: {file}");
 							Debug.WriteLine(ParseTreePrinter.Text(programContext));
 						#endif

@@ -104,6 +104,13 @@ namespace Fusion {
 		}
 
 		/// <summary>
+		/// Looks up a localized string similar to Output folder not found: {0}.
+		/// </summary>
+ 		public static string FolderNotFound(string folder) {
+			return string.Format(FormatCulture, ResourceManager.GetString("FolderNotFound", Culture), folder);
+		}
+
+		/// <summary>
 		/// Looks up a localized string similar to Include file "{0}" not found at {1}.
 		/// </summary>
  		public static string IncludeFileNotFound(string file, Position position) {
@@ -111,7 +118,7 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Include folder {0} not found.
+		/// Looks up a localized string similar to Include folder "{0}" not found.
 		/// </summary>
  		public static string IncludeFolderNotFound(string folder) {
 			return string.Format(FormatCulture, ResourceManager.GetString("IncludeFolderNotFound", Culture), folder);

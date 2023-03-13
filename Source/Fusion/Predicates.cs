@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 
 namespace Fusion {
 	public class Predicates {
@@ -8,14 +7,14 @@ namespace Fusion {
 		public FusionParserListener Listener { get; }
 
 		public Predicates(Assembler assembler, FusionParserListener listener) {
-			Assembler = assembler;
-			Listener = listener;
+			this.Assembler = assembler;
+			this.Listener = listener;
 		}
 
 		private int ParamCount(string name) {
 			MacroDefinition? parsingMacro = this.Listener.CurrentMacro;
 			Debug.Assert(parsingMacro != null);
-			if(!parsingMacro.IsParameter(name) && !parsingMacro.IsLabel(name) && Assembler.Macro.TryGetValue(name, out var macro)) {
+			if(!parsingMacro.IsParameter(name) && !parsingMacro.IsLabel(name) && this.Assembler.Macro.TryGetValue(name, out var macro)) {
 				return macro.Parameters.Count;
 			}
 			return -1;
