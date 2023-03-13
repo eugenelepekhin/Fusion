@@ -336,7 +336,7 @@ namespace Fusion {
 			case "<<": return this.Numeric(context, (a, b) => a << b);
 			case ">>": return this.Numeric(context, (a, b) => a >> b);
 			default:
-				Debug.Fail("Unknown unary operator");
+				Debug.Fail("Unknown binary operator");
 				throw new InvalidOperationException();
 			}
 		}

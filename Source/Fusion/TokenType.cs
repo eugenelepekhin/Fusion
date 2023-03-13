@@ -6,9 +6,6 @@ namespace Fusion {
 		Number,
 		String,
 		Identifier,
-		Separator,
 		Operator,
-		Comparison,
-		Error
 	}
 }

@@ -52,15 +52,6 @@ namespace Fusion {
 		public bool IsIdentifier() { return this.TokenType == Fusion.TokenType.Identifier; }
 		public bool IsIdentifier(string data) { return this.IsIdentifier() && this.TextEqual(data); }
 		public bool IsIdentifier(params string[] oneOf) { return this.IsIdentifier() && this.TextEqual(oneOf); }
-		public bool IsSeparator() { return this.TokenType == Fusion.TokenType.Separator; }
-		public bool IsSeparator(string data) { return this.IsSeparator() && this.TextEqual(data); }
-		public bool IsOperator() { return this.TokenType == Fusion.TokenType.Operator; }
-		public bool IsOperator(string data) { return this.IsOperator() && this.TextEqual(data); }
-		public bool IsOperator(params string[] oneOf) { return this.IsOperator() && this.TextEqual(oneOf); }
-		public bool IsComparison() { return this.TokenType == Fusion.TokenType.Comparison; }
-		public bool IsComparison(string data) { return this.IsComparison() && this.TextEqual(data); }
-		public bool IsComparison(params string[] oneOf) { return this.IsComparison() && this.TextEqual(oneOf); }
-		public bool IsError() { return this.TokenType == Fusion.TokenType.Error; }
 
 		public bool Equals(Token? other) {
 			return other != null && this.TokenType == other.TokenType && this.TextEqual(other.Value);
