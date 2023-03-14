@@ -43,8 +43,17 @@ namespace UnitTest {
 			this.CompileTest("macro main{(2+3)*4}", 20);
 			this.CompileTest("macro main{2+3*4}", 14);
 			this.CompileTest("macro a{7} macro main{a+a*a}", 7+7*7);
+			this.CompileTest("macro main{-2+3}", 1);
+			this.CompileTest("macro main{+-+3}", (byte)((-3) & 0xFF));
 			this.CompileTest("macro add a,b{a+b} macro main{add 1,2+3}", 1 + 2 + 3);
 			this.CompileTest("macro dub a{a*2} macro main{dub 2+3 (dub 2)+3}", 10, 7);
+
+			this.CompileTest("macro main{1 << 2 + 3 0b10'000'000 >> 2 + 3}", 1 << 2 + 3, 0b10_000_000 >> 2 + 3);
+			this.CompileTest("macro main{1 < 1 << 2}", 1 < 1 << 2 ? 1 : 0);
+			this.CompileTest("macro main{0 <= 1 != 1 0 <= (1 != 1)}", 0, 1);
+			this.CompileTest("macro main{0 < 3 & 2  0 < (3 & 2)}", 0, 1);
+
+			this.CompileTest("macro main{2 < 3 && 2 2 < (3 && 2)}", 1, 0);
 		}
 
 		[TestMethod]
@@ -79,6 +88,21 @@ namespace UnitTest {
 			this.CompileTest("macro main{test 1, 2, 3} macro test a,b,c{sum b,mul a,sum b,c} macro mul a,b{a*b} macro sum a,b{a+b}", 7);
 
 			this.CompileTest("macro a p{p+1} macro b{3} macro c p{p*2} macro d p{p+10} macro f p{p+4} macro g{5} macro main{a b c d f g}", 4, 19 * 2);
+
+			// allowed keyword as macro name
+			this.CompileTest("macro atomic p{p+1} macro main{atomic 3}", 4);
+			this.CompileTest("macro macro p{p+2} macro main{macro 4}", 6);
+			this.CompileTest("macro binary p{p+3} macro main{binary 5}", 8);
+			this.CompileTest("macro include p{p+4} macro main{include 6}", 10);
+
+			// allowed keyword as parameter name
+			this.CompileTest("macro foo atomic{atomic+1} macro main{foo 10}", 11);
+			this.CompileTest("macro foo macro{macro+2} macro main{foo 11}", 13);
+			this.CompileTest("macro foo binary{binary+3} macro main{foo 12}", 15);
+			this.CompileTest("macro foo include{include+4} macro main{foo 13}", 17);
+
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1}", "Number of actual arguments 1 not equal to number of declared parameters 2 in macro foo");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1, 2, 3}", "Number of actual arguments 3 not equal to number of declared parameters 2 in macro foo");
 		}
 
 		[TestMethod]
@@ -180,6 +204,11 @@ namespace UnitTest {
 			this.SyntaxErrorTest("macro {1}");
 			this.SyntaxErrorTest("macro 3{2} macro main{1 3}");
 			this.CompileErrorsTest("macro a{1} macro a{2} macro main{10 a 20}", "Macro a redefined at");
+
+			this.SyntaxErrorTest("macro print a{33 a} macro main{1 print 2 3}");
+			this.SyntaxErrorTest("macro error a{33 a} macro main{1 error 2 3}");
+			this.SyntaxErrorTest("macro if a{33 a} macro main{1 if 2 3}");
+			this.SyntaxErrorTest("macro else a{33 a} macro main{1 else 2 3}");
 
 			this.CompileErrorsTest("macro foo a, a{2} macro main{1 foo 2, 3 4}", "Macro foo already contains parameter a at");
 			//this.CompileErrorsTest("macro foo macro{33} macro main{1 foo 2 3}", "Name of parameter can not be a keyword \"macro\" at");
