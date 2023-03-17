@@ -20,38 +20,27 @@
 		/>
 	</Target>
 
-	<Target Name="CopyLicenseFile" AfterTargets="AfterBuild" Condition="Exists('$(MSBuildThisFileDirectory)License.txt') and '$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
-		<Copy SourceFiles="$(MSBuildThisFileDirectory)License.txt" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
-		<Copy SourceFiles="$(MSBuildThisFileDirectory)fusion.cmd" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
-	</Target>
+	<Target Name="ZipResult" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
+		<PropertyGroup>
+			<PublishFolder>$(MSBuildProjectDirectory)\bin\Release\publish</PublishFolder>
+			<DocFolder>$(MSBuildThisFileDirectory)Docs</DocFolder>
+		</PropertyGroup>
 
-	<Target Name="CopyDocFiles" AfterTargets="AfterBuild" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
-		<ItemGroup>
-			<DocsItems Include="$(MSBuildThisFileDirectory)\Docs\*.*"/>
-		</ItemGroup>
-
-		<Copy SourceFiles="@(DocsItems)" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="true"/>
-	</Target>
-
-	<Target Name="ZipResult" AfterTargets="AfterBuild; CopyLicenseFile; CopyDocFiles" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
 		<ItemGroup>
 			<ZipItem Include="$(MSBuildProjectDirectory)\FusionLexer.g4"/>
 			<ZipItem Include="$(MSBuildProjectDirectory)\FusionParser.g4"/>
-			<ZipItem Include="$(TargetDir)Example.txt"/>
-			<ZipItem Include="$(TargetDir)Fusion Language v1.docx"/>
-			<ZipItem Include="$(TargetDir)fusion.cmd"/>
-			<ZipItem Include="$(TargetDir)Fusion.dll"/>
-			<ZipItem Include="$(TargetDir)Fusion.pdb"/>
-			<ZipItem Include="$(TargetDir)Antlr4.Runtime.dll"/>
-			<ZipItem Include="$(TargetDir)Fusion.runtimeconfig.json"/>
-			<ZipItem Include="$(TargetDir)LabelExample.txt"/>
-			<ZipItem Include="$(TargetDir)License.txt"/>
-			<ZipItem Include="$(TargetDir)ZeroingBlock.txt"/>
+			<ZipItem Include="$(DocFolder)\Example.txt"/>
+			<ZipItem Include="$(DocFolder)\Fusion Language v1.docx"/>
+			<ZipItem Include="$(PublishFolder)\Fusion.exe"/>
+			<ZipItem Include="$(PublishFolder)\Fusion.pdb"/>
+			<ZipItem Include="$(DocFolder)\LabelExample.txt"/>
+			<ZipItem Include="$(MSBuildThisFileDirectory)License.txt"/>
+			<ZipItem Include="$(DocFolder)\ZeroingBlock.txt"/>
 		</ItemGroup>
 
 		<PropertyGroup>
 			<ZipApp>$(ProgramW6432)\7-Zip\7z.exe</ZipApp>
-			<ZipFileName>$(TargetDir)Fusion.zip</ZipFileName>
+			<ZipFileName>$(PublishFolder)\Fusion.zip</ZipFileName>
 
 			<ItemList>@(ZipItem)</ItemList>
 			<Quotes>" "</Quotes>
