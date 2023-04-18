@@ -1,28 +1,30 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
-	<Target Name="CopyTools" AfterTargets="AfterBuild">
+
+	<Target Name="PublishProject" AfterTargets="AfterBuild" Condition="'$(Configuration)' == 'Release' and '$(PublishFolder)' != ''">
 		<PropertyGroup>
-			<ToolsFolder>$(MSBuildThisFileDirectory)Tools</ToolsFolder>
+			<Command>dotnet publish $(MSBuildProjectFile) --no-build -o $(PublishFolder) -c Release</Command>
 		</PropertyGroup>
 
-		<Copy Condition="$(MSBuildProjectDirectory.StartsWith($(ToolsFolder)))" SourceFiles="$(TargetPath)" DestinationFolder="$(ToolsFolder)" SkipUnchangedFiles="true"/>
+		<!--<Message Importance="high" Text=">>> $(Command)"/>-->
+		<Exec Command="$(Command)"/>
 	</Target>
 
-	<Target Name="GenerateResourceWrappers" BeforeTargets="BeforeBuild" Condition="'@(EmbeddedResource)' != '' and '$(MSBuildProjectName)' == 'Fusion'">
+	<Target Name="GenerateResourceWrappers" BeforeTargets="BeforeBuild" Condition="'@(EmbeddedResource)' != ''">
 		<PropertyGroup>
-			<ResourceWrapperGeneratorCommand>"$(MSBuildThisFileDirectory)Tools\ResourceWrapper.Generator.exe" /f "$(MSBuildProjectDirectory)" /n "$(RootNamespace)" /a "@(EmbeddedResource)"</ResourceWrapperGeneratorCommand>
+			<ResourceWrapperGeneratorCommand>"$(ToolsFolder)\ResourceWrapper.Generator.exe" /f "$(MSBuildProjectDirectory)" /n "$(RootNamespace)" /a "@(EmbeddedResource)"</ResourceWrapperGeneratorCommand>
 			<PseudoBuildDefined>$(DefineConstants.Contains("Pseudo"))</PseudoBuildDefined>
 			<ResourceWrapperGeneratorCommand Condition="$(PseudoBuildDefined)">$(ResourceWrapperGeneratorCommand) /Pseudo</ResourceWrapperGeneratorCommand>
+			<!-- new format of command required new parameters -->
+			<ResourceWrapperGeneratorCommand>$(ResourceWrapperGeneratorCommand) /r "%(EmbeddedResource.Identity)" /g "%(EmbeddedResource.Generator)" /cs "%(EmbeddedResource.LastGenOutput)" /rn "%(EmbeddedResource.CustomToolNamespace)"</ResourceWrapperGeneratorCommand>
 		</PropertyGroup>
 
-		<Exec Condition="'%(EmbeddedResource.Generator)'!='' and '%(EmbeddedResource.LastGenOutput)' != ''"
-			Command="$(ResourceWrapperGeneratorCommand) /r &quot;%(EmbeddedResource.Identity)&quot; /g &quot;%(EmbeddedResource.Generator)&quot; /cs &quot;%(EmbeddedResource.LastGenOutput)&quot; /rn &quot;%(EmbeddedResource.CustomToolNamespace)&quot;"
-		/>
+		<!--<Message Condition="'%(EmbeddedResource.Generator)'!='' and '%(EmbeddedResource.LastGenOutput)' != ''" Importance="high" Text="$(ResourceWrapperGeneratorCommand)"/>-->
+		<Exec Condition="'%(EmbeddedResource.Generator)'!='' and '%(EmbeddedResource.LastGenOutput)' != ''" Command="$(ResourceWrapperGeneratorCommand)"/>
 	</Target>
 
-	<Target Name="ZipResult" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
+	<Target Name="ZipResult" AfterTargets="PublishProject" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
 		<PropertyGroup>
-			<PublishFolder>$(MSBuildProjectDirectory)\bin\Release\publish</PublishFolder>
 			<DocFolder>$(MSBuildThisFileDirectory)Docs</DocFolder>
 		</PropertyGroup>
 
@@ -31,8 +33,8 @@
 			<ZipItem Include="$(MSBuildProjectDirectory)\FusionParser.g4"/>
 			<ZipItem Include="$(DocFolder)\Example.txt"/>
 			<ZipItem Include="$(DocFolder)\Fusion Language v1.docx"/>
-			<ZipItem Include="$(PublishFolder)\Fusion.exe"/>
-			<ZipItem Include="$(PublishFolder)\Fusion.pdb"/>
+			<ZipItem Include="$(PublishFolder)Fusion.exe"/>
+			<ZipItem Include="$(PublishFolder)Fusion.pdb"/>
 			<ZipItem Include="$(DocFolder)\LabelExample.txt"/>
 			<ZipItem Include="$(MSBuildThisFileDirectory)License.txt"/>
 			<ZipItem Include="$(DocFolder)\ZeroingBlock.txt"/>
@@ -40,7 +42,7 @@
 
 		<PropertyGroup>
 			<ZipApp>$(ProgramW6432)\7-Zip\7z.exe</ZipApp>
-			<ZipFileName>$(PublishFolder)\Fusion.zip</ZipFileName>
+			<ZipFileName>$(PublishFolder)Fusion.zip</ZipFileName>
 
 			<ItemList>@(ZipItem)</ItemList>
 			<Quotes>" "</Quotes>
@@ -50,6 +52,9 @@
 		</PropertyGroup>
 
 		<Message Condition="!Exists('$(ZipApp)')" Importance="high" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating zip file"/>
+		<!--<Message Importance="high" Text="7-zip command: $(ZipCmd)"/>-->
+		<Delete Files="$(ZipFileName)" Condition="Exists('$(ZipFileName)')"/>
 		<Exec Condition="Exists('$(ZipApp)')" Command="$(ZipCmd)"/>
 	</Target>
+
 </Project>
