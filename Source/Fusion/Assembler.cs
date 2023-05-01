@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Antlr4.Runtime;
 
@@ -159,7 +160,7 @@ namespace Fusion {
 			}
 		}
 
-		private P? Parser<P>(string file, int currentPass) where P : Parser {
+		private P? Parser<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]P>(string file, int currentPass) where P : Parser {
 			if(this.started < File.GetLastWriteTime(file)) {
 				this.FatalError(Resource.FileChanged(file));
 				return null;

@@ -51,7 +51,7 @@
 			<ZipCmd>"$(ZipApp)" a "$(ZipFileName)" -mx9 $(QuotedList)</ZipCmd>
 		</PropertyGroup>
 
-		<Message Condition="!Exists('$(ZipApp)')" Importance="high" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating zip file"/>
+		<Error Condition="!Exists('$(ZipApp)')" Text="7-zip ('$(ZipApp)') not found on this machine. Please install it before creating zip file"/>
 		<!--<Message Importance="high" Text="7-zip command: $(ZipCmd)"/>-->
 		<Delete Files="$(ZipFileName)" Condition="Exists('$(ZipFileName)')"/>
 		<Exec Condition="Exists('$(ZipApp)')" Command="$(ZipCmd)"/>
