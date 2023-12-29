@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using io = System.IO;
+using sysIo = System.IO;
 
 namespace ResourceWrapper.Generator {
 	partial class ResourcesWrapper {
@@ -48,11 +48,11 @@ namespace ResourceWrapper.Generator {
 				this.items = list;
 				string content = this.TransformText();
 				string? oldFileContent = null;
-				if(io.File.Exists(this.Code)) {
-					oldFileContent = io.File.ReadAllText(this.Code, Encoding.UTF8);
+				if(sysIo.File.Exists(this.Code)) {
+					oldFileContent = sysIo.File.ReadAllText(this.Code, Encoding.UTF8);
 				}
 				if(!StringComparer.Ordinal.Equals(oldFileContent, content)) {
-					io.File.WriteAllText(this.Code, content, Encoding.UTF8);
+					sysIo.File.WriteAllText(this.Code, content, Encoding.UTF8);
 					Message.Flush();
 				}
 				Message.Clear();

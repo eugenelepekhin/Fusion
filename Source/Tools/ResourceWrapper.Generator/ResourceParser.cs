@@ -12,6 +12,8 @@ namespace ResourceWrapper.Generator {
 	/// If there are formating parameters comment should declare parameters of formating function: {type1 parameter1, type2 parameter2, ... typeM parameterM}
 	/// </summary>
 	internal class ResourceParser {
+		private static readonly char[] splitters = new char[] { ',' };
+
 		public static IEnumerable<ResourceItem>? Parse(string file, bool enforceParameterDeclaration, IEnumerable<string> satelites, out int errors, out int warnings) {
 			XmlDocument resource = new XmlDocument();
 			resource.Load(file);
@@ -224,7 +226,7 @@ namespace ResourceWrapper.Generator {
 			if(0 < count) {
 				Match paramsMatch = this.functionParameters.Match(comment);
 				if(paramsMatch.Success) {
-					string[] list = paramsMatch.Groups["param"].Value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+					string[] list = paramsMatch.Groups["param"].Value.Split(ResourceParser.splitters, StringSplitOptions.RemoveEmptyEntries);
 					List<Parameter> parameterList = new List<Parameter>(list.Length);
 					foreach(string text in list) {
 						if(!string.IsNullOrWhiteSpace(text)) {

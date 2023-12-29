@@ -150,7 +150,7 @@ namespace Fusion {
 				if(value.StartsWith("0b", ignoreCase: true, CultureInfo.InvariantCulture)) {
 					return between(3, 34);
 				}
-				if(value.StartsWith("0", ignoreCase: true, CultureInfo.InvariantCulture)) {
+				if(value.StartsWith('0')) {
 					return between(1, 12) && Token.ParseOcta(value) <= int.MaxValue;
 				}
 				return between(1, 10) && Token.ParseDecimal(value) <= int.MaxValue;

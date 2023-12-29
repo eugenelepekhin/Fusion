@@ -5,7 +5,7 @@ namespace Fusion {
 	using Antlr4.Runtime.Misc;
 	using Antlr4.Runtime.Tree;
 
-	internal class ParseTreePrinter : FusionParserBaseVisitor<int> {
+	internal sealed class ParseTreePrinter : FusionParserBaseVisitor<int> {
 		private readonly StringBuilder text = new StringBuilder();
 		private int indent;
 

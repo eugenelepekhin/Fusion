@@ -78,10 +78,8 @@ namespace Fusion {
 			}
 			FirstPassParser.ExprListContext body = context.macroBody().exprList();
 			this.currentMacro = new MacroDefinition(name, atomic, parameters);
-			if(this.Assembler.Macro.ContainsKey(name.Value)) {
+			if(!this.Assembler.Macro.TryAdd(name.Value, this.currentMacro)) {
 				this.Assembler.Error(Resource.MacroNameRedefinition(name.Value, name.Position));
-			} else {
-				this.Assembler.Macro.Add(name.Value, this.currentMacro);
 			}
 			return base.Visit(body);
 		}

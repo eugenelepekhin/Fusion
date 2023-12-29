@@ -48,8 +48,8 @@ namespace Fusion {
 			}
 			Debug.Assert(this.Macro.IsLabel(labelName), "label name expected");
 			Debug.Assert(!string.IsNullOrWhiteSpace(labelName.Value));
-			if(this.label.ContainsKey(labelName.Value)) {
-				if(this.label[labelName.Value] != value) {
+			if(this.label.TryGetValue(labelName.Value, out int currentValue)) {
+				if(currentValue != value) {
 					this.Assembler.Error(Resource.LabelRedefined(labelName.Value, this.Macro.Name.Value, labelName.Position));
 				}
 			} else {

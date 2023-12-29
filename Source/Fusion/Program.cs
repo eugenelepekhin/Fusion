@@ -8,7 +8,7 @@ using System.Threading;
 using CommandLineParser;
 
 namespace Fusion {
-	internal class Program {
+	internal sealed class Program {
 		private struct Arguments {
 			private string? inputFile;
 			private string? outputFile;
@@ -68,7 +68,7 @@ namespace Fusion {
 				return this.outputFile;
 			}
 
-			public IEnumerable<string> SearchPath() {
+			public List<string> SearchPath() {
 				Debug.Assert(this.searchPath != null);
 				return this.searchPath;
 			}
