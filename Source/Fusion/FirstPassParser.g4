@@ -4,9 +4,9 @@ options {
 	tokenVocab = FusionLexer;
 }
 
-fusionProgram: (binaryDecalration | include | macro)* EOF;	// binaryDecalration may only occurred once
+fusionProgram: (binaryDeclaration | include | macro)* EOF;	// binaryDeclaration may only occurred once
 
-binaryDecalration: Binary outputBitsPerNumber;
+binaryDeclaration: Binary outputBitsPerNumber;
 outputBitsPerNumber: NumberLiteral;
 
 include: Include filePath;

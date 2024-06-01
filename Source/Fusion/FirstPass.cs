@@ -20,7 +20,7 @@ namespace Fusion {
 			this.SourceFile = file;
 		}
 
-		public override int VisitBinaryDecalration([NotNull] FirstPassParser.BinaryDecalrationContext context) {
+		public override int VisitBinaryDeclaration([NotNull] FirstPassParser.BinaryDeclarationContext context) {
 			IToken outputBitsPerNumber = context.outputBitsPerNumber().Start;
 			Debug.Assert(outputBitsPerNumber != null);
 			Token width = new Token(TokenType.Number, outputBitsPerNumber, this.SourceFile);

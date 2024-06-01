@@ -43,10 +43,10 @@ namespace Fusion {
 			return base.VisitFusionProgram(context);
 		}
 
-		public override int VisitBinaryDecalration([NotNull] FusionParser.BinaryDecalrationContext context) {
+		public override int VisitBinaryDeclaration([NotNull] FusionParser.BinaryDeclarationContext context) {
 			this.WriteLine("{0} {1}", context.Start.Text, context.outputBitsPerNumber().Start.Text);
 
-			return base.VisitBinaryDecalration(context);
+			return base.VisitBinaryDeclaration(context);
 		}
 
 		public override int VisitInclude([NotNull] FusionParser.IncludeContext context) {
