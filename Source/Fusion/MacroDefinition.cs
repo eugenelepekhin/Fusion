@@ -12,10 +12,10 @@ namespace Fusion {
 		public ExpressionList Body { get; set; }
 		public bool Atomic { get; }
 
-		public MacroDefinition(Token name, bool atomic, IList<Token> parametes) {
+		public MacroDefinition(Token name, bool atomic, IList<Token> parameters) {
 			Debug.Assert(name != null);
 			this.Name = name;
-			this.Parameters = parametes;
+			this.Parameters = parameters;
 			this.Labels = new List<Token>();
 			this.Body = new ExpressionList();
 			this.Atomic = atomic;
