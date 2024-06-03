@@ -62,10 +62,10 @@ namespace Fusion {
 		}
 
 		/// <summary>
-		/// Looks up a localized string similar to Number of actual arguments {0} not equal to number of declared parameters {1} in macro {2}.
+		/// Looks up a localized string similar to Number of actual arguments {0} does not match any macro {1} declarations at {2}.
 		/// </summary>
- 		public static string ArgumentCount(int arguments, int parameters, string macro) {
-			return string.Format(FormatCulture, ResourceManager.GetString("ArgumentCount", Culture), arguments, parameters, macro);
+ 		public static string ArgumentCount(int arguments, string macro, Position position) {
+			return string.Format(FormatCulture, ResourceManager.GetString("ArgumentCount", Culture), arguments, macro, position);
 		}
 
 		/// <summary>

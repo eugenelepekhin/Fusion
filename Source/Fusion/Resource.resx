@@ -122,8 +122,8 @@
     <comment>{string version}</comment>
   </data>
   <data name="ArgumentCount" xml:space="preserve">
-    <value>Number of actual arguments {0} not equal to number of declared parameters {1} in macro {2}</value>
-    <comment>{int arguments, int parameters, string macro}</comment>
+    <value>Number of actual arguments {0} does not match any macro {1} declarations at {2}</value>
+    <comment>{int arguments, string macro, Position position}</comment>
   </data>
   <data name="BadNumberFormat" xml:space="preserve">
     <value>Bad format of number: '{0}' at {1}</value>

@@ -101,8 +101,12 @@ namespace UnitTest {
 			this.CompileTest("macro foo binary{binary+3} macro main{foo 12}", 15);
 			this.CompileTest("macro foo include{include+4} macro main{foo 13}", 17);
 
-			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1}", "Number of actual arguments 1 not equal to number of declared parameters 2 in macro foo");
-			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1, 2, 3}", "Number of actual arguments 3 not equal to number of declared parameters 2 in macro foo");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1}", "Number of actual arguments 1 does not match any macro foo declarations at");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1, 2, 3}", "Number of actual arguments 3 does not match any macro foo declarations at");
+
+			// test for overload macros
+			this.CompileTest("macro main{a 1,2 a 3,4,5} macro a b, c{b c} macro a b, c, d{b c d}", 1, 2, 3, 4, 5);
+			this.CompileErrorsTest("macro foo a, b{a+b} macro foo a, b, c{a+b+c} macro main{foo 1}", "Number of actual arguments 1 does not match any macro foo declarations at");
 		}
 
 		[TestMethod]

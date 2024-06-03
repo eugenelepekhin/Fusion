@@ -19,8 +19,9 @@ namespace Fusion {
 
 		public override Expression VisitMacro([NotNull] FusionParser.MacroContext context) {
 			string name = context.macroName().GetText();
-			if(this.Assembler.Macro.TryGetValue(name, out MacroDefinition? macro)) {
-				Debug.Assert(macro != null);
+			FusionParser.ParameterListContext parameterListContext = context.parameterList();
+			MacroDefinition? macro = this.Assembler.Macro.Find(name, (parameterListContext == null) ? 0 : parameterListContext.parameterName().Length);
+			if(macro != null) {
 				this.currentMacro = macro;
 				macro.Body = (ExpressionList)this.Visit(context.macroBody().exprList());
 			} else {
@@ -61,15 +62,19 @@ namespace Fusion {
 		public override Expression VisitCall([NotNull] FusionParser.CallContext context) {
 			Token name = new Token(TokenType.Identifier, context.macroName().Start, this.File);
 			Debug.Assert(!string.IsNullOrWhiteSpace(name.Value));
-			if(this.Assembler.Macro.TryGetValue(name.Value, out var macro)) {
-				FusionParser.ArgumentsContext args = context.arguments();
+			FusionParser.ArgumentsContext args = context.arguments();
+			int argCount = (args == null) ? 0 : args.expr().Length;
+			MacroDefinition? macro = this.Assembler.Macro.Find(name.Value, argCount);
+			if(macro != null) {
 				List<Expression> arguments = (args != null) ? args.expr().Select(e => this.Visit(e)).ToList() : new List<Expression>();
-				if(arguments.Count == macro.Parameters.Count) {
-					return new CallExpr(name, macro, arguments);
-				}
-				this.Assembler.Error(Resource.ArgumentCount(arguments.Count, macro.Parameters.Count, macro.Name.Value));
+				Debug.Assert(macro.Parameters.Count == arguments.Count);
+				return new CallExpr(name, macro, arguments);
 			} else {
-				this.Assembler.Error(Resource.UndefinedMacro(name.Value, name.Position));
+				if(0 <= this.Assembler.Macro.MinParameters(name.Value)) {
+					this.Assembler.Error(Resource.ArgumentCount(argCount, name.Value, name.Position));
+				} else {
+					this.Assembler.Error(Resource.UndefinedMacro(name.Value, name.Position));
+				}
 			}
 			return new ValueExpression(VoidValue.Value);
 		}

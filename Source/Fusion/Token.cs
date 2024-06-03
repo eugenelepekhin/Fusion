@@ -60,6 +60,10 @@ namespace Fusion {
 		public override bool Equals(object? obj) => base.Equals(obj);
 		public override int GetHashCode() => base.GetHashCode();
 
+		public bool SameToken(Token other) {
+			return this.Equals(other) && this.Position.Equals(other.Position);
+		}
+
 		public int Number {
 			get {
 				Debug.Assert(this.IsNumber());

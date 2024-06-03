@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Fusion {
 	[SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes")]
@@ -15,6 +16,10 @@ namespace Fusion {
 
 		public override string ToString() {
 			return Resource.PositionText(this.File, this.Line, this.Column);
+		}
+
+		public bool Equals(Position other) {
+			return StringComparer.OrdinalIgnoreCase.Equals(this.File, other.File) && this.Line == other.Line && this.Column == other.Column;
 		}
 	}
 }

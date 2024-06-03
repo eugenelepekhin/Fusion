@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using Antlr4.Runtime;
 
 namespace Fusion {
@@ -45,7 +46,7 @@ namespace Fusion {
 		}
 		
 		public Dictionary<string, int> Files { get; } = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-		public Dictionary<string, MacroDefinition> Macro { get; } = new Dictionary<string, MacroDefinition>();
+		public MacroStore Macro { get; } = new MacroStore();
 
 		public BinaryFormatter BinaryFormatter { get; private set; }
 
@@ -84,15 +85,17 @@ namespace Fusion {
 		}
 
 		private void Expand() {
-			MacroDefinition? main = null;
-			if(!this.Macro.TryGetValue(Assembler.MainName, out main)) {
+			List<MacroDefinition> list = this.Macro.Select(Assembler.MainName).ToList();
+			if(list.Count == 0) {
 				this.Error(Resource.MainMissing);
 				return;
 			}
-			if(0 < main.Parameters.Count) {
+			if(0 < list[0].Parameters.Count) {
 				this.Error(Resource.MainPararameters);
 				return;
 			}
+			MacroDefinition main = list[0];
+			Debug.Assert(main.Parameters.Count == 0 && list.Count == 1);
 			Context context = new Context(this, main);
 			Value value = main.Body.Evaluate(context, 0);
 			if(0 < this.ErrorCount) {
@@ -121,9 +124,9 @@ namespace Fusion {
 		}
 
 		private void SecondPassParse() {
-			FusionParserListener listener = new FusionParserListener(this);
-			Predicates predicates = new Predicates(this, listener);
 			foreach(string file in this.Files.Keys) {
+				FusionParserListener listener = new FusionParserListener(this, file);
+				Predicates predicates = new Predicates(this, listener);
 				if(!this.CanContinue) {
 					break;
 				}

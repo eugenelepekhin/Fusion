@@ -64,7 +64,7 @@ namespace Fusion {
 			Debug.Assert(!string.IsNullOrWhiteSpace(name.Value));
 			bool atomic = context.Atomic() != null;
 			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
-			List<Token>? parameters = new List<Token>();
+			List<Token> parameters = new List<Token>();
 			if(parameterListContext != null) {
 				parameters.AddRange(parameterListContext.parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)));
 				HashSet<string> paramNames = new HashSet<string>();
@@ -78,7 +78,7 @@ namespace Fusion {
 			}
 			FirstPassParser.ExprListContext body = context.macroBody().exprList();
 			this.currentMacro = new MacroDefinition(name, atomic, parameters);
-			if(!this.Assembler.Macro.TryAdd(name.Value, this.currentMacro)) {
+			if(!this.Assembler.Macro.Add(this.currentMacro)) {
 				this.Assembler.Error(Resource.MacroNameRedefinition(name.Value, name.Position));
 			}
 			return base.Visit(body);
