@@ -115,6 +115,13 @@ namespace UnitTest {
 			this.CompileTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],1}", 5, 6, 7, 8, 9, 0, 1);
 			this.CompileErrorsTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],[1]}", "Actual arguments does not match any macro a declarations at");
 			this.CompileTest("macro a [c,d][e,f,g],h{c d e f g h} macro main{a [6,7][8,9,0],1}", 6, 7, 8, 9, 0, 1);
+			// test index overload and index expressions
+			this.CompileTest("macro a b{b} macro a[b]{b+1} macro main{a 3 a 4 a[5] a[8*4]}", 3, 4, 6, 33);
+
+			this.CompileErrorsTest("macro a b[b]{1} macro main{a 5[6]}", "Macro a already contains parameter b");
+			this.CompileErrorsTest("macro a a[b],b{1} macro main{a 5[6],7}", "Macro a already contains parameter b");
+			this.CompileErrorsTest("macro a a[],b{1} macro main{a 5[],7}", "Syntax error: missing {'atomic', 'macro', 'binary', 'include', Identifier} at ']'");
+			this.CompileErrorsTest("macro a a[b],c{1} macro main{a 5[],7}", "Syntax error: mismatched input ']'");
 		}
 
 		[TestMethod]

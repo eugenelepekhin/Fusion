@@ -63,9 +63,9 @@ namespace Fusion {
 			Token name = new Token(TokenType.Identifier, context.macroName().Start, this.SourceFile);
 			Debug.Assert(!string.IsNullOrWhiteSpace(name.Value));
 			bool atomic = context.Atomic() != null;
-			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
 			List<Token> parameters = new List<Token>();
 			StringBuilder callPattern = new StringBuilder();
+			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
 			if(parameterListContext != null) {
 				Debug.Assert(parameterListContext.parameterDeclaration() != null);
 				HashSet<string> paramNames = new HashSet<string>();
