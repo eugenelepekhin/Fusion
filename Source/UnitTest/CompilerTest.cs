@@ -114,6 +114,7 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro a b[c]{b c} macro main{a 5,6}", "Actual arguments does not match any macro a declarations at");
 			this.CompileTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],1}", 5, 6, 7, 8, 9, 0, 1);
 			this.CompileErrorsTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],[1]}", "Actual arguments does not match any macro a declarations at");
+			this.CompileTest("macro a [c,d][e,f,g],h{c d e f g h} macro main{a [6,7][8,9,0],1}", 6, 7, 8, 9, 0, 1);
 		}
 
 		[TestMethod]
