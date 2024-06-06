@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Text;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
@@ -65,19 +65,51 @@ namespace Fusion {
 			bool atomic = context.Atomic() != null;
 			FirstPassParser.ParameterListContext parameterListContext = context.parameterList();
 			List<Token> parameters = new List<Token>();
+			StringBuilder callPattern = new StringBuilder();
 			if(parameterListContext != null) {
-				parameters.AddRange(parameterListContext.parameterName().Select(pnc => new Token(TokenType.Identifier, pnc.Start, this.SourceFile)));
+				Debug.Assert(parameterListContext.parameterDeclaration() != null);
 				HashSet<string> paramNames = new HashSet<string>();
-				foreach(Token param in parameters) {
-					Debug.Assert(!string.IsNullOrWhiteSpace(param.Value));
-					if(!paramNames.Add(param.Value)) {
-						this.Assembler.Error(Resource.ParameterRedefinition(name.Value, param.Value, param.Position));
+				bool comma = false;
+				foreach(var parameterContext in parameterListContext.parameterDeclaration()) {
+					if(comma) {
+						callPattern.Append(',');
 					}
-					Debug.Assert(!param.IsIdentifier(Assembler.ErrorName, Assembler.PrintName, Assembler.IfName, Assembler.ElseName));
+					comma = true;
+					FirstPassParser.ParameterNameContext parameterNameContext = parameterContext.parameterName();
+					if(parameterNameContext != null) {
+						Token parameterName = new Token(TokenType.Identifier, parameterNameContext.Start, this.SourceFile);
+						if(!paramNames.Add(parameterName.Value!)) {
+							this.Assembler.Error(Resource.ParameterRedefinition(name.Value, parameterName.Value, parameterName.Position));
+						} else {
+							parameters.Add(parameterName);
+							callPattern.Append('$');
+						}
+					}
+					FirstPassParser.IndexDeclarationContext[] indexContext = parameterContext.indexDeclaration();
+					if(indexContext != null && 0 < indexContext.Length) {
+						foreach(FirstPassParser.IndexDeclarationContext index in indexContext) {
+							callPattern.Append('[');
+							bool indexComma = false;
+							foreach(FirstPassParser.IndexNameContext indexNameContext in index.indexName()) {
+								Token indexName = new Token(TokenType.Identifier, indexNameContext.Start, this.SourceFile);
+								if(!paramNames.Add(indexName.Value!)) {
+									this.Assembler.Error(Resource.ParameterRedefinition(name.Value, indexName.Value, indexName.Position));
+								} else {
+									parameters.Add(indexName);
+									if(indexComma) {
+										callPattern.Append(',');
+									}
+									indexComma = true;
+									callPattern.Append('$');
+								}
+							}
+							callPattern.Append(']');
+						}
+					}
 				}
 			}
 			FirstPassParser.ExprListContext body = context.macroBody().exprList();
-			this.currentMacro = new MacroDefinition(name, atomic, parameters);
+			this.currentMacro = new MacroDefinition(name, atomic, parameters, callPattern.ToString());
 			if(!this.Assembler.Macro.Add(this.currentMacro)) {
 				this.Assembler.Error(Resource.MacroNameRedefinition(name.Value, name.Position));
 			}

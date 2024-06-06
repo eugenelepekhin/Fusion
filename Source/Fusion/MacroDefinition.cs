@@ -8,17 +8,19 @@ namespace Fusion {
 	public class MacroDefinition {
 		public Token Name { get; }
 		public IList<Token> Parameters { get; }
+		public string CallPattern { get; }
 		public IList<Token> Labels { get; }
 		public ExpressionList Body { get; set; }
 		public bool Atomic { get; }
 
-		public MacroDefinition(Token name, bool atomic, IList<Token> parameters) {
+		public MacroDefinition(Token name, bool atomic, IList<Token> parameters, string callPattern) {
 			Debug.Assert(name != null);
 			this.Name = name;
 			this.Parameters = parameters;
 			this.Labels = new List<Token>();
 			this.Body = new ExpressionList();
 			this.Atomic = atomic;
+			this.CallPattern = callPattern;
 		}
 
 		public bool IsParameter(Token name) => this.Parameters.Any(t => t.Equals(name));

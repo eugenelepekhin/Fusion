@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace Fusion {
 			public int Compare(MacroDefinition? x, MacroDefinition? y) {
 				Debug.Assert(x != null && y != null);
 				Debug.Assert(x.Name.Value == y.Name.Value && x.Name.Value != null);
-				return x.Parameters.Count - y.Parameters.Count;
+				return StringComparer.Ordinal.Compare(x.CallPattern, y.CallPattern);
 			}
 		}
 
@@ -47,6 +48,6 @@ namespace Fusion {
 			return -1;
 		}
 
-		public MacroDefinition? Find(string name, int parameterCount) => this.Select(name).FirstOrDefault(macro => macro.Parameters.Count == parameterCount);
+		public MacroDefinition? Find(string name, string callPattern) => this.Select(name).FirstOrDefault(macro => macro.CallPattern == callPattern);
 	}
 }

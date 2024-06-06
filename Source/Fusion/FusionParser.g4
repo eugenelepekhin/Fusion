@@ -25,8 +25,12 @@ filePath: StringLiteral;
 
 macro: Atomic? Macro macroName parameterList? Begin macroBody End;
 macroName: name;
-parameterList: parameterName (Comma parameterName)*;
+
+parameterList: parameterDeclaration (Comma parameterDeclaration)*;
+parameterDeclaration: (parameterName indexDeclaration*) | indexDeclaration+;
 parameterName: name;
+indexDeclaration: OpenBox indexName (Comma indexName)* CloseBox;
+indexName: name;
 
 macroBody: exprList;
 exprList: (label | expr)*;
@@ -55,5 +59,8 @@ expr: If Open cond=expr Close Begin trueBranch=exprList End (Else Begin falseBra
 	| StringLiteral						#Literal
 	;
 
-arguments: expr (Comma expr)*;
+arguments: argument (Comma argument)*;
+argument: (expr indexExprList*) | indexExprList+;
+indexExprList: OpenBox expr (Comma expr)* CloseBox;
+
 name: (Identifier | Atomic | Macro | Binary | Include);

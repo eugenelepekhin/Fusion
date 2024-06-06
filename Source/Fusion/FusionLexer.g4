@@ -14,6 +14,9 @@ End: '}';
 Open: '(';
 Close: ')';
 
+OpenBox: '[';
+CloseBox: ']';
+
 Comma: ',';
 Colon: ':';
 

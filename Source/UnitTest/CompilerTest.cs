@@ -101,12 +101,19 @@ namespace UnitTest {
 			this.CompileTest("macro foo binary{binary+3} macro main{foo 12}", 15);
 			this.CompileTest("macro foo include{include+4} macro main{foo 13}", 17);
 
-			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1}", "Number of actual arguments 1 does not match any macro foo declarations at");
-			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1, 2, 3}", "Number of actual arguments 3 does not match any macro foo declarations at");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1}", "Actual arguments does not match any macro foo declarations at");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro main{foo 1, 2, 3}", "Actual arguments does not match any macro foo declarations at");
 
 			// test for overload macros
 			this.CompileTest("macro main{a 1,2 a 3,4,5} macro a b, c{b c} macro a b, c, d{b c d}", 1, 2, 3, 4, 5);
-			this.CompileErrorsTest("macro foo a, b{a+b} macro foo a, b, c{a+b+c} macro main{foo 1}", "Number of actual arguments 1 does not match any macro foo declarations at");
+			this.CompileErrorsTest("macro foo a, b{a+b} macro foo a, b, c{a+b+c} macro main{foo 1}", "Actual arguments does not match any macro foo declarations at");
+			this.CompileErrorsTest("macro foo {1} macro main{bar 2}", "Undefined macro bar at");
+
+			// test for index calls
+			this.CompileTest("macro a b[c]{b c} macro main{a 5[6]}", 5, 6);
+			this.CompileErrorsTest("macro a b[c]{b c} macro main{a 5,6}", "Actual arguments does not match any macro a declarations at");
+			this.CompileTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],1}", 5, 6, 7, 8, 9, 0, 1);
+			this.CompileErrorsTest("macro a b[c,d][e,f,g],h{b c d e f g h} macro main{a 5[6,7][8,9,0],[1]}", "Actual arguments does not match any macro a declarations at");
 		}
 
 		[TestMethod]

@@ -121,9 +121,9 @@
     <value>Fusion version {0}</value>
     <comment>{string version}</comment>
   </data>
-  <data name="ArgumentCount" xml:space="preserve">
-    <value>Number of actual arguments {0} does not match any macro {1} declarations at {2}</value>
-    <comment>{int arguments, string macro, Position position}</comment>
+  <data name="ArgumentMismatch" xml:space="preserve">
+    <value>Actual arguments does not match any macro {0} declarations at {1}</value>
+    <comment>{string macro, Position position}</comment>
   </data>
   <data name="BadNumberFormat" xml:space="preserve">
     <value>Bad format of number: '{0}' at {1}</value>

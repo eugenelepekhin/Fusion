@@ -57,15 +57,15 @@ namespace Fusion {
 		public override int VisitMacro([NotNull] FusionParser.MacroContext context) {
 			this.indent = 0;
 			var atomic = context.Atomic();
-			if (atomic != null) {
+			if(atomic != null) {
 				this.Write("{0} ", atomic.GetText());
 			}
 
 			this.Write("{0} {1} ", context.Macro().GetText(), context.macroName().GetText());
 			var args = context.parameterList();
-			if (args != null) {
+			if(args != null) {
 				bool comma = false;
-				foreach(var arg in args.parameterName()) {
+				foreach(var arg in args.parameterDeclaration()) {
 					if(comma) {
 						this.Write(", ");
 					} else {
@@ -130,7 +130,7 @@ namespace Fusion {
 			var args = context.arguments();
 			if(args != null) {
 				bool comma = false;
-				foreach(var arg in args.expr()) {
+				foreach(var arg in args.argument()) {
 					if(comma) {
 						this.Write(",");
 					} else {
@@ -141,6 +141,13 @@ namespace Fusion {
 				}
 			}
 			this.Write(")");
+			return 0;
+		}
+
+		public override int VisitIndexExprList([NotNull] FusionParser.IndexExprListContext context) {
+			this.Write("[");
+			base.VisitIndexExprList(context);
+			this.Write("]");
 			return 0;
 		}
 
