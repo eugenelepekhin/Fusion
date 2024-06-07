@@ -118,6 +118,30 @@ namespace UnitTest {
 			// test index overload and index expressions
 			this.CompileTest("macro a b{b} macro a[b]{b+1} macro main{a 3 a 4 a[5] a[8*4]}", 3, 4, 6, 33);
 
+			string overloadA1 = (
+				"macro a b,c  {b+c+1}" +
+				"macro a b[c] {b+c+2}" +
+				"macro a b,[c]{b+c+3}" +
+				"macro a [b],c{b+c+4}" +
+				"macro a [b,c]{b+c+5}" +
+				"macro main{a 1,2 a 3[4] a 5,[6] a[7],8 a[9,10]}"
+			);
+			this.CompileTest(overloadA1, 4, 9, 14, 19, 24);
+
+			string overloadA2 = (
+				"macro a a,b,c{a+b+c+1}" +
+				"macro a [a],b,c{a+b+c+2}" +
+				"macro a [a,b],c{a+b+c+3}" +
+				"macro a [a,b,c]{a+b+c+4}" +
+				"macro main{" +
+				"a 1,2,3 " +
+				"a [4],5,6 " +
+				"a [7,8],9 " +
+				"a [10,11,12]"+
+				"}"
+			);
+			this.CompileTest(overloadA2, 7,17,27,37);
+
 			this.CompileErrorsTest("macro a b[b]{1} macro main{a 5[6]}", "Macro a already contains parameter b");
 			this.CompileErrorsTest("macro a a[b],b{1} macro main{a 5[6],7}", "Macro a already contains parameter b");
 			this.CompileErrorsTest("macro a a[],b{1} macro main{a 5[],7}", "Syntax error: missing {'atomic', 'macro', 'binary', 'include', Identifier} at ']'");

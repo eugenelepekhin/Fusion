@@ -82,12 +82,7 @@ namespace Fusion {
 					if(indexExprListContext != null) {
 						foreach(FusionParser.IndexExprListContext index in indexExprListContext) {
 							callPattern.Append('[');
-							bool indexComma = false;
 							foreach(FusionParser.ExprContext indexExpr in index.expr()) {
-								if(indexComma) {
-									callPattern.Append(',');
-								}
-								indexComma = true;
 								arguments.Add(this.Visit(indexExpr));
 								callPattern.Append('$');
 							}

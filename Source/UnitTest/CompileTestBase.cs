@@ -42,12 +42,12 @@ namespace UnitTest {
 			return file;
 		}
 
-		protected byte[]? CompileFile(string file, out int errorCount, out string errors) {
+		protected byte[]? CompileFile(string file, IEnumerable<string>? searchPath, out int errorCount, out string errors) {
 			Assert.IsNotNull(this.TestContext);
 			StringBuilder output = new StringBuilder();
 			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
 				using(BinaryWriter writer = new BinaryWriter(stream)) {
-					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output);
+					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output, searchPath);
 					assembler.Compile(file);
 					errorCount = assembler.ErrorCount;
 					errors = output.ToString();
@@ -64,7 +64,7 @@ namespace UnitTest {
 			Assert.IsNotNull(this.TestContext);
 			string file = this.TestFile();
 			File.WriteAllText(file, text);
-			return this.CompileFile(file, out errorCount, out errors);
+			return this.CompileFile(file, null, out errorCount, out errors);
 		}
 		protected byte[]? Compile(string text, out int errorCount) {
 			return this.Compile(text, out errorCount, out _);

@@ -49,6 +49,14 @@ namespace Fusion {
 						filePath = Path.GetFullPath(file);
 						break;
 					}
+					string? folder = Path.GetDirectoryName(this.SourceFile);
+					if(!string.IsNullOrWhiteSpace(folder)) {
+						file = Path.Combine(folder, item, filePath);
+						if(File.Exists(file)) {
+							filePath = Path.GetFullPath(file);
+							break;
+						}
+					}
 				}
 			}
 			if(File.Exists(filePath)) {
@@ -89,17 +97,12 @@ namespace Fusion {
 					if(indexContext != null && 0 < indexContext.Length) {
 						foreach(FirstPassParser.IndexDeclarationContext index in indexContext) {
 							callPattern.Append('[');
-							bool indexComma = false;
 							foreach(FirstPassParser.IndexNameContext indexNameContext in index.indexName()) {
 								Token indexName = new Token(TokenType.Identifier, indexNameContext.Start, this.SourceFile);
 								if(!paramNames.Add(indexName.Value!)) {
 									this.Assembler.Error(Resource.ParameterRedefinition(name.Value, indexName.Value, indexName.Position));
 								} else {
 									parameters.Add(indexName);
-									if(indexComma) {
-										callPattern.Append(',');
-									}
-									indexComma = true;
 									callPattern.Append('$');
 								}
 							}
