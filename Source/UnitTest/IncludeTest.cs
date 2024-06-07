@@ -46,5 +46,24 @@ namespace UnitTest {
 			this.AssertNoErrors(errorCount);
 			this.AssertEqual(result, 234);
 		}
+
+		[TestMethod]
+		public void RelativeIncludeNotFoundTest() {
+			this.WriteFile("p1\\a", "macro a{123}");
+			string file = this.WriteFile("main", "include \"a\" macro main{a}");
+			byte[]? result = this.CompileFile(file, ["p2"], out int errorCount, out string errors);
+			Assert.IsNull(result);
+			StringAssert.StartsWith(errors, "Include file \"a\" not found");
+		}
+
+		[TestMethod]
+		public void AbsoluteIncludeNotFoundTest() {
+			string include = Path.Combine(this.Folder(), "p3\\a");
+			this.WriteFile("p1\\a", "macro a{123}");
+			string file = this.WriteFile("main", string.Format("include \"{0}\" macro main{{a}}", include.Replace("\\", "\\\\")));
+			byte[]? result = this.CompileFile(file, ["p2"], out int errorCount, out string errors);
+			Assert.IsNull(result);
+			StringAssert.StartsWith(errors, string.Format("Include file \"{0}\" not found", include));
+		}
 	}
 }

@@ -18,7 +18,7 @@ namespace Fusion {
 			this.TokenType = tokenType;
 			this.Position = new Position(file, node.Line, node.Column + 1);
 			this.Value = node.Text;
-			if(this.TokenType == TokenType.String) {
+			if(this.TokenType == TokenType.String || this.TokenType == TokenType.Path) {
 				StringBuilder text = new StringBuilder(this.Value);
 				if(0 < text.Length && text[0] == '"') {
 					text.Remove(0, 1);
@@ -27,16 +27,18 @@ namespace Fusion {
 					text.Remove(text.Length - 1, 1);
 				}
 				if(0 < text.Length) {
-					text.Replace("\\\"", "\"");
 					text.Replace("\\\\", "\\");
-					text.Replace("\\0", "\0");
-					text.Replace("\\a", "\a");
-					text.Replace("\\b", "\b");
-					text.Replace("\\f", "\f");
-					text.Replace("\\n", "\n");
-					text.Replace("\\r", "\r");
-					text.Replace("\\t", "\t");
-					text.Replace("\\v", "\v");
+					if(this.TokenType == TokenType.String) {
+						text.Replace("\\\"", "\"");
+						text.Replace("\\0", "\0");
+						text.Replace("\\a", "\a");
+						text.Replace("\\b", "\b");
+						text.Replace("\\f", "\f");
+						text.Replace("\\n", "\n");
+						text.Replace("\\r", "\r");
+						text.Replace("\\t", "\t");
+						text.Replace("\\v", "\v");
+					}
 				}
 				this.Value = text.ToString();
 			}

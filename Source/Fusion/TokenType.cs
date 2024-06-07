@@ -7,5 +7,6 @@ namespace Fusion {
 		String,
 		Identifier,
 		Operator,
+		Path,
 	}
 }

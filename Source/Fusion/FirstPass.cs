@@ -39,7 +39,7 @@ namespace Fusion {
 		}
 
 		public override int VisitInclude([NotNull] FirstPassParser.IncludeContext context) {
-			Token token = new Token(TokenType.String, context.filePath().Start, this.SourceFile);
+			Token token = new Token(TokenType.Path, context.filePath().Start, this.SourceFile);
 			Debug.Assert(!string.IsNullOrWhiteSpace(token.Value));
 			string filePath = token.Value;
 			if(!File.Exists(filePath) && !Path.IsPathRooted(filePath)) {
@@ -63,7 +63,7 @@ namespace Fusion {
 				this.Assembler.FirstPassParse(filePath);
 				return 0;
 			}
-			this.Assembler.FatalError(Resource.IncludeFileNotFound(filePath, token.Position));
+			this.Assembler.FatalError(Resource.IncludeFileNotFound(token.Value, token.Position));
 			return 1;
 		}
 
