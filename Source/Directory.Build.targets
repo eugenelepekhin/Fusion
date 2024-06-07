@@ -32,7 +32,7 @@
 			<ZipItem Include="$(MSBuildProjectDirectory)\FusionLexer.g4"/>
 			<ZipItem Include="$(MSBuildProjectDirectory)\FusionParser.g4"/>
 			<ZipItem Include="$(DocFolder)\Example.txt"/>
-			<ZipItem Include="$(DocFolder)\Fusion Language v1.docx"/>
+			<ZipItem Include="$(DocFolder)\LanguageDoc.md"/>
 			<ZipItem Include="$(PublishFolder)Fusion.exe"/>
 			<ZipItem Include="$(PublishFolder)Fusion.pdb"/>
 			<ZipItem Include="$(DocFolder)\LabelExample.txt"/>

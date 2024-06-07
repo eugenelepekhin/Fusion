@@ -8,7 +8,7 @@
 
     <Description>Fusion language compiler.</Description>
     <Copyright>LogicCircuit.org</Copyright>
-    <Version>4.$([System.DateTime]::UtcNow.ToString("yy.MMdd"))</Version>
+    <Version>5.$([System.DateTime]::UtcNow.ToString("yy.MMdd"))</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
