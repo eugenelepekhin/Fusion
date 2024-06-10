@@ -40,22 +40,22 @@ namespace UnitTest {
 	}
 
 	public static class AssemblerFactory {
-		public static Assembler Create(TestContext testContext, BinaryWriter writer, StringBuilder? output, IEnumerable<string>? searchPath) {
+		public static Assembler Create(TestContext testContext, OutputWriter writer, StringBuilder? output, IEnumerable<string>? searchPath) {
 			TestWriter testWriter = new TestWriter(testContext);
 			testWriter.Output = output;
 			return new Assembler(testWriter, testWriter, writer, searchPath ?? new List<string>());
 		}
 
-		public static Assembler Create(TestContext testContext, BinaryWriter writer, StringBuilder? output) {
+		public static Assembler Create(TestContext testContext, OutputWriter writer, StringBuilder? output) {
 			return AssemblerFactory.Create(testContext, writer, output, null);
 		}
 
-		public static Assembler Create(TestContext testContext, BinaryWriter writer) {
+		public static Assembler Create(TestContext testContext, OutputWriter writer) {
 			return AssemblerFactory.Create(testContext, writer, null);
 		}
 
 		public static Assembler Create(TestContext testContext) {
-			return AssemblerFactory.Create(testContext, new BinaryWriter(new MemoryStream(16 * 1024)));
+			return AssemblerFactory.Create(testContext, new OutputWriter(OutputWriter.OutputType.Binary, 15, " "));
 		}
 	}
 }

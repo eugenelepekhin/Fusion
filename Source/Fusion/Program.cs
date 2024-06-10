@@ -13,13 +13,31 @@ namespace Fusion {
 			private string? inputFile;
 			private string? outputFile;
 			private List<string>? searchPath;
+			private OutputWriter.OutputType outputType;
+			private int textRowWidth;
+			private string seperator;
 
 			public bool Parse(string[] args) {
 				string? path = null;
 				List<string> arguments = new List<string>();
+				OutputWriter.OutputType outputType = OutputWriter.OutputType.Binary;
+				int textRowWidth = 16;
+				string? seperator = null;
 				bool showHelp = false;
 				CommandLine commandLine = new CommandLine()
 					.AddString("include", "i", "<path>", "Semicolon separated list of folders to search for includes", false, p=> path = p)
+					.AddEnum<OutputWriter.OutputType>("output", "o", "<output>", "Defines type of output file (default is binary file)", false,
+						[
+							new(OutputWriter.OutputType.Binary, "Binary", "b", " - Binary file."),
+							new(OutputWriter.OutputType.TextBinary , "TextBinary", "tb", " - A text file filled with numbers written in binary code."),
+							new(OutputWriter.OutputType.TextDecimal , "TextDecimal", "td", " - A text file filled with decimal numbers."),
+							new(OutputWriter.OutputType.TextHexadecimal , "TextHexadecimal", "tx", " - A text file filled with hexadecimal numbers."),
+						],
+						"Where possible values of <output> are:",
+						ot => outputType = ot
+					)
+					.AddInt("itemsInRow", "w", "<rowItems>", "Number of values in text file row (default is 16)", false, 1, 4096, w => textRowWidth = w)
+					.AddString("separator", "s", "<separator>", "Separator of numbers in one row (default is space ' ')", false, s => seperator = s)
 					.AddFlag("help", "?", "Show this help", false, h => showHelp = h)
 				;
 				string? errors = commandLine.Parse(args, a => arguments.AddRange(a));
@@ -52,9 +70,17 @@ namespace Fusion {
 						return false;
 					}
 				}
+				Token token = new Token(TokenType.String, new Position("", 0, 0), seperator ?? " ");
+				seperator = token.Value;
+				Debug.Assert(seperator != null);
+				
 				this.inputFile = arguments[0];
 				this.outputFile = arguments[1];
 				this.searchPath = list;
+
+				this.outputType = outputType;
+				this.textRowWidth = textRowWidth;
+				this.seperator = seperator;
 				return true;
 			}
 
@@ -72,6 +98,10 @@ namespace Fusion {
 				Debug.Assert(this.searchPath != null);
 				return this.searchPath;
 			}
+
+			public OutputWriter.OutputType OutputType() => this.outputType;
+			public int OutputRowWidth() => this.textRowWidth;
+			public string OutputSeparator() => this.seperator;
 		}
 
 		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
@@ -84,30 +114,24 @@ namespace Fusion {
 			try {
 				Arguments arguments = new Arguments();
 				if(arguments.Parse(args)) {
-					using(MemoryStream bin = new MemoryStream(16 * 1024)) {
-						using(BinaryWriter writer = new BinaryWriter(bin)) {
-							Assembler assembler = new Assembler(Console.Error, Console.Out, writer, arguments.SearchPath());
-							Exception? exception = Program.RunOnBigStack(() => assembler.Compile(arguments.InputFile()));
-							if(exception != null) {
-								if(exception is FileNotFoundException fileNotFoundException) {
-									assembler.ErrorOutput.WriteLine(fileNotFoundException.Message);
-								} else {
-									assembler.ErrorOutput.WriteLine(exception.ToString());
-								}
-							} else {
-								if(assembler.ErrorCount <= 0) {
-									writer.Flush();
-									using(FileStream file = File.Create(arguments.OutputFile())) {
-										bin.WriteTo(file);
-									}
-								}
-								if(assembler.ErrorCount == 0) {
-									assembler.StandardOutput.WriteLine(Resource.SummarySuccess);
-									returnCode = 0;
-								} else {
-									assembler.StandardOutput.WriteLine(Resource.SummaryErrors(assembler.ErrorCount));
-								}
-							}
+					using OutputWriter writer = new OutputWriter(arguments.OutputType(), arguments.OutputRowWidth(), arguments.OutputSeparator());
+					Assembler assembler = new Assembler(Console.Error, Console.Out, writer, arguments.SearchPath());
+					Exception? exception = Program.RunOnBigStack(() => assembler.Compile(arguments.InputFile()));
+					if(exception != null) {
+						if(exception is FileNotFoundException fileNotFoundException) {
+							assembler.ErrorOutput.WriteLine(fileNotFoundException.Message);
+						} else {
+							assembler.ErrorOutput.WriteLine(exception.ToString());
+						}
+					} else {
+						if(assembler.ErrorCount <= 0) {
+							writer.SaveFile(arguments.OutputFile());
+						}
+						if(assembler.ErrorCount == 0) {
+							assembler.StandardOutput.WriteLine(Resource.SummarySuccess);
+							returnCode = 0;
+						} else {
+							assembler.StandardOutput.WriteLine(Resource.SummaryErrors(assembler.ErrorCount));
 						}
 					}
 				}

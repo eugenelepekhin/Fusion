@@ -23,7 +23,7 @@ namespace Fusion {
 		public TextWriter ErrorOutput { get; }
 		public TextWriter StandardOutput { get; }
 
-		private readonly BinaryWriter writer;
+		private readonly OutputWriter writer;
 
 		public int ErrorCount { get; private set; }
 		private bool fatalError;
@@ -50,7 +50,7 @@ namespace Fusion {
 
 		public BinaryFormatter BinaryFormatter { get; private set; }
 
-		public Assembler(TextWriter errorOutput, TextWriter standardOutput, BinaryWriter writer, IEnumerable<string> searchPath) {
+		public Assembler(TextWriter errorOutput, TextWriter standardOutput, OutputWriter writer, IEnumerable<string> searchPath) {
 			this.ErrorOutput = errorOutput;
 			this.StandardOutput = standardOutput;
 			this.writer = writer;

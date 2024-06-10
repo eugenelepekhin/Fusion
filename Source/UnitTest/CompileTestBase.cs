@@ -45,19 +45,38 @@ namespace UnitTest {
 		protected byte[]? CompileFile(string file, IEnumerable<string>? searchPath, out int errorCount, out string errors) {
 			Assert.IsNotNull(this.TestContext);
 			StringBuilder output = new StringBuilder();
-			using(MemoryStream stream = new MemoryStream(16 * 1024)) {
-				using(BinaryWriter writer = new BinaryWriter(stream)) {
-					Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output, searchPath);
-					assembler.Compile(file);
-					errorCount = assembler.ErrorCount;
-					errors = output.ToString();
-					if(assembler.ErrorCount <= 0) {
-						writer.Flush();
-						return stream.ToArray();
-					}
-				}
+			using OutputWriter writer = new OutputWriter(OutputWriter.OutputType.Binary, 16, " ");
+			Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output, searchPath);
+			assembler.Compile(file);
+			errorCount = assembler.ErrorCount;
+			errors = output.ToString();
+			if(assembler.ErrorCount <= 0) {
+				return writer.ToArray();
 			}
 			return null;
+		}
+
+		protected string? CompileFileToText(string file, OutputWriter.OutputType outputType, int rowWidth, out int errorCount, out string errors) {
+			Assert.IsNotNull(this.TestContext);
+			StringBuilder output = new StringBuilder();
+			using OutputWriter writer = new OutputWriter(outputType, rowWidth, " ");
+			Assembler assembler = AssemblerFactory.Create(this.TestContext, writer, output, null);
+			assembler.Compile(file);
+			errorCount = assembler.ErrorCount;
+			errors = output.ToString();
+			if(assembler.ErrorCount <= 0) {
+				string outputFile = file + ".txt";
+				writer.SaveFile(outputFile);
+				return File.ReadAllText(outputFile);
+			}
+			return null;
+		}
+
+		protected string? CompileToText(string text, OutputWriter.OutputType outputType, int rowWidth, out int errorCount, out string errors) {
+			Assert.IsNotNull(this.TestContext);
+			string file = this.TestFile();
+			File.WriteAllText(file, text);
+			return this.CompileFileToText(file, outputType, rowWidth, out errorCount, out errors);
 		}
 
 		private byte[]? Compile(string text, out int errorCount, out string errors) {

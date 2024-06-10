@@ -14,10 +14,10 @@ namespace Fusion {
 		public Position Position { get; }
 		public string? Value { get; }
 
-		public Token(TokenType tokenType, IToken node, string file) {
+		public Token(TokenType tokenType, Position position, string? value) {
 			this.TokenType = tokenType;
-			this.Position = new Position(file, node.Line, node.Column + 1);
-			this.Value = node.Text;
+			this.Position = position;
+			this.Value = value;
 			if(this.TokenType == TokenType.String || this.TokenType == TokenType.Path) {
 				StringBuilder text = new StringBuilder(this.Value);
 				if(0 < text.Length && text[0] == '"') {
@@ -42,6 +42,9 @@ namespace Fusion {
 				}
 				this.Value = text.ToString();
 			}
+		}
+
+		public Token(TokenType tokenType, IToken node, string file) : this(tokenType, new Position(file, node.Line, node.Column + 1), node.Text) {
 		}
 		public Token(TokenType tokenType, ITerminalNode node, string file) : this(tokenType, node.Symbol, file) {
 		}

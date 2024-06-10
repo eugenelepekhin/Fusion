@@ -4,10 +4,10 @@ using System.IO;
 namespace Fusion {
 	public abstract class BinaryFormatter {
 		public abstract int CellSize { get; }
-		protected BinaryWriter Writer { get; }
-		public long	Position { get { return this.Writer.BaseStream.Position; } }
+		protected OutputWriter Writer { get; }
+		public long	Position { get { return this.Writer.Position; } }
 
-		protected BinaryFormatter(BinaryWriter writer) {
+		protected BinaryFormatter(OutputWriter writer) {
 			this.Writer = writer;
 		}
 
@@ -18,7 +18,7 @@ namespace Fusion {
 	public class BinaryFormatter8 : BinaryFormatter {
 		public override int CellSize { get { return 8; } }
 
-		public BinaryFormatter8(BinaryWriter writer) : base(writer) {
+		public BinaryFormatter8(OutputWriter writer) : base(writer) {
 		}
 
 		public override string? Write(char value) {
@@ -40,7 +40,7 @@ namespace Fusion {
 	public class BinaryFormatter16 : BinaryFormatter {
 		public override int CellSize { get { return 16; } }
 
-		public BinaryFormatter16(BinaryWriter writer) : base(writer) {
+		public BinaryFormatter16(OutputWriter writer) : base(writer) {
 		}
 
 		public override string? Write(char value) {
@@ -62,7 +62,7 @@ namespace Fusion {
 	public class BinaryFormatter32 : BinaryFormatter {
 		public override int CellSize { get { return 32; } }
 
-		public BinaryFormatter32(BinaryWriter writer) : base(writer) {
+		public BinaryFormatter32(OutputWriter writer) : base(writer) {
 		}
 
 		public override string? Write(char value) {

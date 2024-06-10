@@ -13,7 +13,7 @@ namespace UnitTest {
 		}
 
 		[TestMethod]
-		public void ArithmExprTest() {
+		public void ArithmeticExprTest() {
 			this.CompileTest("macro main{!3 !0 (+4) (-3) (~5)}", 0, 1, 4, (byte)((-3) & 0xFF), (byte)((~5) & 0xFF));
 
 			this.CompileTest("macro main{(1+2) (-3+-4) (\"abc\"+\"def\")}", 3, (-7 & 0xFF), (byte)'a', (byte)'b', (byte)'c', (byte)'d', (byte)'e', (byte)'f', 0);
@@ -340,6 +340,22 @@ namespace UnitTest {
 			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a}", 1, 2, 0xABCD, 3, 4, 5, 3);
 			this.CompileTest32("binary 32 macro main{1 2 0xABCD a: 3 4 5 a + 0x70000000}", 1, 2, 0xABCD, 3, 4, 5, 0x70000003);
 			this.CompileTest32("binary 32 macro main{1 2 a 0x1234ADBC a: 3 4 5 a 6}", 1, 2, 4, 0x1234ADBC, 3, 4, 5, 4, 6 );
+		}
+
+		[TestMethod]
+		public void CompileTextOutputTest() {
+			void test(Fusion.OutputWriter.OutputType outputType, int rowWidth, string input, params string[] expected) {
+				string? output = this.CompileToText(input, outputType, rowWidth, out int errorCount, out string errors);
+				Assert.AreEqual(0, errorCount);
+				Assert.IsNotNull(output);
+				string[] actual = output.Split([" ", "\r\n"], StringSplitOptions.RemoveEmptyEntries);
+				this.AreEqual(expected, actual);
+			}
+
+			test(Fusion.OutputWriter.OutputType.TextDecimal, 16, "macro main{1 2}", "1", "2");
+			test(Fusion.OutputWriter.OutputType.TextDecimal, 2, "macro main{1 2 3}", "1", "2", "3");
+			test(Fusion.OutputWriter.OutputType.TextBinary, 2, "macro main{2 3 5 7}", "00000010", "00000011", "00000101", "00000111");
+			test(Fusion.OutputWriter.OutputType.TextHexadecimal, 2, "macro main{2 3 0xa5 0xc7}", "02", "03", "A5", "C7");
 		}
 	}
 }
