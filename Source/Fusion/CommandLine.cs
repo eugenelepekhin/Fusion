@@ -139,7 +139,7 @@ namespace CommandLineParser {
 							string value = Parameter.Trim(match.Groups["value"].Value);
 							if(separatorIsEmpty && value.Length == 0 && parameter.ExpectValue()) {
 								if(i + 1 < args.Length) {
-									value = Parameter.Trim(args[++i]); // assume next argument is the value. Note! the index of the loop is advanced here.
+									value = args[++i]; // assume next argument is the value. Note! the index of the loop is advanced here. Also if it's in the next argument do not trim as it maybe important spaces.
 								} else {
 									errors.Add(string.Format(CultureInfo.InvariantCulture, "Parameter \"{0}\" is missing its value", text));
 									break;
