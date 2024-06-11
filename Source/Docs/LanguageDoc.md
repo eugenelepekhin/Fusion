@@ -1,6 +1,25 @@
 # Fusion Language
 
-A Fusion file is made up of macro definitions or include statements.
+<!--TOC-->
+  - [Introduction](#introduction)
+    - [Literals](#literals)
+    - [Macro substitution](#macro-substitution)
+    - [Binary output](#binary-output)
+    - [Parameters](#parameters)
+  - [Expressions](#expressions)
+  - [Operators](#operators)
+  - [Comments](#comments)
+  - [Labels](#labels)
+  - [Formal definition of the Fusion language](#formal-definition-of-the-fusion-language)
+  - [Some practical examples:](#some-practical-examples)
+    - [Defining and using addition assembly instruction for some hypothetical CPU](#defining-and-using-addition-assembly-instruction-for-some-hypothetical-cpu)
+    - [Defining and using labels](#defining-and-using-labels)
+    - [Filling up memory block with 0](#filling-up-memory-block-with-0)
+  - [Command line options](#command-line-options)
+<!--/TOC-->
+
+## Introduction
+A Fusion file is made up of macro definitions, include statements, or optional one definition of binary type output.
 An include statement allows the reuse of previously defined macros and is structured as follows:
 
 ```
@@ -45,6 +64,7 @@ C:\FusionTest>fusion Test1.asm Test1.bin
 ```
 
 To view the content of the Test1.bin file, open it in a binary viewer or editor of your choice.
+Alternatively you can generate text file with binary, decimal or hexadecimal representation of the binary output. For details see the command line options.
 If you don't have one, you can use [LogicCircuit](https://logiccircuit.org/) by creating a ROM circuit and setting its data and address bit width to 8 bits each.
 Then, in the ROM dialog, click the "Load…" button, select the bin file, and click "OK". You'll see the content of the file in the editor grid.
 
@@ -58,9 +78,11 @@ macro main { 3 4 5 6 }
 
 This will produce a 4-byte file.
 
+### Literals
+
 Each number in Fusion can be in one of the following forms:
 
--	Integer number (e.g., 1, 3, 100, 1024)
+-	Decimal number (e.g., 1, 3, 100, 1024)
 -	Hexadecimal number (e.g., 0x1, 0xFF, 0x3c)
 -	Binary number (e.g., 0b1, 0b0, 0b1010101)
 -	Octal number (e.g., 0127)
@@ -76,7 +98,9 @@ Instead of number you can put a string in form:
 In the output it will be replaced with ASCII representation of all the characters between the quotas.
 At the end it will be a 0 byte to indicate the end of the string.
 
-Now let see some more complex example:
+### Macro substitution
+
+Now let's look at some more complex example:
 
 ```
 macro ThreeAndFive { 3 5 }
@@ -94,6 +118,20 @@ macro main { 3 + 4 }
 ```
 
 This will produce one byte file with content 7.
+
+### Binary output
+By default the compiler will output each number as one byte.
+If you need to output it as two byte number or 4 byte number you can specify this with "binary" keyword, folowed by number of output bits:
+
+```
+binary 16
+```
+or
+```
+binary 32
+```
+
+It is only possible to specify 8, 16, or 32 bit outputs.
 
 ### Parameters
 Macros can have parameters, as shown in this example:
@@ -165,7 +203,7 @@ You can group expression in parentheses ( and ).
 The language cannot be full without conditional operators. In Fusion it is "if" statement which comes in form:
 
 ```
-if(condition) \{ true clause \} [else \{ false clause\}]
+if(condition) { true clause } [else { false clause }]
 ```
 
 The else part is optional. The condition is an expression which is evaluated to some number.
@@ -237,11 +275,12 @@ This will produce binary file with content: 3, 4, 5, 2, 6. Number 2 was the resu
 During successful compilation Fusion will print out listing. In order to make the listing more readable you can prepend macro definition with "atomic" keyword.
 This will put all the output of the macro in the listing in one line instead of breaking it up to each inner call.
 
-## Formal definition of the Fusion language.
-Please refer to formal grammar in the two files: FusionLexer.g4 and FusionParser.g4
+## Formal definition of the Fusion language
+Please refer to formal grammar in the two files: [FusionLexer.g4](../Fusion/FusionLexer.g4) and [FusionParser.g4](../Fusion/FusionParser.g4)
 These two files are in the ANTLR4 syntax and used to generate the language parser.
 
 ## Some practical examples:
+
 ### Defining and using addition assembly instruction for some hypothetical CPU
 
 ```
@@ -314,5 +353,12 @@ macro Fill value, size {
 macro main {
 	Fill 0, 10
 }
+```
+
+## Command line options
+To see command line options of the compiler just execute in command line the following command:
+
+```
+Fusion.exe /?
 ```
 
