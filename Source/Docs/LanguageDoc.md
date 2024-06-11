@@ -64,11 +64,9 @@ C:\FusionTest>fusion Test1.asm Test1.bin
 ```
 
 To view the content of the Test1.bin file, open it in a binary viewer or editor of your choice.
-Alternatively you can generate text file with binary, decimal or hexadecimal representation of the binary output. For details see the command line options.
 If you don't have one, you can use [LogicCircuit](https://logiccircuit.org/) by creating a ROM circuit and setting its data and address bit width to 8 bits each.
 Then, in the ROM dialog, click the "Load…" button, select the bin file, and click "OK". You'll see the content of the file in the editor grid.
-
-
+Alternatively you can generate text file with binary, decimal or hexadecimal representation of the binary output. For details see the command line options.
 
 Another example:
 
