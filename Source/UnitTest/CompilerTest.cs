@@ -110,8 +110,9 @@ namespace UnitTest {
 			this.CompileErrorsTest("macro foo {1} macro main{bar 2}", "Undefined macro bar at");
 			this.CompileErrorsTest("macro a b[c] {b c} macro a b[c]{b c} macro main{a 5[6]}", "Macro a redefined at");
 
-			// macro without parameters can't be reloaded.
+			// macro without parameters can't be overloaded.
 			this.CompileErrorsTest("macro a{1} macro a b{b} macro main{a a 5}", "Macro a redefined at");
+			this.CompileErrorsTest("macro a{1} macro a [b]{b} macro main{a a[5]}", "Macro a redefined at");
 
 			// test for index calls
 			this.CompileTest("macro a b[c]{b c} macro main{a 5[6]}", 5, 6);
