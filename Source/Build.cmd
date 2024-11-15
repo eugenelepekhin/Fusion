@@ -7,5 +7,11 @@ if "%VSCMD_VER%" == "" (
 
 @echo on
 
-msbuild -r -p:Configuration=Release Fusion.sln
-rem @if "%ERRORLEVEL%" NEQ "0" (exit /B)
+msbuild -r -p:Configuration=Release Tools\ResourceWrapper.Generator\ResourceWrapper.Generator.csproj
+@if "%ERRORLEVEL%" NEQ "0" (exit /B)
+
+dotnet publish -c Release Fusion\Fusion.csproj
+@if "%ERRORLEVEL%" NEQ "0" (exit /B)
+
+msbuild -p:Configuration=Release -t:ZipResult Fusion
+@if "%ERRORLEVEL%" NEQ "0" (exit /B)

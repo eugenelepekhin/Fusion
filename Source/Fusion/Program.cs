@@ -107,6 +107,7 @@ namespace Fusion {
 		[SuppressMessage("Microsoft.Design", "CA1031:Do not catch general exception types")]
 		internal static int Main(string[] args) {
 			Console.Out.WriteLine(Resource.AppTitle(typeof(Program).Assembly.GetName().Version!.ToString(3)));
+			//Console.Out.WriteLine(".net version={0}", Environment.Version);
 			int returnCode = 1;
 			#if DEBUG
 				Stopwatch stopwatch = Stopwatch.StartNew();

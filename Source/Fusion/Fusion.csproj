@@ -12,9 +12,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-	<PublishFolder>$(MSBuildThisFileDirectory)bin\$(Configuration)\publish\</PublishFolder>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishTrimmed>true</PublishTrimmed>
+	<PublishFolder Condition="'$(PublishFolder)' == ''">$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\publish\</PublishFolder>
   </PropertyGroup>
 
   <ItemGroup>

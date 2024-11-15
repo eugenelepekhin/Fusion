@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
 
-	<Target Name="PublishProject" AfterTargets="AfterBuild" Condition="'$(Configuration)' == 'Release' and '$(PublishFolder)' != ''">
+	<Target Name="PublishProject" AfterTargets="AfterBuild" Condition="'$(Configuration)' == 'Release' and '$(PublishFolder)' != '' and '$(MSBuildProjectName)' != 'Fusion'">
 		<PropertyGroup>
 			<Command>dotnet publish $(MSBuildProjectFile) --no-build -o $(PublishFolder) -c Release</Command>
 		</PropertyGroup>
@@ -23,7 +23,7 @@
 		<Exec Condition="'%(EmbeddedResource.Generator)'!='' and '%(EmbeddedResource.LastGenOutput)' != ''" Command="$(ResourceWrapperGeneratorCommand)"/>
 	</Target>
 
-	<Target Name="ZipResult" AfterTargets="PublishProject" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
+	<Target Name="ZipResult" Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Fusion'">
 		<PropertyGroup>
 			<DocFolder>$(MSBuildThisFileDirectory)Docs</DocFolder>
 		</PropertyGroup>

@@ -5,6 +5,7 @@
 		<PublishFolder>$(ToolsFolder)</PublishFolder>
 		<SelfContained>false</SelfContained>
 		<PublishReadyToRun>false</PublishReadyToRun>
+		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
 
 </Project>
