@@ -11,8 +11,9 @@
 		<SelfContained>true</SelfContained>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<PublishSingleFile>true</PublishSingleFile>
-		<!--<PublishReadyToRun>false</PublishReadyToRun>-->
+		<PublishReadyToRun>false</PublishReadyToRun>
 		<PublishTrimmed>true</PublishTrimmed>
+		<PublishFolder>$(MSBuildProjectDirectory)\bin\publish\</PublishFolder>
 	</PropertyGroup>
 
 </Project>

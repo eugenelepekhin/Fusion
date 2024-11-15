@@ -11,10 +11,6 @@
     <Version>5.$([System.DateTime]::UtcNow.ToString("yy.MMdd"))</Version>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-	<PublishFolder Condition="'$(PublishFolder)' == ''">$(MSBuildThisFileDirectory)bin\$(Configuration)\$(TargetFramework)\$(RuntimeIdentifier)\publish\</PublishFolder>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Antlr4" Version="4.6.6">
       <PrivateAssets>all</PrivateAssets>
