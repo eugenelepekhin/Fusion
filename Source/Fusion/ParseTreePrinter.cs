@@ -165,7 +165,7 @@ namespace Fusion {
 		}
 
 		public override int VisitPrint([NotNull] FusionParser.PrintContext context) {
-			this.Write("{0} (", context.start.Text);
+			this.Write("{0} (", context.Start.Text);
 			this.Visit(context.expr());
 			this.Write(")");
 			return 0;

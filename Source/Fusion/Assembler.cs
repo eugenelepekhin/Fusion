@@ -170,7 +170,7 @@ namespace Fusion {
 			}
 			if(!this.Files.TryGetValue(file, out var pass) || pass < currentPass) {
 				this.Files[file] = currentPass;
-				FusionErrorListner errorListner = new FusionErrorListner(this, file);
+				FusionErrorListener errorListner = new FusionErrorListener(this, file);
 				using TextReader reader = new StreamReader(file);
 				FusionLexer fusionLexer = new FusionLexer(new AntlrInputStream(reader));
 				fusionLexer.RemoveErrorListeners();
