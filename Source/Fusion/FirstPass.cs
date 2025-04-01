@@ -95,6 +95,7 @@ namespace Fusion {
 					}
 					FirstPassParser.IndexDeclarationContext[] indexContext = parameterContext.indexDeclaration();
 					if(indexContext != null && 0 < indexContext.Length) {
+						bool innerComma = false;
 						foreach(FirstPassParser.IndexDeclarationContext index in indexContext) {
 							callPattern.Append('[');
 							foreach(FirstPassParser.IndexNameContext indexNameContext in index.indexName()) {
@@ -103,10 +104,15 @@ namespace Fusion {
 									this.Assembler.Error(Resource.ParameterRedefinition(name.Value, indexName.Value, indexName.Position));
 								} else {
 									parameters.Add(indexName);
+									if(innerComma) {
+										callPattern.Append(',');
+									}
+									innerComma = true;
 									callPattern.Append('$');
 								}
 							}
 							callPattern.Append(']');
+							innerComma = false;
 						}
 					}
 				}

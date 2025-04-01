@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest {
 	[TestClass]
@@ -361,6 +362,13 @@ namespace UnitTest {
 			test(Fusion.OutputWriter.OutputType.TextDecimal, 2, "macro main{1 2 3}", "1", "2", "3");
 			test(Fusion.OutputWriter.OutputType.TextBinary, 2, "macro main{2 3 5 7}", "00000010", "00000011", "00000101", "00000111");
 			test(Fusion.OutputWriter.OutputType.TextHexadecimal, 2, "macro main{2 3 0xa5 0xc7}", "02", "03", "A5", "C7");
+		}
+
+		[TestMethod]
+		public void CompileListingTest() {
+			string listing = this.CompileListing("macro argsCall x{if(x<5){args 1[2,3]}else{args 4[5,6]}} macro args a[b,c]{a b c} macro main{argsCall 5}");
+			StringAssert.Matches(listing, new Regex(@"args 1\[2, 3]"));
+			StringAssert.Matches(listing, new Regex(@"args 4\[5, 6]"));
 		}
 	}
 }

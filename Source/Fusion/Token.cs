@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -9,7 +10,7 @@ using Antlr4.Runtime.Tree;
 
 namespace Fusion {
 	
-	public class Token : IEquatable<Token> {
+	public class Token : IEquatable<Token>, IWritable {
 		public TokenType TokenType { get; }
 		public Position Position { get; }
 		public string? Value { get; }
@@ -166,6 +167,8 @@ namespace Fusion {
 			}
 			return false;
 		}
+
+		public void WriteListing(TextWriter writer) => writer.Write(this.Value);
 
 		#if DEBUG
 			public override string ToString() {

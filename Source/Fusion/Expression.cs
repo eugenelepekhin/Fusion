@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 
 namespace Fusion {
-	public abstract class Expression : Value {
+	public abstract class Expression : Value, IWritable {
 		public override bool IsComplete { get { return false; } }
 
 		public abstract void WriteText(TextWriter writer, int indent);
@@ -26,6 +26,8 @@ namespace Fusion {
 		public override Value WriteValue(Assembler assembler) {
 			throw new InvalidOperationException();
 		}
+
+		public virtual void WriteListing(TextWriter writer) => this.WriteText(writer, 0);
 
 		#if DEBUG
 			public override string ToString() {
@@ -575,13 +577,8 @@ namespace Fusion {
 		public override void WriteText(TextWriter writer, int indent) {
 			writer.Write(this.Name.Value);
 			if(0 < this.Argument.Count) {
-				for(int i = 0; i < this.Argument.Count; i++) {
-					if(0 < i) {
-						writer.Write(",");
-					}
-					writer.Write(" ");
-					this.Argument[i].WriteText(writer, 0);
-				}
+				writer.Write(' ');
+				this.Macro.WriteWithPattern(this.Argument, writer);
 			}
 		}
 
@@ -636,6 +633,9 @@ namespace Fusion {
 					list.WriteListing(assembler, resultList, indent);
 					return 0;
 				}
+				if(expr is not Label) {
+					Expression.Indent(assembler.StandardOutput, indent);
+				}
 				if(expr is CallExpr call) {
 					Debug.Assert(resultList != null);
 					call.WriteText(assembler.StandardOutput, indent);
@@ -648,7 +648,7 @@ namespace Fusion {
 							}
 							assembler.StandardOutput.WriteLine();
 						} else {
-							call.Macro.Body.WriteListing(assembler, resultList, indent + 1);
+							call.Macro.Body.WriteListing(assembler, resultList, indent);
 						}
 					}
 					return 0;

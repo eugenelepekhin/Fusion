@@ -5,6 +5,10 @@ using System.IO;
 using System.Linq;
 
 namespace Fusion {
+	public interface IWritable {
+		void WriteListing(TextWriter writer);
+	}
+
 	public class MacroDefinition {
 		public Token Name { get; }
 		public IList<Token> Parameters { get; }
@@ -41,12 +45,9 @@ namespace Fusion {
 			}
 			writer.Write("macro ");
 			writer.Write(this.Name.Value);
-			for(int i = 0; i < this.Parameters.Count; i++) {
-				if(0 < i) {
-					writer.Write(",");
-				}
-				writer.Write(" ");
-				writer.Write(this.Parameters[i].Value);
+			if(0 < this.Parameters.Count) {
+				writer.Write(' ');
+				this.WriteWithPattern(this.Parameters, writer);
 			}
 			if(this.Body != null) {
 				writer.WriteLine(" {");
@@ -59,6 +60,26 @@ namespace Fusion {
 			} else {
 				writer.WriteLine(" !!! No Body !!!");
 			}
+		}
+
+		public void WriteWithPattern<T>(IEnumerable<T> list, TextWriter writer) where T:IWritable {
+			string pattern = this.CallPattern;
+			int index = 0;
+			void decorate() {
+				while(index < pattern.Length && pattern[index] != '$') {
+					writer.Write(pattern[index]);
+					if(pattern[index] == ',') {
+						writer.Write(" ");
+					}
+					index++;
+				}
+				index++;
+			}
+			foreach(T item in list) {
+				decorate();
+				item.WriteListing(writer);
+			}
+			decorate();
 		}
 
 		#if DEBUG

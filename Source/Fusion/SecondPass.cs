@@ -80,13 +80,19 @@ namespace Fusion {
 					}
 					FusionParser.IndexExprListContext[] indexExprListContext = arg.indexExprList();
 					if(indexExprListContext != null) {
+						bool innerComma = false;
 						foreach(FusionParser.IndexExprListContext index in indexExprListContext) {
 							callPattern.Append('[');
 							foreach(FusionParser.ExprContext indexExpr in index.expr()) {
 								arguments.Add(this.Visit(indexExpr));
+								if(innerComma) {
+									callPattern.Append(',');
+								}
+								innerComma = true;
 								callPattern.Append('$');
 							}
 							callPattern.Append(']');
+							innerComma = false;
 						}
 					}
 				}

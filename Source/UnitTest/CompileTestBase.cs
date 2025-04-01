@@ -150,6 +150,14 @@ namespace UnitTest {
 			return errors;
 		}
 
+		protected string CompileListing(string text) {
+			int count;
+			string listing;
+			this.Compile(text, out count, out listing);
+			Assert.IsTrue(0 == count && !string.IsNullOrEmpty(listing), "Expecting listing and no errors.");
+			return listing;
+		}
+
 		protected void CompileErrorsTest(string text, string? errorFragment) {
 			string errors = this.CompileErrors(text);
 			errorFragment = string.IsNullOrWhiteSpace(errorFragment) ? ".*" : errorFragment;
