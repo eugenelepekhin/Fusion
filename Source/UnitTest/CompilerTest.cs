@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest {
@@ -366,9 +367,74 @@ namespace UnitTest {
 
 		[TestMethod]
 		public void CompileListingTest() {
-			string listing = this.CompileListing("macro argsCall x{if(x<5){args 1[2,3]}else{args 4[5,6]}} macro args a[b,c]{a b c} macro main{argsCall 5}");
-			StringAssert.Matches(listing, new Regex(@"args 1\[2, 3]"));
-			StringAssert.Matches(listing, new Regex(@"args 4\[5, 6]"));
+			string unspace(string input) => Regex.Replace(input, @"\s", "");
+			void test(string text, string[] expected) {
+				Assert.IsNotNull(this.TestContext);
+				Debug.WriteLine("Checking listing of:");
+				Debug.WriteLine(text);
+
+				string listing = unspace(this.CompileListing(text));
+				foreach(string line in expected) {
+					StringAssert.Contains(listing, unspace(line));
+				}
+			}
+			test(
+				"macro argsCall x{if(x<5){args 1[2,3]}else{args 4[5,6]}}" +
+				"macro args a[b,c]{a b c}" +
+				"macro main{argsCall 5}",
+				["args 1[2, 3]", "args 4[5, 6]"]
+			);
+			test(
+				"macro a b{b}" +
+				"macro call{a 5}" +
+				"macro main{call}",
+				["a 5"]
+			);
+			test(
+				"macro a [b]{b}" +
+				"macro call{a [5]}" +
+				"macro main{call}",
+				["a [5]"]
+			);
+			test(
+				"macro a b[c]{b c}" +
+				"macro call{a 3[5]}" +
+				"macro main{call}",
+				["a 3[5]"]
+			);
+			test(
+				"macro a [b][c]{b c}" +
+				"macro call{a [3][5]}" +
+				"macro main{call}",
+				["a [3][5]"]
+			);
+			test(
+				"macro a [b,c][d]{b c d}" +
+				"macro call{a [3,4][5]}" +
+				"macro main{call}",
+				["a [3,4][5]"]
+			);
+			test(
+				"macro a [b,c],[d]{b c d}" +
+				"macro call{a [3,4],[5]}" +
+				"macro main{call}",
+				["a [3,4],[5]"]
+			);
+			//Check the right overload is used and listed
+			test(
+				"macro a [b,c],[d]{b+c+d}" +
+				"macro a [b,c],d{b c d}" +
+				"macro call{a [3,4],5}" +
+				"macro main{call}",
+				["a [3,4],5"]
+			);
+			test(
+				"macro a [b,c],[d]{b+c+d}" +
+				"macro a [b,c],d{b c d}" +
+				"macro call{a [3,4],[5]}" +
+				"macro main{call}",
+				["a [3,4],[5]"]
+			);
 		}
 	}
 }
