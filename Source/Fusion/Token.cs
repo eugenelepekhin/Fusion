@@ -13,9 +13,9 @@ namespace Fusion {
 	public class Token : IEquatable<Token>, IWritable {
 		public TokenType TokenType { get; }
 		public Position Position { get; }
-		public string? Value { get; }
+		public string Value { get; }
 
-		public Token(TokenType tokenType, Position position, string? value) {
+		public Token(TokenType tokenType, Position position, string value) {
 			this.TokenType = tokenType;
 			this.Position = position;
 			this.Value = value;

@@ -7,9 +7,6 @@ if "%VSCMD_VER%" == "" (
 
 @echo on
 
-msbuild -r -p:Configuration=Release Tools\ResourceWrapper.Generator\ResourceWrapper.Generator.csproj
-@if "%ERRORLEVEL%" NEQ "0" (exit /B)
-
 msbuild -r -p:Configuration=Release -t:PublishProject Fusion
 @if "%ERRORLEVEL%" NEQ "0" (exit /B)
 
