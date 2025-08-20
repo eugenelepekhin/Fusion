@@ -15,7 +15,7 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
-    <PackageReference Include="EugeneLepekhin.StrongTypeResource" Version="1.0.1" />
+    <PackageReference Include="EugeneLepekhin.StrongTypeResource" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Resource.resx">
-      <Generator>StrongTypeResource.internal</Generator>
+      <Generator>MSBuild:StrongTypeResourceInternal</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
