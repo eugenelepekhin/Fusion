@@ -318,12 +318,12 @@ namespace UnitTest {
 			// concatenation of undefined labels does not allowed
 			int errorCount;
 			byte[]? actual = this.Compile("macro main{1 \"abc\"+a 2 3 a: 4 5}", out errorCount);
-			Assert.IsTrue(0 < errorCount);
+			Assert.IsGreaterThan(0, errorCount);
 
 			// if statement resulting in void value should be ignored to not affect arithmetic
 			this.CompileTest("macro c a {if(a<0){error \"hello\"}a}macro main{1+c 3}", 4);
 			this.CompileTest("macro c a {if(a<0){error \"world\"}a*3}macro main{4+c 5}", 19);
-			// also check for sublist
+			// also check for sub-list
 			this.CompileTest("macro c a{if(a<0){error\"world\"}a*3}macro b a{if(a==1){c 10}else{if(a==2){c 20}else{error\"error\"}}}macro main{4+b 2}", 64);
 			this.CompileTest("macro c a{if(a<0){error\"world\"}a*3}macro b a{if(a==2){c 10}else{if(a==1){error\"error\"}else{c a}}}macro main{4+b 4}", 16);
 		}

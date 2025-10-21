@@ -1,7 +1,8 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using Fusion;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest {
 	public abstract class CompileTestBase {
@@ -89,16 +90,17 @@ namespace UnitTest {
 			return this.Compile(text, out errorCount, out _);
 		}
 
+		[SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods")]
 		protected void AreEqual<E, A>(E[] expected, A[]? actual) where E:IComparable where A:IComparable {
 			Assert.IsNotNull(actual, "Expecting compiler to create an output set of bytes");
-			Assert.AreEqual(expected.Length, actual.Length, "Expecting {0} elements output, while actually it's {1}", expected.Length, actual.Length);
+			Assert.AreEqual(expected.Length, actual.Length, $"Expecting {expected.Length} elements output, while actually it's {actual.Length}");
 			for(int i = 0; i < expected.Length; i++) {
-				Assert.AreEqual(0, expected[i].CompareTo(actual[i]), "Elements at {0} index are different: expecting {1:x}, actual {2:x}", i, expected[i], actual[i]);
+				Assert.AreEqual(0, expected[i].CompareTo(actual[i]), string.Format(CultureInfo.InvariantCulture, "Elements at {0} index are different: expecting {1:x}, actual {2:x}", i, expected[i], actual[i]));
 			}
 		}
 
 		protected void AssertNoErrors(int errorCount) {
-			Assert.AreEqual(0, errorCount, "Expecting compilation pass without errors, while actually it's {0} errors", errorCount);
+			Assert.AreEqual(0, errorCount, $"Expecting compilation pass without errors, while actually it's {errorCount} errors");
 		}
 
 		protected void CompileTest(string text, params byte[] expected) {
@@ -117,16 +119,17 @@ namespace UnitTest {
 			byte[]? actual = this.Compile(text, out errorCount);
 			Assert.IsNotNull(actual, "Expecting compiler to create a set of bytes");
 			Assert.AreEqual(0, errorCount);
-			Assert.AreEqual(expected.Length * 2, actual.Length);
+			Assert.AreEqual(actual.Length, expected.Length * 2);
 			using(MemoryStream stream = new MemoryStream(actual)) {
 				using(BinaryReader reader = new BinaryReader(stream)) {
 					foreach(int expectedItem in expected) {
-						Assert.AreEqual((int)(ushort)reader.ReadInt16(), expectedItem);
+						Assert.AreEqual(expectedItem, (int)(ushort)reader.ReadInt16());
 					}
 				}
 			}
 		}
 
+		[SuppressMessage("Usage", "MSTEST0037:Use proper 'Assert' methods")]
 		protected void CompileTest32(string text, params int[] expected) {
 			int errorCount;
 			byte[]? actual = this.Compile(text, out errorCount);
@@ -136,7 +139,7 @@ namespace UnitTest {
 			using(MemoryStream stream = new MemoryStream(actual)) {
 				using(BinaryReader reader = new BinaryReader(stream)) {
 					foreach(int expectedItem in expected) {
-						Assert.AreEqual(reader.ReadInt32(), expectedItem);
+						Assert.AreEqual(expectedItem, reader.ReadInt32());
 					}
 				}
 			}
@@ -162,7 +165,7 @@ namespace UnitTest {
 			string errors = this.CompileErrors(text);
 			errorFragment = string.IsNullOrWhiteSpace(errorFragment) ? ".*" : errorFragment;
 			StringAssert.Matches(errors, new Regex(errorFragment, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant),
-				"Expected error fragment ({0}) not found in error message: {1}", errorFragment, errors
+				$"Expected error fragment ({errorFragment}) not found in error message: {errors}"
 			);
 		}
 
