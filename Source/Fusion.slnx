@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="../README.md" />
+    <File Path="Docs/Example.txt" />
+    <File Path="Docs/LabelExample.txt" />
+    <File Path="Docs/LanguageDoc.md" />
+    <File Path="Docs/ZeroingBlock.txt" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Build.cmd" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="License.txt" />
+  </Folder>
+  <Project Path="Fusion/Fusion.csproj" />
+  <Project Path="UnitTest/UnitTest.csproj" />
+</Solution>
